@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import axios from 'axios';
+import DatePicker from 'react-datepicker';
+import 'react-datepicker/dist/react-datepicker.css';
 
 const versionOptions = ["Ultra Train", "Super Train", "Minimal Equipment", "Beginner"];
 
@@ -53,12 +55,16 @@ const ClusterCopyForm = () => {
 
       <label>
         Date:
-        <input
-          type="date"
-          value={date}
-          onChange={(e) => setDate(e.target.value)}
-          style={{ marginLeft: '10px' }}
-        />
+        <DatePicker
+  selected={date ? new Date(date) : null}
+  onChange={(dateObj) => {
+    const formatted = dateObj.toISOString().split('T')[0];
+    setDate(formatted);
+  }}
+  dateFormat="yyyy-MM-dd"
+  placeholderText="Select a date"
+  className="custom-datepicker"
+/>
       </label>
 
       <br /><br />
