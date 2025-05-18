@@ -10,6 +10,7 @@ import UploadWorkout from './pages/UploadWorkoutPage';
 import AdminCalendar from './components/admin/AdminCalendar';
 import LibraryPage from './pages/LibraryPage'; // ✅
 import Settings from './components/admin/settings'; // ✅
+import ClusterCopyPage from './pages/ClusterCopyPage';
 
 const App = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -31,6 +32,7 @@ const App = () => {
 
   {/* 🔐 Superadmin-only routes */}
   <Route path="/admin" element={<AdminCalendar />} />
+  <Route path="/admin/cluster-copy" element={<ClusterCopyPage />} />
         <Route path="/library" element={<LibraryPage />} />
         <Route path="/settings" element={<Settings />} />
          {/* Default route */}

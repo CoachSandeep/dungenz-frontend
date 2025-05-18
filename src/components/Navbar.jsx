@@ -74,6 +74,7 @@ const Navbar = () => {
           {adminMenuOpen && (
             <div className="admin-dropdown">
               <button onClick={() => navigate('/admin')}>🛠 Manage Workouts</button>
+              <button onClick={() => navigate('/admin/cluster-copy')}>🔁 Cluster Copy</button>
               <button onClick={() => navigate('/library')}>📚 Library</button>
               <button onClick={() => navigate('/settings')}>Setting</button>
             </div>
