@@ -5,10 +5,10 @@ const SettingsPage = () => {
   const [releaseTime, setReleaseTime] = useState('21:00');
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
-
+  const token = localStorage.getItem('token');
  
   useEffect(() => {
-    const token = localStorage.getItem('token');
+
     const fetchSettings = async () => {
       try {
         const res = await axios.get(`${process.env.REACT_APP_API_BASE_URL}/settings`, {
@@ -40,6 +40,7 @@ const SettingsPage = () => {
           headers: {
             Authorization: `Bearer ${token}`,
           },
+          withCredentials: true, // 👈 Try adding this
         }
       );
       alert("Release time updated successfully!");
