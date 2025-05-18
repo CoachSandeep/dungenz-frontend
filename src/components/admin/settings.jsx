@@ -6,7 +6,9 @@ const SettingsPage = () => {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
 
+ 
   useEffect(() => {
+    console.log("Token being sent:", localStorage.getItem('token'));
     const fetchSettings = async () => {
       try {
         const res = await axios.get(`${process.env.REACT_APP_API_BASE_URL}/settings`, {
