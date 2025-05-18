@@ -34,13 +34,13 @@ const SettingsPage = () => {
     setSaving(true);
     try {
       const res = await axios.post(
-        `${process.env.REACT_APP_API_BASE_URL}/settings/update`,
-        { releaseTime },
+        `${process.env.REACT_APP_API_BASE_URL}settings/update`,
+        { releaseTime: "21:00" },
         {
           headers: {
             Authorization: `Bearer ${token}`,
           },
-          withCredentials: true, // 👈 Try adding this
+          withCredentials: true,
         }
       );
       alert("Release time updated successfully!");
