@@ -1,5 +1,5 @@
 import React from 'react';
-import ClusterCopyForm from '../components/ClusterCopyForm';
+import ClusterCopyForm from '../components/admin/ClusterCopyForm';
 
 const ClusterCopyPage = () => {
   return (
