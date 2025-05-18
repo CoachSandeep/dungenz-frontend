@@ -34,7 +34,7 @@ const SettingsPage = () => {
     setSaving(true);
     try {
       const res = await axios.post(
-        `${process.env.REACT_APP_API_BASE_URL}/settings`,
+        `${process.env.REACT_APP_API_BASE_URL}/settings/update`,
         { releaseTime },
         {
           headers: {
