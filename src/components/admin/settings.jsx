@@ -33,6 +33,7 @@ const SettingsPage = () => {
     });
     // setSaving(true);
     try {
+      console.log("🔥 Token from localStorage:", token);
       const res = await axios.post(
         `${process.env.REACT_APP_API_BASE_URL}/settings/update`,
         { releaseTime: "21:00" },
