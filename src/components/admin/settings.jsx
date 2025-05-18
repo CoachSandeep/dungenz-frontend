@@ -33,16 +33,14 @@ const SettingsPage = () => {
     });
     setSaving(true);
     try {
-      const res = await axios.post(
-        `${process.env.REACT_APP_API_BASE_URL}/settings/update`,
-        { releaseTime },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-          withCredentials: true, // 👈 Try adding this
-        }
-      );
+      const res = await fetch(`${process.env.REACT_APP_API_BASE_URL}settings/update`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',         // ✅ Must manually set
+          'Authorization': `Bearer ${token}`,         // ✅ Token required
+        },
+        body: JSON.stringify({ releaseTime: "23:00" }), // ✅ Must stringify body
+      });
       alert("Release time updated successfully!");
     } catch (err) {
       alert("Failed to save release time.");
