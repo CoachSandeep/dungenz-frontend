@@ -33,7 +33,7 @@ const SettingsPage = () => {
     });
     setSaving(true);
     try {
-      const res = await axios.put(
+      const res = await axios.post(
         `${process.env.REACT_APP_API_BASE_URL}/settings`,
         { releaseTime },
         {
