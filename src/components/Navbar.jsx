@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate, NavLink } from 'react-router-dom';
+import { useNavigate, NavLink, useLocation  } from 'react-router-dom';
 import './../styles/Header.css';
 import logo from '../assets/logo.png';
 import dp from '../assets/dp.png';
@@ -12,7 +12,7 @@ const Navbar = () => {
   const [adminMenuOpen, setAdminMenuOpen] = useState(false);
 
   const navigate = useNavigate();
-
+  const location = useLocation();
   useEffect(() => {
     const token = localStorage.getItem('token');
     const user = JSON.parse(localStorage.getItem('user'));
@@ -23,15 +23,19 @@ const Navbar = () => {
         setIsSuperadmin(true);
       }
     }
-  }, []);
+    setNavOpen(false);
+    setAdminMenuOpen(false);
 
+  }, [location.pathname]);
+
+ 
   const toggleMenu = () => {
     setNavOpen(!navOpen);
     setAdminMenuOpen(false); // Close admin menu if nav toggled
   };
 
   const handleLogout = () => {
-    localStorage.clear();
+    localStorage.removeItem('token');
     setIsLoggedIn(false);
     setIsSuperadmin(false);
     navigate('/login');
