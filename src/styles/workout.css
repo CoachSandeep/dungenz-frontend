@@ -1,0 +1,196 @@
+.horizontal-container {
+  padding: 0.5rem;
+  background-color: #eceaea;
+  min-height: 100vh;
+  color: #fff;
+}
+
+.timeline-heading {
+  text-align: center;
+  font-size: 2rem;
+  margin-bottom: 1.5rem;
+  color: #ff2c2c;
+}
+
+.timeline-horizontal {
+  display: flex;
+  flex-direction: row;
+  overflow-x: auto;
+  white-space: nowrap;
+  scroll-behavior: smooth;
+  padding: 10px 10px;
+  gap: 20px;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none; /* for Firefox */
+}
+
+.timeline-horizontal::-webkit-scrollbar {
+  display: none;
+}
+
+.timeline-date-circle {
+  min-width: 45px;
+  height: 45px;
+  border-radius: 50%;
+  background-color: #222;
+  color: white;
+  text-align: center;
+  cursor: pointer;
+  padding: 8px 0;
+  border: 2px solid #444;
+  transition: 0.3s;
+  flex-shrink: 0;
+}
+
+.timeline-date-circle.active {
+  border-color: #ff2c2c;
+  background-color: #ff2c2c;
+}
+
+.circle-date {
+  font-size: 0.9rem;
+  font-weight: bold;
+}
+
+.circle-day {
+  font-size: 0.6rem;
+  color: #eee;
+}
+
+.timeline-details-box {
+  background-color: #eceaea;
+  border-radius: 10px;
+  
+}
+.timeline-header-w{
+  background-color: #fff;
+}
+
+.timeline-header-w h1 {
+  font-size: 0.9rem;
+  color:#000000;
+}
+
+.timeline-header-w h3 {
+  font-size: 0.9rem;
+  color:#000000;
+}
+
+
+.version-container {
+  margin-top: 0.2rem;
+  background-color: #ffffff;
+  padding: 1rem;
+  border-radius: 8px;
+}
+
+.version-header {
+  margin-bottom: 1rem;
+}
+
+.badge {
+  padding: 5px 10px;
+  font-size: 0.8rem;
+  border-radius: 20px;
+  font-weight: bold;
+  display: inline-block;
+}
+
+.badge-ultratrain { background-color: #ff2c2c; color: white; }
+.badge-supertrain { background-color: #007bff; color: white; }
+.badge-minimalequipment { background-color: #ffc107; color: black; }
+.badge-beginner { background-color: #28a745; color: white; }
+
+.workout-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.workout-item {
+  padding: 0.75rem;
+  background-color: #eceaea;
+  border-radius: 5px;
+  color: #000000;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.workout-item:hover {
+  background-color: #2c2c2c;
+}
+
+.inline-details {
+  font-size: 0.85rem;
+  color: #000000;
+  margin-top: 10px;
+}
+
+.expand-btn {
+  margin-top: 10px;
+  background-color: transparent;
+  color: #ff2c2c;
+  border: 1px solid #ff2c2c;
+  padding: 6px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0,0,0,0.8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 99;
+}
+
+.modal-box {
+  background-color: #111;
+  padding: 2rem;
+  border-radius: 10px;
+  width: 90%;
+  max-width: 500px;
+  color: white;
+  position: relative;
+}
+
+.modal-box button {
+  background-color: #ff2c2c;
+  color: white;
+  padding: 0.6rem 1.2rem;
+  border: none;
+  border-radius: 5px;
+  margin-top: 1rem;
+  cursor: pointer;
+}
+
+.timeline-date-circle.disabled {
+  background-color: #2a2a2a;
+  border-color: #555;
+  color: #888;
+  pointer-events: none;
+}
+
+.timeline-date-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: 0 5px;
+}
+
+.month-heading {
+  font-weight: bold;
+  margin-top: -13px;
+  font-size:0.8rem;
+  color:#000000;
+}
+
+.timeline-label {
+  margin-top: 5px;
+  font-size: 12px;
+}

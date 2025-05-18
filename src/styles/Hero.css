@@ -1,0 +1,38 @@
+
+.hero {
+  height: 100vh;
+  background-image: url('../assets/spartan-bg.jpg');
+  background-size: cover;
+  background-position: center;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.hero-overlay {
+  background: rgba(0, 0, 0, 0.75);
+  padding: 40px;
+  text-align: center;
+  border-radius: 8px;
+}
+
+.hero-title {
+  color: #fff;
+  font-family: 'Anton', sans-serif;
+  font-size: 2rem;
+  font-weight: 700;
+  line-height: 1.4;
+  max-width: 800px;
+  margin: 0 auto 20px;
+}
+
+.hero-btn {
+  background-color: #ff2c2c;
+  color: white;
+  padding: 12px 24px;
+  border-radius: 4px;
+  font-weight: bold;
+  text-decoration: none;
+  font-size: 1rem;
+}

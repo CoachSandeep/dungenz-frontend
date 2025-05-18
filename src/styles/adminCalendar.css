@@ -1,0 +1,178 @@
+.admin-timeline-container {
+    padding: 10px;
+    background: #eceaea;
+  }
+  .timeline-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .date-picker {
+    padding: 6px 10px;
+    border-radius: 6px;
+    border: 1px solid #555;
+    background: #111;
+    color: #fff;
+  }
+  .timeline-horizontal {
+    display: flex;
+    overflow-x: auto;
+    gap: 12px;
+    padding: 10px 0;
+    margin-bottom: 20px;
+  }
+  .timeline-date-circle {
+    text-align: center;
+    padding: 8px;
+    border-radius: 50%;
+    width: 45px;
+    height: 45px;
+    background: #222;
+    color: #ccc;
+    cursor: pointer;
+    font-size: 0.9rem;
+  }
+  .timeline-date-circle.active {
+    background: #ff2c2c;
+    color: #fff;
+  }
+  .timeline-details-box {
+    background: #fff;
+    border-radius: 10px;
+    padding: 10px;
+  }
+  .admin-date-heading {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    color: #ff2c2c;
+  }
+  .add-btn {
+    background: #ff2c2c;
+    border: none;
+    color: #fff;
+    padding: 6px 12px;
+    border-radius: 6px;
+    cursor: pointer;
+  }
+  .version-group {
+    margin-top: 20px;
+    background-color: #eceaea;
+    padding:5px;
+    border-radius:4px;
+  }
+  .badge-title-line {
+    font-weight: bold;
+    margin-bottom: 10px;
+  }
+  .badge {
+    padding: 5px 12px;
+    border-radius: 4px;
+    font-size: 0.8rem;
+    background-color: #333;
+    color: #fff;
+  }
+  .admin-workout-item {
+    background-color:#fff;
+    color: #000;
+    padding: 10px;
+    border-radius: 6px;
+    margin-bottom: 10px;
+  }
+  .workout-title-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .icon-actions svg {
+    margin-left: 10px;
+    color: #2e2d2d;
+    cursor: pointer;
+    transition: 0.2s;
+  }
+  .icon-actions svg:hover {
+    color: #e42121;
+  }
+  
+  .admin-date-heading {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+  }
+  
+  .add-form-box {
+    background: #1a1a1a;
+    padding: 15px;
+    border-radius: 10px;
+    margin-bottom: 20px;
+  }
+  
+  .add-form-box input,
+  .add-form-box textarea {
+    width: 100%;
+    padding: 8px;
+    background: #2a2a2a;
+    border: none;
+    color: white;
+    margin-bottom: 10px;
+    border-radius: 6px;
+  }
+  
+  .cluster-create-box {
+    background: #1b1b1b;
+    padding: 20px;
+    border-radius: 10px;
+    margin: 20px 0;
+  }
+  .cluster-create-box input,
+  .cluster-create-box textarea,
+  .cluster-create-box select {
+    width: 100%;
+    padding: 8px;
+    margin-bottom: 10px;
+    background: #2b2b2b;
+    border: none;
+    color: white;
+    border-radius: 6px;
+  }
+  .cluster-create-box button {
+    margin-right: 10px;
+    padding: 8px 12px;
+  }
+  
+  .filter-bar {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: #fff;
+  }
+
+  .timeline-header .selectfilter{
+    width: 50%;
+
+  }
+
+  .filter-starred
+  {
+ background: #fff;
+ color:#000;
+  }
+
+  .filter-starred label input
+  {
+    width:10%;
+   
+  }
+
+  .timeline-header .label input{
+    width: 50%;
+  }
+
+  .library-section {
+    margin: 20px 0;
+    padding: 10px;
+    border: 1px dashed #aaa;
+    background-color: #f8f8f8;
+    border-radius: 8px;
+  }

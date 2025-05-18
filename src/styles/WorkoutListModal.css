@@ -1,0 +1,44 @@
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.7);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  
+  .modal-box {
+    background: #1e1e1e;
+    padding: 20px;
+    border-radius: 8px;
+    width: 90%;
+    max-width: 500px;
+    color: white;
+  }
+  
+  .workout-item-admin {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin: 10px 0;
+  }
+  
+  .admin-buttons button {
+    margin-left: 5px;
+    font-size: 0.9rem;
+  }
+  
+  .add-workout-btn, .close-modal {
+    margin-top: 15px;
+    padding: 10px;
+    width: 100%;
+    background: #ff2c2c;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    font-weight: bold;
+  }
+  
