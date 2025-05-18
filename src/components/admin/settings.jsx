@@ -8,7 +8,7 @@ const SettingsPage = () => {
 
  
   useEffect(() => {
-    console.log("Token being sent:", localStorage.getItem('token'));
+    const token = localStorage.getItem('token');
     const fetchSettings = async () => {
       try {
         const res = await axios.get(`${process.env.REACT_APP_API_BASE_URL}/settings`, {
@@ -28,13 +28,20 @@ const SettingsPage = () => {
   }, []);
 
   const handleSave = async () => {
+    console.log("🛡 Sending headers:", {
+      Authorization: `Bearer ${token}`
+    });
     setSaving(true);
     try {
-      const res = await axios.put(`${process.env.REACT_APP_API_BASE_URL}/settings`, {
-        headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
-        releaseTime,
-      
-      });
+      const res = await axios.put(
+        `${process.env.REACT_APP_API_BASE_URL}/settings`,
+        { releaseTime },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
       alert("Release time updated successfully!");
     } catch (err) {
       alert("Failed to save release time.");
