@@ -31,10 +31,10 @@ const SettingsPage = () => {
     console.log("🛡 Sending headers:", {
       Authorization: `Bearer ${token}`
     });
-    setSaving(true);
+    // setSaving(true);
     try {
       const res = await axios.post(
-        `${process.env.REACT_APP_API_BASE_URL}settings/update`,
+        `${process.env.REACT_APP_API_BASE_URL}/settings/update`,
         { releaseTime: "21:00" },
         {
           headers: {
