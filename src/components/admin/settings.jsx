@@ -33,7 +33,7 @@ const SettingsPage = () => {
     });
     setSaving(true);
     try {
-      const res = await fetch(`${process.env.REACT_APP_API_BASE_URL}settings/update`, {
+      const res = await fetch(`${process.env.REACT_APP_API_BASE_URL}/settings/update`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',         // ✅ Must manually set
