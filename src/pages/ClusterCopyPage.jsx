@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
-import DateNavigationHeader from '../components/DateNavigationHeader';
-import WorkoutBlockList from '../components/WorkoutBlockList';
-import WorkoutModal from '../components/WorkoutModal';
-import CopyFooterBar from '../components/CopyFooterBar';
+import DateNavigationHeader from '../components/admin/DateNavigationHeader';
+import WorkoutBlockList from '../components/admin/WorkoutBlockList';
+import WorkoutModal from '../components/admin/WorkoutModal';
+import CopyFooterBar from '../components/admin/CopyFooterBar';
 import axios from 'axios';
 
 const versionOptions = ["Ultra Train", "Super Train", "Minimal Equipment", "Beginner"];
