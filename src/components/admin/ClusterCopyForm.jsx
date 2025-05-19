@@ -1,120 +1,143 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
+import DateNavigationHeader from '../components/DateNavigationHeader';
+import WorkoutBlockList from '../components/WorkoutBlockList';
+import WorkoutModal from '../components/WorkoutModal';
+import CopyFooterBar from '../components/CopyFooterBar';
 import axios from 'axios';
-import DatePicker from 'react-datepicker';
-import 'react-datepicker/dist/react-datepicker.css';
 
 const versionOptions = ["Ultra Train", "Super Train", "Minimal Equipment", "Beginner"];
 
-const ClusterCopyForm = () => {
-  const [date, setDate] = useState('');
-  const [fromVersion, setFromVersion] = useState('Ultra Train');
-  const [toVersions, setToVersions] = useState([]);
-  const [status, setStatus] = useState('');
+const ClusterCopyPage = () => {
+  const [allWorkouts, setAllWorkouts] = useState([]);
+  const [groupedWorkouts, setGroupedWorkouts] = useState({});
+  const [selectedWorkoutIds, setSelectedWorkoutIds] = useState([]);
+  const [targetVersions, setTargetVersions] = useState([]);
+  const [modalWorkout, setModalWorkout] = useState(null);
+  const [currentMonth, setCurrentMonth] = useState(new Date());
+  const [selectedVersion, setSelectedVersion] = useState('Ultra Train');
 
   const token = localStorage.getItem('token');
 
-  const handleCheckboxChange = (version) => {
-    setToVersions((prev) =>
-      prev.includes(version)
-        ? prev.filter((v) => v !== version)
-        : [...prev, version]
+  useEffect(() => {
+    fetchWorkouts();
+  }, [selectedVersion]);
+
+  const fetchWorkouts = async () => {
+    try {
+      const res = await axios.get(`${process.env.REACT_APP_API_BASE_URL}/admin/workouts`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      const filtered = res.data.filter(w => w.version === selectedVersion);
+      setAllWorkouts(filtered);
+
+      const grouped = {};
+      filtered.forEach(w => {
+        const dateKey = new Date(w.date).toISOString().split('T')[0];
+        if (!grouped[dateKey]) grouped[dateKey] = [];
+        grouped[dateKey].push(w);
+      });
+
+      setGroupedWorkouts(grouped);
+    } catch (err) {
+      console.error('Failed to load workouts', err);
+    }
+  };
+
+  const handleWorkoutToggle = (id) => {
+    setSelectedWorkoutIds(prev =>
+      prev.includes(id) ? prev.filter(wid => wid !== id) : [...prev, id]
     );
   };
 
-  const handleSubmit = async () => {
-    if (!date || !fromVersion || toVersions.length === 0) {
-      setStatus('⚠️ Please fill all fields');
-      return;
-    }
-
+  const handleCopy = async () => {
     try {
-      const res = await axios.post(
-        `${process.env.REACT_APP_API_BASE_URL}/admin/workouts/cluster-copy`,
-        {
-          date,
-          fromVersion,
-          toVersions,
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
+      const selected = allWorkouts.filter(w => selectedWorkoutIds.includes(w._id));
 
-      setStatus(`✅ Copied ${res.data.copies.length} workouts successfully!`);
+      for (let toVersion of targetVersions) {
+        for (let w of selected) {
+          await axios.post(
+            `${process.env.REACT_APP_API_BASE_URL}/admin/workouts/${w._id}/copy`,
+            { toVersion },
+            {
+              headers: { Authorization: `Bearer ${token}` },
+            }
+          );
+        }
+      }
+
+      alert(`✅ ${selected.length} workouts copied to ${targetVersions.length} version(s)!`);
+      setSelectedWorkoutIds([]);
+      setTargetVersions([]);
     } catch (err) {
-      console.error(err);
-      setStatus('❌ Failed to copy workouts');
+      console.error('Copy failed:', err);
+      alert('❌ Copy failed');
     }
   };
 
+  const jumpToDate = (date) => {
+    if (date instanceof Date) {
+      setCurrentMonth(date);
+      const section = document.querySelector(`[data-date="${date.toISOString().split('T')[0]}"]`);
+      if (section) section.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  };
+
+  const handlePrevMonth = () => {
+    const newMonth = new Date(currentMonth);
+    newMonth.setMonth(currentMonth.getMonth() - 1);
+    setCurrentMonth(newMonth);
+  };
+
+  const handleNextMonth = () => {
+    const newMonth = new Date(currentMonth);
+    newMonth.setMonth(currentMonth.getMonth() + 1);
+    setCurrentMonth(newMonth);
+  };
+
+  const handleToday = () => {
+    const today = new Date();
+    setCurrentMonth(today);
+    jumpToDate(today);
+  };
+
+  const currentMonthLabel = currentMonth.toLocaleDateString('en-US', {
+    month: 'long',
+    year: 'numeric',
+  });
+
   return (
-    <div className="cluster-copy-form" style={{ padding: '20px', maxWidth: '500px' }}>
-      <h3>🧱 Cluster Copy Workouts</h3>
+    <div style={{ backgroundColor: '#0d0d0d', minHeight: '100vh' }}>
+      <DateNavigationHeader
+        currentMonth={currentMonthLabel}
+        onPrevMonth={handlePrevMonth}
+        onNextMonth={handleNextMonth}
+        onJumpToDate={jumpToDate}
+        onToday={handleToday}
+        selectedVersion={selectedVersion}
+        onVersionChange={setSelectedVersion}
+        versionOptions={versionOptions}
+      />
 
-      <label>
-        Date:
-        <DatePicker
-  selected={date ? new Date(date) : null}
-  onChange={(dateObj) => {
-    const formatted = dateObj.toISOString().split('T')[0];
-    setDate(formatted);
-  }}
-  dateFormat="yyyy-MM-dd"
-  placeholderText="Select a date"
-  className="custom-datepicker"
-/>
-      </label>
+      <WorkoutBlockList
+        groupedWorkouts={groupedWorkouts}
+        selectedWorkouts={selectedWorkoutIds}
+        onWorkoutToggle={handleWorkoutToggle}
+        onViewWorkout={(w) => setModalWorkout(w)}
+      />
 
-      <br /><br />
+      <WorkoutModal workout={modalWorkout} onClose={() => setModalWorkout(null)} />
 
-      <label>
-        Copy From:
-        <select
-          value={fromVersion}
-          onChange={(e) => setFromVersion(e.target.value)}
-          style={{ marginLeft: '10px' }}
-        >
-          {versionOptions.map((v) => (
-            <option key={v} value={v}>
-              {v}
-            </option>
-          ))}
-        </select>
-      </label>
-
-      <br /><br />
-
-      <label>Copy To:</label>
-      <div style={{ marginTop: '5px' }}>
-        {versionOptions
-          .filter((v) => v !== fromVersion)
-          .map((v) => (
-            <label key={v} style={{ display: 'block' }}>
-              <input
-                type="checkbox"
-                checked={toVersions.includes(v)}
-                onChange={() => handleCheckboxChange(v)}
-              />{' '}
-              {v}
-            </label>
-          ))}
-      </div>
-
-      <br />
-
-      <button onClick={handleSubmit} style={{ padding: '8px 16px' }}>
-        🚀 Copy Cluster
-      </button>
-
-      {status && (
-        <p style={{ marginTop: '15px', color: status.startsWith('✅') ? 'green' : 'red' }}>
-          {status}
-        </p>
+      {selectedWorkoutIds.length > 0 && (
+        <CopyFooterBar
+          selectedCount={selectedWorkoutIds.length}
+          selectedTargetVersions={targetVersions}
+          setSelectedTargetVersions={setTargetVersions}
+          onCopy={handleCopy}
+        />
       )}
     </div>
   );
 };
 
-export default ClusterCopyForm;
+export default ClusterCopyPage;

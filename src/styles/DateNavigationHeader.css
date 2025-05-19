@@ -1,0 +1,70 @@
+.date-nav-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px 24px;
+    background-color: #111;
+    border-bottom: 2px solid #ff2c2c;
+    color: white;
+    position: sticky;
+    top: 0;
+    z-index: 999;
+  }
+  
+  .left {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+  
+  .month-label {
+    font-size: 22px;
+    font-weight: bold;
+    color: #fff;
+    letter-spacing: 1px;
+  }
+  
+  .nav-arrow {
+    background: transparent;
+    border: none;
+    color: #ff2c2c;
+    font-size: 24px;
+    cursor: pointer;
+    transition: transform 0.2s;
+  }
+  .nav-arrow:hover {
+    transform: scale(1.2);
+  }
+  
+  .right {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  
+  .jump-datepicker {
+    background-color: #222;
+    color: white;
+    border: 1px solid #444;
+    padding: 6px 10px;
+    border-radius: 5px;
+  }
+  
+  .today-btn {
+    background-color: #ff2c2c;
+    border: none;
+    color: white;
+    padding: 6px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: bold;
+  }
+  
+  .version-dropdown {
+    padding: 6px 12px;
+    background-color: #1a1a1a;
+    border: 1px solid #ff2c2c;
+    color: white;
+    border-radius: 4px;
+  }
+  
