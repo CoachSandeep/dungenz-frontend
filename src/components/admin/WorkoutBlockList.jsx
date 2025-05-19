@@ -1,5 +1,5 @@
 import React from 'react';
-import './WorkoutBlockList.css';
+import './../../styles/WorkoutBlockList.css';
 
 const WorkoutBlockList = ({ groupedWorkouts, onWorkoutToggle, selectedWorkouts, onViewWorkout }) => {
   return (
