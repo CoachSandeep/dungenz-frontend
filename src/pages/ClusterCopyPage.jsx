@@ -1,141 +1,158 @@
+// ClusterCopyPage.jsx
 import React, { useEffect, useState } from 'react';
-import DateNavigationHeader from '../components/admin/DateNavigationHeader';
-import WorkoutBlockList from '../components/admin/WorkoutBlockList';
-import WorkoutModal from '../components/admin/WorkoutModal';
-import CopyFooterBar from '../components/admin/CopyFooterBar';
+import DatePicker from 'react-datepicker';
+import 'react-datepicker/dist/react-datepicker.css';
 import axios from 'axios';
 
-const versionOptions = ["Ultra Train", "Super Train", "Minimal Equipment", "Beginner"];
+const versions = ["Ultra Train", "Super Train", "Minimal Equipment", "Beginner"];
 
 const ClusterCopyPage = () => {
-  const [allWorkouts, setAllWorkouts] = useState([]);
-  const [groupedWorkouts, setGroupedWorkouts] = useState({});
-  const [selectedWorkoutIds, setSelectedWorkoutIds] = useState([]);
-  const [targetVersions, setTargetVersions] = useState([]);
-  const [modalWorkout, setModalWorkout] = useState(null);
+  const [workouts, setWorkouts] = useState({});
   const [currentMonth, setCurrentMonth] = useState(new Date());
-  const [selectedVersion, setSelectedVersion] = useState('Ultra Train');
-
-  const token = localStorage.getItem('token');
+  const [selected, setSelected] = useState({});
+  const [targetDate, setTargetDate] = useState(new Date());
+  const [targetVersions, setTargetVersions] = useState([]);
 
   useEffect(() => {
     fetchWorkouts();
-  }, [selectedVersion]);
+  }, [currentMonth]);
 
   const fetchWorkouts = async () => {
-    try {
-      const res = await axios.get(`${process.env.REACT_APP_API_BASE_URL}/admin/workouts`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-
-      const filtered = res.data.filter(w => w.version === selectedVersion);
-      setAllWorkouts(filtered);
-
-      const grouped = {};
-      filtered.forEach(w => {
-        const dateKey = new Date(w.date).toISOString().split('T')[0];
-        if (!grouped[dateKey]) grouped[dateKey] = [];
-        grouped[dateKey].push(w);
-      });
-
-      setGroupedWorkouts(grouped);
-    } catch (err) {
-      console.error('Failed to load workouts', err);
-    }
+    const month = currentMonth.getMonth() + 1;
+    const year = currentMonth.getFullYear();
+    const res = await axios.get(`/api/workouts/by-month?month=${month}&year=${year}`);
+    setWorkouts(res.data);
   };
 
-  const handleWorkoutToggle = (id) => {
-    setSelectedWorkoutIds(prev =>
-      prev.includes(id) ? prev.filter(wid => wid !== id) : [...prev, id]
+  const handlePrevMonth = () => {
+    setCurrentMonth(prev => new Date(prev.getFullYear(), prev.getMonth() - 1, 1));
+  };
+
+  const handleNextMonth = () => {
+    setCurrentMonth(prev => new Date(prev.getFullYear(), prev.getMonth() + 1, 1));
+  };
+
+  const toggleSelect = (dateKey, version, workoutId) => {
+    setSelected(prev => {
+      const current = prev[dateKey]?.[version] || [];
+      const alreadySelected = current.includes(workoutId);
+      const newSelection = alreadySelected
+        ? current.filter(id => id !== workoutId)
+        : [...current, workoutId];
+
+      return {
+        ...prev,
+        [dateKey]: {
+          ...(prev[dateKey] || {}),
+          [version]: newSelection
+        }
+      };
+    });
+  };
+
+  const selectAllInGroup = (dateKey, version) => {
+    const ids = workouts[dateKey]?.[version]?.map(w => w._id) || [];
+    setSelected(prev => ({
+      ...prev,
+      [dateKey]: {
+        ...(prev[dateKey] || {}),
+        [version]: ids
+      }
+    }));
+  };
+
+  const toggleTargetVersion = version => {
+    setTargetVersions(prev =>
+      prev.includes(version)
+        ? prev.filter(v => v !== version)
+        : [...prev, version]
     );
   };
 
   const handleCopy = async () => {
-    try {
-      const selected = allWorkouts.filter(w => selectedWorkoutIds.includes(w._id));
+    for (const [dateKey, versionsMap] of Object.entries(selected)) {
+      for (const [version, ids] of Object.entries(versionsMap)) {
+        if (ids.length === 0) continue;
 
-      for (let toVersion of targetVersions) {
-        for (let w of selected) {
-          await axios.post(
-            `${process.env.REACT_APP_API_BASE_URL}/admin/workouts/${w._id}/copy`,
-            { toVersion },
-            {
-              headers: { Authorization: `Bearer ${token}` },
-            }
-          );
-        }
+        await axios.post('/api/workouts/copy-cluster', {
+          sourceDate: dateKey,
+          version,
+          workoutIds: ids,
+          targetDate: targetDate.toISOString().split('T')[0],
+          targetVersions
+        });
       }
-
-      alert(`✅ ${selected.length} workouts copied to ${targetVersions.length} version(s)!`);
-      setSelectedWorkoutIds([]);
-      setTargetVersions([]);
-    } catch (err) {
-      console.error('Copy failed:', err);
-      alert('❌ Copy failed');
     }
+    alert('Workouts copied successfully!');
+    setSelected({});
+    setTargetVersions([]);
   };
-
-  const jumpToDate = (date) => {
-    if (date instanceof Date) {
-      setCurrentMonth(date);
-      const section = document.querySelector(`[data-date="${date.toISOString().split('T')[0]}"]`);
-      if (section) section.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    }
-  };
-
-  const handlePrevMonth = () => {
-    const newMonth = new Date(currentMonth);
-    newMonth.setMonth(currentMonth.getMonth() - 1);
-    setCurrentMonth(newMonth);
-  };
-
-  const handleNextMonth = () => {
-    const newMonth = new Date(currentMonth);
-    newMonth.setMonth(currentMonth.getMonth() + 1);
-    setCurrentMonth(newMonth);
-  };
-
-  const handleToday = () => {
-    const today = new Date();
-    setCurrentMonth(today);
-    jumpToDate(today);
-  };
-
-  const currentMonthLabel = currentMonth.toLocaleDateString('en-US', {
-    month: 'long',
-    year: 'numeric',
-  });
 
   return (
-    <div style={{ backgroundColor: '#0d0d0d', minHeight: '100vh' }}>
-      <DateNavigationHeader
-        currentMonth={currentMonthLabel}
-        onPrevMonth={handlePrevMonth}
-        onNextMonth={handleNextMonth}
-        onJumpToDate={jumpToDate}
-        onToday={handleToday}
-        selectedVersion={selectedVersion}
-        onVersionChange={setSelectedVersion}
-        versionOptions={versionOptions}
-      />
+    <div className="p-4 text-white">
+      <div className="flex justify-between items-center mb-4">
+        <button onClick={handlePrevMonth}>&lt;</button>
+        <h2 className="text-xl font-bold">
+          {currentMonth.toLocaleString('default', { month: 'long', year: 'numeric' })}
+        </h2>
+        <button onClick={handleNextMonth}>&gt;</button>
+      </div>
 
-      <WorkoutBlockList
-        groupedWorkouts={groupedWorkouts}
-        selectedWorkouts={selectedWorkoutIds}
-        onWorkoutToggle={handleWorkoutToggle}
-        onViewWorkout={(w) => setModalWorkout(w)}
-      />
+      {Object.keys(workouts).map(dateKey => (
+        <div key={dateKey} className="mb-6">
+          <h3 className="text-lg font-semibold mb-2">{dateKey}</h3>
+          {versions.map(version => (
+            workouts[dateKey]?.[version]?.length ? (
+              <div key={version} className="mb-2">
+                <div className="flex items-center">
+                  <h4 className="font-semibold mr-2">{version}</h4>
+                  <button onClick={() => selectAllInGroup(dateKey, version)} className="text-sm underline">
+                    Select All
+                  </button>
+                </div>
+                {workouts[dateKey][version].map(workout => (
+                  <div key={workout._id} className="flex items-center ml-4">
+                    <input
+                      type="checkbox"
+                      checked={selected[dateKey]?.[version]?.includes(workout._id) || false}
+                      onChange={() => toggleSelect(dateKey, version, workout._id)}
+                    />
+                    <span className="ml-2">{workout.customName || workout.name}</span>
+                  </div>
+                ))}
+              </div>
+            ) : null
+          ))}
+        </div>
+      ))}
 
-      <WorkoutModal workout={modalWorkout} onClose={() => setModalWorkout(null)} />
+      <div className="mt-8">
+        <label className="block font-bold mb-2">Select Target Date:</label>
+        <DatePicker selected={targetDate} onChange={setTargetDate} className="text-black" />
 
-      {selectedWorkoutIds.length > 0 && (
-        <CopyFooterBar
-          selectedCount={selectedWorkoutIds.length}
-          selectedTargetVersions={targetVersions}
-          setSelectedTargetVersions={setTargetVersions}
-          onCopy={handleCopy}
-        />
-      )}
+        <div className="mt-4">
+          <label className="block font-bold mb-2">Copy to Versions:</label>
+          {versions.map(v => (
+            <div key={v}>
+              <label>
+                <input
+                  type="checkbox"
+                  checked={targetVersions.includes(v)}
+                  onChange={() => toggleTargetVersion(v)}
+                />
+                <span className="ml-2">{v}</span>
+              </label>
+            </div>
+          ))}
+        </div>
+
+        <button
+          onClick={handleCopy}
+          className="mt-6 bg-red-700 hover:bg-red-800 text-white font-bold py-2 px-4 rounded"
+        >
+          Copy Selected Workouts
+        </button>
+      </div>
     </div>
   );
 };
