@@ -5,6 +5,8 @@ body, html {
   background-color: #eceaea;
   color: white;
   font-family: "Roboto Flex", sans-serif;
+  overflow-x: hidden;
+  max-width: 100%;
 }
 
 * {
