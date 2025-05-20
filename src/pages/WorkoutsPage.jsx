@@ -63,6 +63,7 @@ const Workouts = () => {
   };
 
   const fetchWorkoutsByDate = async (dateKey) => {
+    console.log('📅 Fetching date:', dateKey);
     const token = localStorage.getItem('token');
     try {
       const res = await fetch(`${process.env.REACT_APP_API_BASE_URL}/workouts?date=${dateKey}`, {
@@ -86,7 +87,7 @@ const Workouts = () => {
         grouped[dateKey].versions[w.version].push(w);
       });
       setGroupedWorkouts(grouped);
-      setDates(prev => (prev.includes(dateKey) ? prev : [...prev, dateKey]).sort());
+      setDates(prev => Array.from(new Set([...prev, dateKey])).sort());
     } catch (err) {
       console.error(err);
     }
@@ -107,7 +108,11 @@ const Workouts = () => {
       }
       setSelectedDate(todayKey);
       setTimeout(() => {
-        if (scrollRef.current[todayKey]) scrollToCenter(todayKey);
+        if (scrollRef.current[todayKey]) {
+          scrollToCenter(todayKey);
+        } else {
+          console.warn('⚠️ todayKey not in scrollRef');
+        }
       }, 300);
     };
     init();
@@ -149,6 +154,7 @@ const Workouts = () => {
     setSelectedDate(dateKey);
     scrollToCenter(dateKey);
   };
+
 
   return (
     <div className="horizontal-container">
