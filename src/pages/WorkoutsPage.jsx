@@ -29,7 +29,6 @@ const Workouts = () => {
   const filterVisibleWorkouts = (allWorkouts, releaseTimeString) => {
     if (user?.role === 'admin' || user?.role === 'superadmin') return allWorkouts;
     if (!releaseTimeString) return [];
-
     const [releaseHour, releaseMinute] = releaseTimeString.split(':').map(Number);
     const now = new Date();
     const nowIST = new Date(now.toLocaleString('en-US', { timeZone: 'Asia/Kolkata' }));
@@ -38,7 +37,6 @@ const Workouts = () => {
     const tomorrowKey = new Date();
     tomorrowKey.setDate(nowIST.getDate() + 1);
     const tomorrowDateKey = tomorrowKey.toISOString().split('T')[0];
-
     return allWorkouts.filter(w => {
       if (!w.date) return false;
       const workoutDateKey = new Date(w.date).toISOString().split('T')[0];
@@ -62,49 +60,6 @@ const Workouts = () => {
     }
   };
 
-  useEffect(() => {
-    const fetchInitialWorkouts = async () => {
-      const token = localStorage.getItem('token');
-      try {
-        const res = await fetch(`${process.env.REACT_APP_API_BASE_URL}/workouts?date=${todayKey}`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-        const data = await res.json();
-
-        const settingsRes = await fetch(`${process.env.REACT_APP_API_BASE_URL}/settings`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-        const settings = await settingsRes.json();
-        const visibleWorkouts = filterVisibleWorkouts(data, settings.releaseTime);
-
-        const grouped = {};
-        const dateObj = new Date(todayKey);
-        const displayDate = dateObj.toLocaleDateString("en-GB");
-        const day = dateObj.toLocaleDateString("en-US", { weekday: 'short' });
-
-        grouped[todayKey] = { displayDate, day, versions: {} };
-        visibleWorkouts.forEach(w => {
-          if (!grouped[todayKey].versions[w.version]) {
-            grouped[todayKey].versions[w.version] = [];
-          }
-          grouped[todayKey].versions[w.version].push(w);
-        });
-
-        setGroupedWorkouts(grouped);
-        setDates([todayKey]);
-        setSelectedDate(todayKey);
-
-        setTimeout(() => {
-          if (scrollRef.current[todayKey]) scrollToCenter(todayKey);
-        }, 300);
-      } catch (err) {
-        console.error(err);
-      }
-    };
-
-    fetchInitialWorkouts();
-  }, []);
-
   const fetchWorkoutsByDate = async (dateKey) => {
     const token = localStorage.getItem('token');
     try {
@@ -112,32 +67,70 @@ const Workouts = () => {
         headers: { Authorization: `Bearer ${token}` },
       });
       const data = await res.json();
-
       const settingsRes = await fetch(`${process.env.REACT_APP_API_BASE_URL}/settings`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       const settings = await settingsRes.json();
       const visibleWorkouts = filterVisibleWorkouts(data, settings.releaseTime);
-
       const grouped = { ...groupedWorkouts };
       const dateObj = new Date(dateKey);
       const displayDate = dateObj.toLocaleDateString("en-GB");
       const day = dateObj.toLocaleDateString("en-US", { weekday: 'short' });
       grouped[dateKey] = { displayDate, day, versions: {} };
-
       visibleWorkouts.forEach(w => {
         if (!grouped[dateKey].versions[w.version]) {
           grouped[dateKey].versions[w.version] = [];
         }
         grouped[dateKey].versions[w.version].push(w);
       });
-
       setGroupedWorkouts(grouped);
-      if (!dates.includes(dateKey)) setDates(prev => [...prev, dateKey]);
+      setDates(prev => prev.includes(dateKey) ? prev : [...prev, dateKey].sort());
     } catch (err) {
       console.error(err);
     }
   };
+
+  useEffect(() => {
+    const fetchInitialRange = async () => {
+      const baseDate = new Date();
+      const initialDates = [];
+      for (let i = -5; i <= 5; i++) {
+        const d = new Date(baseDate);
+        d.setDate(d.getDate() + i);
+        const key = d.toISOString().split('T')[0];
+        initialDates.push(key);
+        await fetchWorkoutsByDate(key);
+      }
+      setSelectedDate(todayKey);
+      setTimeout(() => {
+        if (scrollRef.current[todayKey]) scrollToCenter(todayKey);
+      }, 300);
+    };
+
+    fetchInitialRange();
+
+    const handleScroll = () => {
+      const container = scrollContainerRef.current;
+      if (container && container.scrollLeft < 50) {
+        const firstDate = new Date(dates[0]);
+        const loadMoreDates = [];
+        for (let i = 1; i <= 5; i++) {
+          const d = new Date(firstDate);
+          d.setDate(d.getDate() - i);
+          loadMoreDates.push(d.toISOString().split('T')[0]);
+        }
+        loadMoreDates.forEach(async (d) => {
+          if (!dates.includes(d)) await fetchWorkoutsByDate(d);
+        });
+      }
+    };
+
+    const container = scrollContainerRef.current;
+    if (container) container.addEventListener('scroll', handleScroll);
+    return () => {
+      if (container) container.removeEventListener('scroll', handleScroll);
+    };
+  }, [dates]);
 
   const toggleExpandAll = (version) => {
     setExpandedVersions(prev => ({
@@ -153,7 +146,6 @@ const Workouts = () => {
     setSelectedDate(dateKey);
     scrollToCenter(dateKey);
   };
-
 
   return (
     <div className="horizontal-container">
