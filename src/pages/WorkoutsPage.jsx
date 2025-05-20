@@ -29,36 +29,24 @@ const Workouts = () => {
   const filterVisibleWorkouts = (allWorkouts, releaseTimeString) => {
     if (user?.role === 'admin' || user?.role === 'superadmin') return allWorkouts;
     if (!releaseTimeString) return [];
-  
-    // Parse the release time string
+
     const [releaseHour, releaseMinute] = releaseTimeString.split(':').map(Number);
-  
-    // Current IST time
     const now = new Date();
     const nowIST = new Date(now.toLocaleString('en-US', { timeZone: 'Asia/Kolkata' }));
-  
-    // Create today's release datetime at that hour (in IST)
     const releaseTimeIST = new Date(nowIST);
     releaseTimeIST.setHours(releaseHour, releaseMinute, 0, 0);
-  
-    // If current IST time is before today's release time → don't show tomorrow's workout
     const tomorrowKey = new Date();
     tomorrowKey.setDate(nowIST.getDate() + 1);
     const tomorrowDateKey = tomorrowKey.toISOString().split('T')[0];
-  
+
     return allWorkouts.filter(w => {
       if (!w.date) return false;
-  
       const workoutDateKey = new Date(w.date).toISOString().split('T')[0];
-  
       if (workoutDateKey < tomorrowDateKey) return true;
       if (workoutDateKey === tomorrowDateKey && nowIST >= releaseTimeIST) return true;
-  
       return false;
     });
   };
-  
-  
 
   const scrollToCenter = (dateKey) => {
     const el = scrollRef.current?.[dateKey];
@@ -75,10 +63,10 @@ const Workouts = () => {
   };
 
   useEffect(() => {
-    const fetchWorkouts = async () => {
+    const fetchInitialWorkouts = async () => {
       const token = localStorage.getItem('token');
       try {
-        const res = await fetch(`${process.env.REACT_APP_API_BASE_URL}/workouts`, {
+        const res = await fetch(`${process.env.REACT_APP_API_BASE_URL}/workouts?date=${todayKey}`, {
           headers: { Authorization: `Bearer ${token}` },
         });
         const data = await res.json();
@@ -89,72 +77,67 @@ const Workouts = () => {
         const settings = await settingsRes.json();
         const visibleWorkouts = filterVisibleWorkouts(data, settings.releaseTime);
 
-        console.log("🧠 releaseTime from settings:", settings.releaseTime);
-console.log("🧍‍♂️ User role:", user?.role);
-console.log("🪵 Raw workouts:", data);
-console.log("🧹 Visible workouts after filter:", visibleWorkouts);
-console.log("🔍 releaseTime string:", settings.releaseTime);
-        
         const grouped = {};
-        let latestWorkoutDate = null;
+        const dateObj = new Date(todayKey);
+        const displayDate = dateObj.toLocaleDateString("en-GB");
+        const day = dateObj.toLocaleDateString("en-US", { weekday: 'short' });
 
-        visibleWorkouts.forEach((w) => {
-          if (!w.date || !w.version) return;
-
-          const dateObj = new Date(w.date);
-          const dateKey = dateObj.toISOString().split('T')[0];
-          const displayDate = dateObj.toLocaleDateString("en-GB");
-          const day = dateObj.toLocaleDateString("en-US", { weekday: 'short' });
-
-          if (!grouped[dateKey]) {
-            grouped[dateKey] = { displayDate, day, versions: {} };
+        grouped[todayKey] = { displayDate, day, versions: {} };
+        visibleWorkouts.forEach(w => {
+          if (!grouped[todayKey].versions[w.version]) {
+            grouped[todayKey].versions[w.version] = [];
           }
-          if (!grouped[dateKey].versions[w.version]) {
-            grouped[dateKey].versions[w.version] = [];
-          }
-          grouped[dateKey].versions[w.version].push(w);
-
-          if (!latestWorkoutDate || dateObj > latestWorkoutDate) {
-            latestWorkoutDate = dateObj;
-          }
+          grouped[todayKey].versions[w.version].push(w);
         });
 
-        const dateList = Object.keys(grouped).sort();
-        const extendedDates = [...dateList];
-
-        if (latestWorkoutDate) {
-          for (let i = 1; i <= 7; i++) {
-            const newDate = new Date(latestWorkoutDate);
-            newDate.setDate(newDate.getDate() + i);
-            const dateKey = newDate.toISOString().split('T')[0];
-            if (!grouped[dateKey]) {
-              grouped[dateKey] = {
-                displayDate: newDate.toLocaleDateString("en-GB"),
-                day: newDate.toLocaleDateString("en-US", { weekday: 'short' }),
-                versions: {},
-              };
-              extendedDates.push(dateKey);
-            }
-          }
-        }
-
         setGroupedWorkouts(grouped);
-        setDates(extendedDates);
-        const defaultDate = dateList[dateList.length - 1] || null;
-        setSelectedDate(defaultDate);
+        setDates([todayKey]);
+        setSelectedDate(todayKey);
 
         setTimeout(() => {
-          if (defaultDate && scrollRef.current[defaultDate]) {
-            scrollToCenter(defaultDate);
-          }
+          if (scrollRef.current[todayKey]) scrollToCenter(todayKey);
         }, 300);
       } catch (err) {
         console.error(err);
       }
     };
 
-    fetchWorkouts();
+    fetchInitialWorkouts();
   }, []);
+
+  const fetchWorkoutsByDate = async (dateKey) => {
+    const token = localStorage.getItem('token');
+    try {
+      const res = await fetch(`${process.env.REACT_APP_API_BASE_URL}/workouts?date=${dateKey}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      const data = await res.json();
+
+      const settingsRes = await fetch(`${process.env.REACT_APP_API_BASE_URL}/settings`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      const settings = await settingsRes.json();
+      const visibleWorkouts = filterVisibleWorkouts(data, settings.releaseTime);
+
+      const grouped = { ...groupedWorkouts };
+      const dateObj = new Date(dateKey);
+      const displayDate = dateObj.toLocaleDateString("en-GB");
+      const day = dateObj.toLocaleDateString("en-US", { weekday: 'short' });
+      grouped[dateKey] = { displayDate, day, versions: {} };
+
+      visibleWorkouts.forEach(w => {
+        if (!grouped[dateKey].versions[w.version]) {
+          grouped[dateKey].versions[w.version] = [];
+        }
+        grouped[dateKey].versions[w.version].push(w);
+      });
+
+      setGroupedWorkouts(grouped);
+      if (!dates.includes(dateKey)) setDates(prev => [...prev, dateKey]);
+    } catch (err) {
+      console.error(err);
+    }
+  };
 
   const toggleExpandAll = (version) => {
     setExpandedVersions(prev => ({
@@ -163,10 +146,14 @@ console.log("🔍 releaseTime string:", settings.releaseTime);
     }));
   };
 
-  const handleDateSelect = (dateKey) => {
+  const handleDateSelect = async (dateKey) => {
+    if (!groupedWorkouts[dateKey]) {
+      await fetchWorkoutsByDate(dateKey);
+    }
     setSelectedDate(dateKey);
     scrollToCenter(dateKey);
   };
+
 
   return (
     <div className="horizontal-container">
