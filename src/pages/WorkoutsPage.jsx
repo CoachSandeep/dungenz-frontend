@@ -7,6 +7,8 @@ const Workouts = () => {
   const [groupedWorkouts, setGroupedWorkouts] = useState({});
   const [dates, setDates] = useState([]);
   const [selectedDate, setSelectedDate] = useState(null);
+  const [startDate, setStartDate] = useState(null);
+  const [endDate, setEndDate] = useState(null);
   const [modalWorkout, setModalWorkout] = useState(null);
   const [expandedVersions, setExpandedVersions] = useState({});
   const scrollRef = useRef({});
@@ -84,21 +86,23 @@ const Workouts = () => {
         grouped[dateKey].versions[w.version].push(w);
       });
       setGroupedWorkouts(grouped);
-      setDates(prev => prev.includes(dateKey) ? prev : [...prev, dateKey].sort());
+      setDates(prev => (prev.includes(dateKey) ? prev : [...prev, dateKey]).sort());
     } catch (err) {
       console.error(err);
     }
   };
 
   useEffect(() => {
-    const fetchInitialRange = async () => {
-      const baseDate = new Date();
-      const initialDates = [];
-      for (let i = -5; i <= 5; i++) {
-        const d = new Date(baseDate);
-        d.setDate(d.getDate() + i);
-        const key = d.toISOString().split('T')[0];
-        initialDates.push(key);
+    const init = async () => {
+      const base = new Date();
+      const start = new Date(base);
+      start.setDate(base.getDate() - 5);
+      const end = new Date(base);
+      end.setDate(base.getDate() + 5);
+      setStartDate(start);
+      setEndDate(end);
+      for (let d = new Date(start); d <= end; d.setDate(d.getDate() + 1)) {
+        const key = new Date(d).toISOString().split('T')[0];
         await fetchWorkoutsByDate(key);
       }
       setSelectedDate(todayKey);
@@ -106,22 +110,21 @@ const Workouts = () => {
         if (scrollRef.current[todayKey]) scrollToCenter(todayKey);
       }, 300);
     };
+    init();
+  }, []);
 
-    fetchInitialRange();
-
+  useEffect(() => {
     const handleScroll = () => {
       const container = scrollContainerRef.current;
-      if (container && container.scrollLeft < 50) {
-        const firstDate = new Date(dates[0]);
-        const loadMoreDates = [];
-        for (let i = 1; i <= 5; i++) {
-          const d = new Date(firstDate);
-          d.setDate(d.getDate() - i);
-          loadMoreDates.push(d.toISOString().split('T')[0]);
+      if (!container || !startDate) return;
+      if (container.scrollLeft < 50) {
+        const newStart = new Date(startDate);
+        newStart.setDate(newStart.getDate() - 5);
+        for (let d = new Date(newStart); d < startDate; d.setDate(d.getDate() + 1)) {
+          const key = new Date(d).toISOString().split('T')[0];
+          if (!groupedWorkouts[key]) fetchWorkoutsByDate(key);
         }
-        loadMoreDates.forEach(async (d) => {
-          if (!dates.includes(d)) await fetchWorkoutsByDate(d);
-        });
+        setStartDate(newStart);
       }
     };
 
@@ -130,7 +133,7 @@ const Workouts = () => {
     return () => {
       if (container) container.removeEventListener('scroll', handleScroll);
     };
-  }, [dates]);
+  }, [startDate, groupedWorkouts]);
 
   const toggleExpandAll = (version) => {
     setExpandedVersions(prev => ({
