@@ -1,14 +1,16 @@
 import React, { useState } from 'react';
-import { useNavigate  } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import logo from '../assets/logo.png';
 
 const Login = () => {
   const navigate = useNavigate();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [isLoggingIn, setIsLoggingIn] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setIsLoggingIn(true);
 
     try {
       const res = await fetch(`${process.env.REACT_APP_API_BASE_URL}/auth/login`, {
@@ -21,7 +23,7 @@ const Login = () => {
 
       if (res.ok) {
         localStorage.setItem('token', data.token);
-        localStorage.setItem('user', JSON.stringify(data.user)); // ✅ Save user with role
+        localStorage.setItem('user', JSON.stringify(data.user));
 
         if (data.user.role === 'superadmin') {
           navigate('/admin');
@@ -34,6 +36,8 @@ const Login = () => {
     } catch (err) {
       console.error(err);
       alert('Something went wrong.');
+    } finally {
+      setIsLoggingIn(false);
     }
   };
 
@@ -56,7 +60,14 @@ const Login = () => {
           onChange={(e) => setPassword(e.target.value)}
           required
         />
-        <button type="submit">Login</button>
+       <button
+  type="submit"
+  className="login-button"
+  disabled={isLoggingIn}
+>
+  {isLoggingIn ? 'Logging in...' : 'Login'}
+</button>
+
         <p>New here? <a href="/register">Create account</a></p>
       </form>
     </div>
