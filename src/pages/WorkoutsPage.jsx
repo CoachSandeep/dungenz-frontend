@@ -10,7 +10,7 @@ const Workouts = () => {
   const [modalWorkout, setModalWorkout] = useState(null);
   const [expandedVersions, setExpandedVersions] = useState({});
   const [startDate, setStartDate] = useState(null);
-  const [highlightedDate, setHighlightedDate] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
   const scrollRef = useRef({});
   const scrollContainerRef = useRef(null);
   const user = JSON.parse(localStorage.getItem('user'));
@@ -101,8 +101,10 @@ const Workouts = () => {
         await fetchWorkoutsByDate(dateKey);
       }
       setSelectedDate(todayKey);
-      setHighlightedDate(todayKey);
-      setTimeout(() => scrollToCenter(todayKey), 300);
+      setTimeout(() => {
+        scrollToCenter(todayKey);
+        setIsLoading(false);
+      }, 300);
     };
     fetchInitialDates();
   }, []);
@@ -115,12 +117,8 @@ const Workouts = () => {
     if (!groupedWorkouts[dateKey]) {
       await fetchWorkoutsByDate(dateKey);
     }
-    setSelectedDate(null);
-    setHighlightedDate(dateKey);
-    setTimeout(() => {
-      setSelectedDate(dateKey);
-      scrollToCenter(dateKey);
-    }, 0);
+    setSelectedDate(dateKey);
+    setTimeout(() => scrollToCenter(dateKey), 100);
   };
 
   return (
@@ -131,7 +129,7 @@ const Workouts = () => {
         </div>
         {dates.map((dateKey, index) => {
           const dateObj = new Date(dateKey);
-          const isActive = selectedDate === dateKey || highlightedDate === dateKey;
+          const isActive = selectedDate === dateKey;
           const hasWorkouts = Object.keys(groupedWorkouts[dateKey]?.versions || {}).length > 0;
           const showMonthHeading = index === 0 || new Date(dates[index - 1]).getMonth() !== dateObj.getMonth();
           const monthName = dateObj.toLocaleDateString('en-US', { month: 'long' });
@@ -207,6 +205,12 @@ const Workouts = () => {
             <p><strong>Date:</strong> {new Date(modalWorkout.date).toLocaleDateString()}</p>
             <button onClick={() => setModalWorkout(null)}>Close</button>
           </div>
+        </div>
+      )}
+
+      {isLoading && (
+        <div className="loading-overlay">
+          Loading your workouts...
         </div>
       )}
     </div>
