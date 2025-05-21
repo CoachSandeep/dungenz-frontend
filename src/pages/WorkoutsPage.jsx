@@ -113,8 +113,12 @@ const Workouts = () => {
     if (!groupedWorkouts[dateKey]) {
       await fetchWorkoutsByDate(dateKey);
     }
+     // Force re-render even if same date is tapped again
+  setSelectedDate(null); // clear first
+  setTimeout(() => {
     setSelectedDate(dateKey);
     scrollToCenter(dateKey);
+  }, 0);
   };
 
   return (
