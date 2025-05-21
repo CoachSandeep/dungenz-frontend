@@ -114,11 +114,23 @@ const Workouts = () => {
   };
 
   const handleDateSelect = async (dateKey) => {
+    const isSameDate = selectedDate === dateKey;
+  
     if (!groupedWorkouts[dateKey]) {
       await fetchWorkoutsByDate(dateKey);
     }
-    setSelectedDate(dateKey);
-    setTimeout(() => scrollToCenter(dateKey), 100);
+  
+    // Always scroll to center
+    scrollToCenter(dateKey);
+  
+    // Only update selectedDate if it's different OR forced re-render
+    if (!isSameDate) {
+      setSelectedDate(dateKey);
+    } else {
+      // force refresh to apply active class
+      setSelectedDate(null);
+      setTimeout(() => setSelectedDate(dateKey), 0);
+    }
   };
 
   return (
@@ -139,7 +151,7 @@ const Workouts = () => {
               {showMonthHeading && <div className="month-heading">{monthName}</div>}
               <div
                 data-date={dateKey}
-                className={`timeline-date-circle ${isActive ? 'active' : ''} ${!hasWorkouts ? 'disabled' : ''}`}
+                className={`timeline-date-circle ${selectedDate === dateKey ? 'active' : ''} ${!hasWorkouts ? 'disabled' : ''}`}
                 onClick={() => handleDateSelect(dateKey)}
                 ref={el => { if (el) scrollRef.current[dateKey] = el; }}
               >
