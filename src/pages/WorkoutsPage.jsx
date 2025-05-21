@@ -126,15 +126,16 @@ const Workouts = () => {
         if (el) {
           scrollToCenter(todayKey);
         } else {
+          console.warn('⚠️ todayKey not in scrollRef, retrying...');
           const retry = setInterval(() => {
-            const el = scrollRef.current[todayKey];
-            if (el) {
+            const retryEl = scrollRef.current[todayKey];
+            if (retryEl) {
+              console.log('✅ Scrolling to todayKey now:', todayKey);
               scrollToCenter(todayKey);
               clearInterval(retry);
             }
           }, 100);
-          // Optional timeout to kill it after 2 seconds if failed
-          setTimeout(() => clearInterval(retry), 2000);
+          setTimeout(() => clearInterval(retry), 2000); // Stop retrying after 2s
         }
       }, 300);
     };
