@@ -120,26 +120,17 @@ const Workouts = () => {
       }
       setSelectedDate(todayKey);
       setTimeout(() => {
-        if (!hasScrolledToToday) {
+        requestAnimationFrame(() => {
           const el = scrollRef.current[todayKey];
-          if (el) {
+          if (el && !hasScrolledToToday) {
             scrollToCenter(todayKey);
             setHasScrolledToToday(true);
+            console.log('✅ Scrolled to today after all fetches');
           } else {
-            console.warn('⚠️ todayKey not in scrollRef, retrying...');
-            const retry = setInterval(() => {
-              const retryEl = scrollRef.current[todayKey];
-              if (retryEl) {
-                console.log('✅ Scrolling to todayKey now:', todayKey);
-                scrollToCenter(todayKey);
-                setHasScrolledToToday(true);
-                clearInterval(retry);
-              }
-            }, 100);
-            setTimeout(() => clearInterval(retry), 2000);
+            console.warn('⛔ todayKey element not found for scroll');
           }
-        }
-      }, 300);
+        });
+      }, 0);
     };
     init();
   }, []);
