@@ -11,6 +11,7 @@ const Workouts = () => {
   const [endDate, setEndDate] = useState(null);
   const [modalWorkout, setModalWorkout] = useState(null);
   const [expandedVersions, setExpandedVersions] = useState({});
+  const [hasScrolledToToday, setHasScrolledToToday] = useState(false);
   const scrollRef = useRef({});
   const scrollContainerRef = useRef(null);
   const user = JSON.parse(localStorage.getItem('user'));
@@ -64,7 +65,6 @@ const Workouts = () => {
 
   const fetchWorkoutsByDate = async (dateKey) => {
     console.log('📅 Fetching date:', dateKey);
-    
 
     const token = localStorage.getItem('token');
     try {
@@ -87,8 +87,6 @@ const Workouts = () => {
       visibleWorkouts.forEach(w => {
         const version = w.version?.trim() || "Uncategorized";
         console.log("📌 Workout:", w.title, "| version:", version);
-      
-        
         if (!grouped[dateKey].versions[version]) {
           grouped[dateKey].versions[version] = [];
         }
@@ -122,20 +120,24 @@ const Workouts = () => {
       }
       setSelectedDate(todayKey);
       setTimeout(() => {
-        const el = scrollRef.current[todayKey];
-        if (el) {
-          scrollToCenter(todayKey);
-        } else {
-          console.warn('⚠️ todayKey not in scrollRef, retrying...');
-          const retry = setInterval(() => {
-            const retryEl = scrollRef.current[todayKey];
-            if (retryEl) {
-              console.log('✅ Scrolling to todayKey now:', todayKey);
-              scrollToCenter(todayKey);
-              clearInterval(retry);
-            }
-          }, 100);
-          setTimeout(() => clearInterval(retry), 2000); // Stop retrying after 2s
+        if (!hasScrolledToToday) {
+          const el = scrollRef.current[todayKey];
+          if (el) {
+            scrollToCenter(todayKey);
+            setHasScrolledToToday(true);
+          } else {
+            console.warn('⚠️ todayKey not in scrollRef, retrying...');
+            const retry = setInterval(() => {
+              const retryEl = scrollRef.current[todayKey];
+              if (retryEl) {
+                console.log('✅ Scrolling to todayKey now:', todayKey);
+                scrollToCenter(todayKey);
+                setHasScrolledToToday(true);
+                clearInterval(retry);
+              }
+            }, 100);
+            setTimeout(() => clearInterval(retry), 2000);
+          }
         }
       }, 300);
     };
@@ -176,7 +178,9 @@ const Workouts = () => {
       await fetchWorkoutsByDate(dateKey);
     }
     setSelectedDate(dateKey);
-    scrollToCenter(dateKey);
+    if (dateKey !== todayKey || !hasScrolledToToday) {
+      scrollToCenter(dateKey);
+    }
   };
 
 
