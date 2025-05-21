@@ -94,8 +94,14 @@ const Workouts = () => {
         }
         grouped[dateKey].versions[version].push(w);
       });
-      setGroupedWorkouts(grouped);
-      setDates(prev => Array.from(new Set([...prev, dateKey])).sort());
+      setGroupedWorkouts(prev => {
+        const updated = { ...prev, ...grouped };
+        setDates(prevDates => {
+          const allKeys = Object.keys(updated);
+          return Array.from(new Set([...prevDates, ...allKeys])).sort();
+        });
+        return updated;
+      });
     } catch (err) {
       console.error(err);
     }
