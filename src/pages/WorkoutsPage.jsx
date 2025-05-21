@@ -110,15 +110,22 @@ const Workouts = () => {
   };
 
   const handleDateSelect = async (dateKey) => {
+    const isSame = selectedDate === dateKey;
+
     if (!groupedWorkouts[dateKey]) {
       await fetchWorkoutsByDate(dateKey);
     }
-     // Force re-render even if same date is tapped again
-  setSelectedDate(null); // clear first
-  setTimeout(() => {
-    setSelectedDate(dateKey);
-    scrollToCenter(dateKey);
-  }, 0);
+
+    if (isSame) {
+      setSelectedDate(null);
+      setTimeout(() => {
+        setSelectedDate(dateKey);
+        scrollToCenter(dateKey);
+      }, 10);
+    } else {
+      setSelectedDate(dateKey);
+      scrollToCenter(dateKey);
+    }
   };
 
   return (
