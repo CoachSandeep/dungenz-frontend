@@ -85,7 +85,10 @@ const Workouts = () => {
       const day = dateObj.toLocaleDateString("en-US", { weekday: 'short' });
       grouped[dateKey] = { displayDate, day, versions: {} };
       visibleWorkouts.forEach(w => {
-        const version = w.version || "Uncategorized";
+        const version = w.version?.trim() || "Uncategorized";
+        console.log("📌 Workout:", w.title, "| version:", version);
+      
+        
         if (!grouped[dateKey].versions[version]) {
           grouped[dateKey].versions[version] = [];
         }
