@@ -10,6 +10,7 @@ const Workouts = () => {
   const [modalWorkout, setModalWorkout] = useState(null);
   const [expandedVersions, setExpandedVersions] = useState({});
   const [startDate, setStartDate] = useState(null);
+  const [highlightedDate, setHighlightedDate] = useState(null);
   const scrollRef = useRef({});
   const scrollContainerRef = useRef(null);
   const user = JSON.parse(localStorage.getItem('user'));
@@ -100,6 +101,7 @@ const Workouts = () => {
         await fetchWorkoutsByDate(dateKey);
       }
       setSelectedDate(todayKey);
+      setHighlightedDate(todayKey);
       setTimeout(() => scrollToCenter(todayKey), 300);
     };
     fetchInitialDates();
@@ -110,22 +112,15 @@ const Workouts = () => {
   };
 
   const handleDateSelect = async (dateKey) => {
-    const isSame = selectedDate === dateKey;
-
     if (!groupedWorkouts[dateKey]) {
       await fetchWorkoutsByDate(dateKey);
     }
-
-    if (isSame) {
-      setSelectedDate(null);
-      setTimeout(() => {
-        setSelectedDate(dateKey);
-        scrollToCenter(dateKey);
-      }, 10);
-    } else {
+    setSelectedDate(null);
+    setHighlightedDate(dateKey);
+    setTimeout(() => {
       setSelectedDate(dateKey);
       scrollToCenter(dateKey);
-    }
+    }, 0);
   };
 
   return (
@@ -136,7 +131,7 @@ const Workouts = () => {
         </div>
         {dates.map((dateKey, index) => {
           const dateObj = new Date(dateKey);
-          const isActive = selectedDate === dateKey;
+          const isActive = selectedDate === dateKey || highlightedDate === dateKey;
           const hasWorkouts = Object.keys(groupedWorkouts[dateKey]?.versions || {}).length > 0;
           const showMonthHeading = index === 0 || new Date(dates[index - 1]).getMonth() !== dateObj.getMonth();
           const monthName = dateObj.toLocaleDateString('en-US', { month: 'long' });
