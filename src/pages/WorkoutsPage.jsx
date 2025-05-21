@@ -9,6 +9,7 @@ const Workouts = () => {
   const [selectedDate, setSelectedDate] = useState(null);
   const [modalWorkout, setModalWorkout] = useState(null);
   const [expandedVersions, setExpandedVersions] = useState({});
+  const [startDate, setStartDate] = useState(null);
   const scrollRef = useRef({});
   const scrollContainerRef = useRef(null);
   const user = JSON.parse(localStorage.getItem('user'));
@@ -65,6 +66,21 @@ const Workouts = () => {
     }
   };
 
+  const loadPreviousDates = async () => {
+    const newStart = new Date(startDate);
+    newStart.setDate(startDate.getDate() - 5);
+    for (let d = new Date(newStart); d < startDate; d.setDate(d.getDate() + 1)) {
+      const dateKey = d.toISOString().split('T')[0];
+      await fetchWorkoutsByDate(dateKey);
+    }
+    const updatedDates = [];
+    for (let d = new Date(newStart); d <= new Date(); d.setDate(d.getDate() + 1)) {
+      updatedDates.push(new Date(d).toISOString().split('T')[0]);
+    }
+    setDates([...new Set([...updatedDates, ...dates])].sort());
+    setStartDate(newStart);
+  };
+
   useEffect(() => {
     const today = new Date();
     const baseDates = [];
@@ -74,12 +90,12 @@ const Workouts = () => {
       baseDates.push(newDate.toISOString().split('T')[0]);
     }
     setDates(baseDates);
+    setStartDate(new Date(today.setDate(today.getDate() - 5)));
 
-    // Fetch only past 5 days + today
     const fetchInitialDates = async () => {
       for (let i = -5; i <= 0; i++) {
-        const d = new Date(today);
-        d.setDate(today.getDate() + i);
+        const d = new Date();
+        d.setDate(d.getDate() + i);
         const dateKey = d.toISOString().split('T')[0];
         await fetchWorkoutsByDate(dateKey);
       }
@@ -104,6 +120,9 @@ const Workouts = () => {
   return (
     <div className="horizontal-container">
       <div className="timeline-horizontal" ref={scrollContainerRef}>
+        <div className="timeline-date-wrapper">
+          <div className="timeline-date-circle load-more-circle" onClick={loadPreviousDates}>+ Load</div>
+        </div>
         {dates.map((dateKey, index) => {
           const dateObj = new Date(dateKey);
           const isActive = selectedDate === dateKey;
