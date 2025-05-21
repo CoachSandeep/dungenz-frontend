@@ -122,10 +122,19 @@ const Workouts = () => {
       }
       setSelectedDate(todayKey);
       setTimeout(() => {
-        if (scrollRef.current[todayKey]) {
+        const el = scrollRef.current[todayKey];
+        if (el) {
           scrollToCenter(todayKey);
         } else {
-          console.warn('⚠️ todayKey not in scrollRef');
+          const retry = setInterval(() => {
+            const el = scrollRef.current[todayKey];
+            if (el) {
+              scrollToCenter(todayKey);
+              clearInterval(retry);
+            }
+          }, 100);
+          // Optional timeout to kill it after 2 seconds if failed
+          setTimeout(() => clearInterval(retry), 2000);
         }
       }, 300);
     };
