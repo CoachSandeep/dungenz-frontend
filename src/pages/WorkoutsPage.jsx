@@ -64,6 +64,8 @@ const Workouts = () => {
 
   const fetchWorkoutsByDate = async (dateKey) => {
     console.log('📅 Fetching date:', dateKey);
+    
+
     const token = localStorage.getItem('token');
     try {
       const res = await fetch(`${process.env.REACT_APP_API_BASE_URL}/workouts?date=${dateKey}`, {
@@ -74,7 +76,9 @@ const Workouts = () => {
         headers: { Authorization: `Bearer ${token}` },
       });
       const settings = await settingsRes.json();
+      console.log('📥 Raw workouts:', data);
       const visibleWorkouts = filterVisibleWorkouts(data, settings.releaseTime);
+      console.log('🎯 After releaseTime filter:', visibleWorkouts);
       const grouped = { ...groupedWorkouts };
       const dateObj = new Date(dateKey);
       const displayDate = dateObj.toLocaleDateString("en-GB");
