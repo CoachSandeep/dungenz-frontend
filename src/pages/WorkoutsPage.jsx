@@ -6,20 +6,18 @@ const versionOrder = ["Ultra Train", "Super Train", "Minimal Equipment", "Beginn
 const Workouts = () => {
   const [groupedWorkouts, setGroupedWorkouts] = useState({});
   const [dates, setDates] = useState([]);
+  const [fetchedDates, setFetchedDates] = useState(new Set());
   const [selectedDate, setSelectedDate] = useState(null);
-  const [startDate, setStartDate] = useState(null);
-  const [endDate, setEndDate] = useState(null);
   const [modalWorkout, setModalWorkout] = useState(null);
   const [expandedVersions, setExpandedVersions] = useState({});
-  const [hasScrolledToToday, setHasScrolledToToday] = useState(false);
   const scrollRef = useRef({});
   const scrollContainerRef = useRef(null);
   const user = JSON.parse(localStorage.getItem('user'));
   const todayKey = new Date().toISOString().split('T')[0];
 
-  const getDisplayDate = (selectedDate) => {
+  const getDisplayDate = (dateKey) => {
     const today = new Date();
-    const targetDate = new Date(selectedDate);
+    const targetDate = new Date(dateKey);
     today.setHours(0, 0, 0, 0);
     targetDate.setHours(0, 0, 0, 0);
     const diff = Math.floor((targetDate - today) / (1000 * 60 * 60 * 24));
@@ -64,8 +62,7 @@ const Workouts = () => {
   };
 
   const fetchWorkoutsByDate = async (dateKey) => {
-    console.log('📅 Fetching date:', dateKey);
-
+    if (fetchedDates.has(dateKey)) return;
     const token = localStorage.getItem('token');
     try {
       const res = await fetch(`${process.env.REACT_APP_API_BASE_URL}/workouts?date=${dateKey}`, {
@@ -76,9 +73,7 @@ const Workouts = () => {
         headers: { Authorization: `Bearer ${token}` },
       });
       const settings = await settingsRes.json();
-      console.log('📥 Raw workouts:', data);
       const visibleWorkouts = filterVisibleWorkouts(data, settings.releaseTime);
-      console.log('🎯 After releaseTime filter:', visibleWorkouts);
       const grouped = { ...groupedWorkouts };
       const dateObj = new Date(dateKey);
       const displayDate = dateObj.toLocaleDateString("en-GB");
@@ -86,112 +81,79 @@ const Workouts = () => {
       grouped[dateKey] = { displayDate, day, versions: {} };
       visibleWorkouts.forEach(w => {
         const version = w.version?.trim() || "Uncategorized";
-        console.log("📌 Workout:", w.title, "| version:", version);
         if (!grouped[dateKey].versions[version]) {
           grouped[dateKey].versions[version] = [];
         }
         grouped[dateKey].versions[version].push(w);
       });
-      setGroupedWorkouts(prev => {
-        const updated = { ...prev, ...grouped };
-        setDates(prevDates => {
-          const allKeys = Object.keys(updated);
-          return Array.from(new Set([...prevDates, ...allKeys])).sort();
-        });
-        return updated;
-      });
+      setGroupedWorkouts(prev => ({ ...prev, ...grouped }));
+      setDates(prev => Array.from(new Set([...prev, dateKey])).sort());
+      setFetchedDates(prev => new Set(prev).add(dateKey));
     } catch (err) {
       console.error(err);
     }
   };
 
-  useEffect(() => {
-    const init = async () => {
-      const base = new Date();
-      const start = new Date(base);
-      start.setDate(base.getDate() - 5);
-      const end = new Date(base);
-      end.setDate(base.getDate() + 5);
-      setStartDate(start);
-      setEndDate(end);
-      for (let d = new Date(start); d <= end; d.setDate(d.getDate() + 1)) {
-        const key = new Date(d).toISOString().split('T')[0];
-        await fetchWorkoutsByDate(key);
-      }
-      setSelectedDate(todayKey);
-      setTimeout(() => {
-        requestAnimationFrame(() => {
-          const el = scrollRef.current[todayKey];
-          if (el && !hasScrolledToToday) {
-            scrollToCenter(todayKey);
-            setHasScrolledToToday(true);
-            console.log('✅ Scrolled to today after all fetches');
-          } else {
-            console.warn('⛔ todayKey element not found for scroll');
-          }
-        });
-      }, 0);
-    };
-    init();
-  }, []);
-
-  useEffect(() => {
-    const handleScroll = () => {
-      const container = scrollContainerRef.current;
-      if (!container || !startDate) return;
-      if (container.scrollLeft < 50) {
-        const newStart = new Date(startDate);
-        newStart.setDate(newStart.getDate() - 5);
-        for (let d = new Date(newStart); d < startDate; d.setDate(d.getDate() + 1)) {
-          const key = new Date(d).toISOString().split('T')[0];
-          if (!groupedWorkouts[key]) fetchWorkoutsByDate(key);
-        }
-        setStartDate(newStart);
-      }
-    };
-
-    const container = scrollContainerRef.current;
-    if (container) container.addEventListener('scroll', handleScroll);
-    return () => {
-      if (container) container.removeEventListener('scroll', handleScroll);
-    };
-  }, [startDate, groupedWorkouts]);
-
-  const toggleExpandAll = (version) => {
-    setExpandedVersions(prev => ({
-      ...prev,
-      [version]: !prev[version]
-    }));
+  const loadInitialDates = () => {
+    const base = new Date();
+    const start = new Date(base);
+    start.setDate(base.getDate() - 4);
+    const end = new Date(base);
+    end.setDate(base.getDate() + 5);
+    const initial = [];
+    for (let d = new Date(start); d <= end; d.setDate(d.getDate() + 1)) {
+      const key = new Date(d).toISOString().split('T')[0];
+      initial.push(key);
+    }
+    setDates([...initial]);
+    initial.slice(0, 5).forEach(key => fetchWorkoutsByDate(key));
   };
+
+  const handleLoadMore = () => {
+    const firstDate = new Date(dates[0]);
+    const newDates = [];
+    for (let i = 5; i >= 1; i--) {
+      const newDate = new Date(firstDate);
+      newDate.setDate(newDate.getDate() - i);
+      const key = newDate.toISOString().split('T')[0];
+      newDates.push(key);
+      fetchWorkoutsByDate(key);
+    }
+    setDates(prev => [...newDates, ...prev]);
+  };
+
+  useEffect(() => {
+    loadInitialDates();
+    setSelectedDate(todayKey);
+    setTimeout(() => scrollToCenter(todayKey), 300);
+  }, []);
 
   const handleDateSelect = async (dateKey) => {
     if (!groupedWorkouts[dateKey]) {
       await fetchWorkoutsByDate(dateKey);
     }
     setSelectedDate(dateKey);
-    if (dateKey !== todayKey || !hasScrolledToToday) {
-      scrollToCenter(dateKey);
-    }
+    scrollToCenter(dateKey);
   };
-
 
   return (
     <div className="horizontal-container">
       <div className="timeline-horizontal" ref={scrollContainerRef}>
+        <div className="timeline-date-wrapper">
+          <div
+            className="timeline-date-circle load-more-circle"
+            onClick={handleLoadMore}
+          >
+            +
+          </div>
+        </div>
         {dates.map((dateKey, index) => {
-          console.log("✅ Rendering dateKey:", dateKey, groupedWorkouts[dateKey]);
-          console.log(`🔎 [Timeline] ${dateKey}`, groupedWorkouts[dateKey]);
           const dateObj = new Date(dateKey);
           const isActive = selectedDate === dateKey;
-          const hasWorkouts = Object.keys(groupedWorkouts[dateKey]?.versions || {}).length > 0;
-
           const today = new Date();
           const diff = Math.floor((dateObj - today) / (1000 * 60 * 60 * 24));
-          let label = '';
-          if (diff === 0) label = 'Today';
-          else if (diff === 1) label = 'Tomorrow';
-          else if (diff === -1) label = 'Yesterday';
-          else label = dateObj.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
+          const label = getDisplayDate(dateKey);
+          const hasWorkouts = Object.keys(groupedWorkouts[dateKey]?.versions || {}).length > 0;
 
           const showMonthHeading = index === 0 || new Date(dates[index - 1]).getMonth() !== dateObj.getMonth();
           const monthName = dateObj.toLocaleDateString('en-US', { month: 'long' });
@@ -201,102 +163,17 @@ const Workouts = () => {
               {showMonthHeading && <div className="month-heading">{monthName}</div>}
               <div
                 data-date={dateKey}
-                className={`timeline-date-circle ${isActive ? 'active' : ''} ${!hasWorkouts ? 'disabled' : ''}`}
-                onClick={() => hasWorkouts && handleDateSelect(dateKey)}
-                ref={(el) => {
-                  if (el) scrollRef.current[dateKey] = el;
-                }}
+                className={`timeline-date-circle ${isActive ? 'active' : ''} ${!hasWorkouts && dateObj <= today ? 'disabled' : ''}`}
+                onClick={() => dateObj <= today && handleDateSelect(dateKey)}
+                ref={(el) => { if (el) scrollRef.current[dateKey] = el; }}
               >
-                <div className="circle-date">{groupedWorkouts[dateKey]?.displayDate.split('/')[0]}</div>
+                <div className="circle-date">{groupedWorkouts[dateKey]?.displayDate?.split('/')[0]}</div>
                 <div className="circle-day">{groupedWorkouts[dateKey]?.day}</div>
               </div>
             </div>
           );
         })}
       </div>
-
-      {selectedDate && (
-        <div className="timeline-details-box">
-          <div className="timeline-header-w">
-            <h1>Hi {user.name}</h1>
-            <h3 style={{ color: "#ff2c2c", marginBottom: '20px' }}>
-              Workout for {getDisplayDate(selectedDate)}
-            </h3>
-            <button
-              className="back-to-today-btn"
-              onClick={() => {
-                if (dates.includes(todayKey)) {
-                  setSelectedDate(todayKey);
-                  scrollToCenter(todayKey);
-                } else {
-                  alert("Today's workout not found.");
-                }
-              }}
-            >
-              Back to Today
-            </button>
-          </div>
-
-          {versionOrder.map((version) =>
-            groupedWorkouts[selectedDate]?.versions[version] ? (
-              <div key={version} className="version-container">
-                <div className="version-header">
-                  <span className={`badge badge-${version.replace(/\s+/g, '').toLowerCase()}`}>
-                    {version}
-                  </span>
-                </div>
-
-                <div className="workout-list">
-                  {groupedWorkouts[selectedDate].versions[version]
-                    .sort((a, b) => a.order - b.order)
-                    .map((w) => (
-                      <div key={w._id} className="workout-item" onClick={() => setModalWorkout(w)}>
-                        <div>
-                          {w.icon && (
-                            <img
-                              src={`/icons/${w.icon}.png`}
-                              alt={w.icon}
-                              className="workout-icon"
-                              style={{ width: '20px', marginRight: '10px' }}
-                            />
-                          )}
-                          {w.title}
-                        </div>
-                        {expandedVersions[version] && (
-                          <div className="inline-details">
-                            <p><strong>Description:</strong> {w.description}</p>
-                            <div dangerouslySetInnerHTML={{ __html: w.description.replace(/\n/g, '<br/>') }} />
-                            <p><strong>Uploaded By:</strong> {w.createdBy?.name || 'Unknown'}</p>
-                          </div>
-                        )}
-                      </div>
-                    ))}
-                </div>
-
-                <button
-                  className="expand-btn"
-                  onClick={() => toggleExpandAll(version)}
-                >
-                  {expandedVersions[version] ? "Hide Workouts" : "Show Full Workout"}
-                </button>
-              </div>
-            ) : null
-          )}
-        </div>
-      )}
-
-      {modalWorkout && (
-        <div className="modal-overlay" onClick={() => setModalWorkout(null)}>
-          <div className="modal-box" onClick={(e) => e.stopPropagation()}>
-            <h2>{modalWorkout.title}</h2>
-            <p><strong>Version:</strong> {modalWorkout.version}</p>
-            <p><strong>Description:</strong> {modalWorkout.description}</p>
-            <p><strong>Uploaded By:</strong> {modalWorkout.createdBy?.name || 'Unknown'}</p>
-            <p><strong>Date:</strong> {new Date(modalWorkout.date).toLocaleDateString()}</p>
-            <button onClick={() => setModalWorkout(null)}>Close</button>
-          </div>
-        </div>
-      )}
     </div>
   );
 };
