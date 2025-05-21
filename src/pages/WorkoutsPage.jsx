@@ -49,12 +49,35 @@ const Workouts = () => {
         headers: { Authorization: `Bearer ${token}` },
       });
       const data = await res.json();
+
+      const settingsRes = await fetch(`${process.env.REACT_APP_API_BASE_URL}/settings`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      const settings = await settingsRes.json();
+
+      const [releaseHour, releaseMinute] = settings.releaseTime.split(':').map(Number);
+      const now = new Date();
+      const nowIST = new Date(now.toLocaleString('en-US', { timeZone: 'Asia/Kolkata' }));
+      const releaseTime = new Date(nowIST);
+      releaseTime.setHours(releaseHour, releaseMinute, 0, 0);
+      const tomorrowKey = new Date(nowIST);
+      tomorrowKey.setDate(tomorrowKey.getDate() + 1);
+      const tomorrowDateKey = tomorrowKey.toISOString().split('T')[0];
+
+      const filtered = user?.role === 'admin' || user?.role === 'superadmin' ? data : data.filter(w => {
+        if (!w.date) return false;
+        const workoutDateKey = new Date(w.date).toISOString().split('T')[0];
+        if (workoutDateKey < tomorrowDateKey) return true;
+        if (workoutDateKey === tomorrowDateKey && nowIST >= releaseTime) return true;
+        return false;
+      });
+
       const grouped = { ...groupedWorkouts };
       const dateObj = new Date(dateKey);
       const displayDate = dateObj.toLocaleDateString("en-GB");
       const day = dateObj.toLocaleDateString("en-US", { weekday: 'short' });
       grouped[dateKey] = { displayDate, day, versions: {} };
-      data.forEach(w => {
+      filtered.forEach(w => {
         const version = w.version?.trim() || "Uncategorized";
         if (!grouped[dateKey].versions[version]) {
           grouped[dateKey].versions[version] = [];
@@ -115,19 +138,13 @@ const Workouts = () => {
 
   const handleDateSelect = async (dateKey) => {
     const isSameDate = selectedDate === dateKey;
-  
     if (!groupedWorkouts[dateKey]) {
       await fetchWorkoutsByDate(dateKey);
     }
-  
-    // Always scroll to center
     scrollToCenter(dateKey);
-  
-    // Only update selectedDate if it's different OR forced re-render
     if (!isSameDate) {
       setSelectedDate(dateKey);
     } else {
-      // force refresh to apply active class
       setSelectedDate(null);
       setTimeout(() => setSelectedDate(dateKey), 0);
     }
