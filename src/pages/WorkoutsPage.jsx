@@ -81,10 +81,11 @@ const Workouts = () => {
       const day = dateObj.toLocaleDateString("en-US", { weekday: 'short' });
       grouped[dateKey] = { displayDate, day, versions: {} };
       visibleWorkouts.forEach(w => {
-        if (!grouped[dateKey].versions[w.version]) {
-          grouped[dateKey].versions[w.version] = [];
+        const version = w.version || "Uncategorized";
+        if (!grouped[dateKey].versions[version]) {
+          grouped[dateKey].versions[version] = [];
         }
-        grouped[dateKey].versions[w.version].push(w);
+        grouped[dateKey].versions[version].push(w);
       });
       setGroupedWorkouts(grouped);
       setDates(prev => Array.from(new Set([...prev, dateKey])).sort());
@@ -160,6 +161,8 @@ const Workouts = () => {
     <div className="horizontal-container">
       <div className="timeline-horizontal" ref={scrollContainerRef}>
         {dates.map((dateKey, index) => {
+          console.log("✅ Rendering dateKey:", dateKey, groupedWorkouts[dateKey]);
+          console.log(`🔎 [Timeline] ${dateKey}`, groupedWorkouts[dateKey]);
           const dateObj = new Date(dateKey);
           const isActive = selectedDate === dateKey;
           const hasWorkouts = Object.keys(groupedWorkouts[dateKey]?.versions || {}).length > 0;
