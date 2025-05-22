@@ -9,7 +9,6 @@ const Workouts = () => {
   const [selectedDate, setSelectedDate] = useState(null);
   const [modalWorkout, setModalWorkout] = useState(null);
   const [expandedVersions, setExpandedVersions] = useState({});
-  const [startDate, setStartDate] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const scrollRef = useRef({});
   const scrollContainerRef = useRef(null);
@@ -49,7 +48,6 @@ const Workouts = () => {
         headers: { Authorization: `Bearer ${token}` },
       });
       const data = await res.json();
-
       const grouped = {};
       data.forEach((w) => {
         const dateKey = new Date(w.date).toISOString().split('T')[0];
@@ -65,7 +63,6 @@ const Workouts = () => {
         }
         grouped[dateKey].versions[version].push(w);
       });
-
       setGroupedWorkouts(grouped);
     } catch (err) {
       console.error(err);
@@ -75,20 +72,22 @@ const Workouts = () => {
   useEffect(() => {
     const today = new Date();
     const baseDates = [];
-    for (let i = -5; i <= 1; i++) {
+    for (let i = -5; i <= 5; i++) {
       const newDate = new Date(today);
       newDate.setDate(today.getDate() + i);
       baseDates.push(newDate.toISOString().split('T')[0]);
     }
     setDates(baseDates);
-    setStartDate(new Date(today.setDate(today.getDate() - 5)));
 
     const fetchInitial = async () => {
       const fromDate = new Date();
       fromDate.setDate(fromDate.getDate() - 5);
       const toDate = new Date();
-      toDate.setDate(toDate.getDate() + 1);
-      await fetchWorkoutsInRange(fromDate.toISOString().split('T')[0], toDate.toISOString().split('T')[0]);
+      toDate.setDate(toDate.getDate() + 5);
+      await fetchWorkoutsInRange(
+        fromDate.toISOString().split('T')[0],
+        toDate.toISOString().split('T')[0]
+      );
       setSelectedDate(todayKey);
       setTimeout(() => {
         scrollToCenter(todayKey);
@@ -128,7 +127,7 @@ const Workouts = () => {
               {showMonthHeading && <div className="month-heading">{monthName}</div>}
               <div
                 data-date={dateKey}
-                className={`timeline-date-circle ${selectedDate === dateKey ? 'active' : ''} ${!hasWorkouts ? 'disabled' : ''}`}
+                className={`timeline-date-circle ${isActive ? 'active' : ''} ${!hasWorkouts ? 'disabled' : ''}`}
                 onClick={() => handleDateSelect(dateKey)}
                 ref={el => { if (el) scrollRef.current[dateKey] = el; }}
               >

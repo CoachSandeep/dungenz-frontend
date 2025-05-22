@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import DatePicker from 'react-datepicker';
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 import 'react-datepicker/dist/react-datepicker.css';
+import './../../styles/ClusterForm.css';
 
 const iconOptions = [
   { label: '🔥 Warm-up', value: 'warmup' },
@@ -37,11 +38,7 @@ const ClusterCreateForm = ({ defaultDate, onSaved }) => {
 
   const handleSave = async () => {
     const formattedDate = selectedDate.toISOString();
-    const payloads = workouts.map(w => ({
-      ...w,
-      version,
-      date: formattedDate
-    }));
+    const payloads = workouts.map(w => ({ ...w, version, date: formattedDate }));
 
     try {
       const responses = await Promise.all(
@@ -58,14 +55,14 @@ const ClusterCreateForm = ({ defaultDate, onSaved }) => {
       );
 
       if (responses.every(res => res.ok)) {
-        alert('All workouts saved!');
+        alert('✅ All workouts saved!');
         onSaved();
       } else {
-        alert('Some workouts failed to save.');
+        alert('⚠️ Some workouts failed to save.');
       }
     } catch (err) {
       console.error(err);
-      alert('Error saving workouts.');
+      alert('❌ Error saving workouts.');
     }
   };
 
@@ -79,28 +76,30 @@ const ClusterCreateForm = ({ defaultDate, onSaved }) => {
 
   return (
     <div className="cluster-create-box">
-      <h3>Create Workout Cluster</h3>
+      <h2 className="form-title">📋 Create Workout Cluster</h2>
 
-      <label>Date</label>
-      <DatePicker
-        selected={selectedDate}
-        onChange={(date) => setSelectedDate(date)}
-        dateFormat="dd/MM/yyyy"
-        className="datepicker"
-      />
+      <div className="form-row">
+        <label>Date:</label>
+        <DatePicker
+          selected={selectedDate}
+          onChange={(date) => setSelectedDate(date)}
+          dateFormat="dd/MM/yyyy"
+          className="datepicker"
+        />
 
-      <label>Version</label>
-      <select value={version} onChange={(e) => setVersion(e.target.value)}>
-        <option>Ultra Train</option>
-        <option>Super Train</option>
-        <option>Minimal Equipment</option>
-        <option>Beginner</option>
-      </select>
+        <label>Version:</label>
+        <select value={version} onChange={(e) => setVersion(e.target.value)}>
+          <option>Ultra Train</option>
+          <option>Super Train</option>
+          <option>Minimal Equipment</option>
+          <option>Beginner</option>
+        </select>
+      </div>
 
       <DragDropContext onDragEnd={onDragEnd}>
         <Droppable droppableId="workoutList">
           {(provided) => (
-            <div {...provided.droppableProps} ref={provided.innerRef}>
+            <div {...provided.droppableProps} ref={provided.innerRef} className="workout-block-list">
               {workouts.map((w, index) => (
                 <Draggable key={index} draggableId={`w-${index}`} index={index}>
                   {(provided) => (
@@ -110,53 +109,53 @@ const ClusterCreateForm = ({ defaultDate, onSaved }) => {
                       {...provided.draggableProps}
                       {...provided.dragHandleProps}
                     >
-            <div className="icon-selector">
-  <label>Workout Icon:</label>
-  <div className="icon-options">
-    {['warmup', 'main', 'cooldown', 'mobility'].map((iconType) => (
-      <label key={iconType}>
-        <input
-          type="radio"
-          name={`icon-${index}`}
-          value={iconType}
-          checked={w.icon === iconType}
-          onChange={(e) => handleChange(index, 'icon', e.target.value)}
-        />
-        <img src={`/icons/${iconType}.png`} alt={iconType} style={{ width: '24px', margin: '5px' }} />
-      </label>
-    ))}
-  </div>
-</div>
+                      <div className="form-section">
+                        <label>Workout Icon:</label>
+                        <div className="icon-options">
+                          {iconOptions.map(icon => (
+                            <label key={icon.value} className="icon-label">
+                              <input
+                                type="radio"
+                                name={`icon-${index}`}
+                                value={icon.value}
+                                checked={w.icon === icon.value}
+                                onChange={(e) => handleChange(index, 'icon', e.target.value)}
+                              />
+                              <img src={`/icons/${icon.value}.png`} alt={icon.label} className="icon-img" />
+                            </label>
+                          ))}
+                        </div>
+                      </div>
 
                       <input
-                        placeholder="Title"
+                        placeholder="🏷️ Title"
                         value={w.title}
                         onChange={(e) => handleChange(index, 'title', e.target.value)}
                       />
-                     <textarea
-  placeholder="Description"
-  rows={4}
-  value={w.description}
-  onChange={(e) => handleChange(index, 'description', e.target.value)}
-/>
+                      <textarea
+                        placeholder="📝 Description"
+                        rows={3}
+                        value={w.description}
+                        onChange={(e) => handleChange(index, 'description', e.target.value)}
+                      />
                       <input
-                        placeholder="Cap Time"
+                        placeholder="⏱️ Cap Time"
                         value={w.capTime}
                         onChange={(e) => handleChange(index, 'capTime', e.target.value)}
                       />
                       <input
-                        placeholder="Custom Name"
+                        placeholder="🏷️ Custom Name"
                         value={w.customName}
                         onChange={(e) => handleChange(index, 'customName', e.target.value)}
                       />
-                     <textarea
-  placeholder="Instructions"
-  rows={4}
-  value={w.instructions}
-  onChange={(e) => handleChange(index, 'instructions', e.target.value)}
-/>
+                      <textarea
+                        placeholder="📋 Instructions"
+                        rows={3}
+                        value={w.instructions}
+                        onChange={(e) => handleChange(index, 'instructions', e.target.value)}
+                      />
                       {index > 0 && (
-                        <button onClick={() => handleRemove(index)}>🗑️ Remove</button>
+                        <button className="remove-btn" onClick={() => handleRemove(index)}>🗑️ Remove</button>
                       )}
                       <hr />
                     </div>
@@ -169,8 +168,10 @@ const ClusterCreateForm = ({ defaultDate, onSaved }) => {
         </Droppable>
       </DragDropContext>
 
-      <button onClick={handleAddWorkout}>➕ Add Another Workout</button>
-      <button onClick={handleSave}>💾 Save All</button>
+      <div className="action-buttons">
+        <button onClick={handleAddWorkout}>➕ Add Another Workout</button>
+        <button className="save-btn" onClick={handleSave}>💾 Save All</button>
+      </div>
     </div>
   );
 };
