@@ -368,3 +368,15 @@ a {
   font-size: 1.5rem;
   font-weight: bold;
 }
+.custom-name {
+  font-size: 1.1rem;
+  color: #fff;
+  font-weight: 600;
+  line-height: 1.2;
+}
+
+.sub-title {
+  font-size: 0.9rem;
+  color: #ccc;
+  margin-top: 2px;
+}

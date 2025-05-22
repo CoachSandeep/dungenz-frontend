@@ -8,8 +8,7 @@ const iconOptions = [
   { label: '🔥 Warm-up', value: 'warmup' },
   { label: '💪 Main Workout', value: 'main' },
   { label: '🧊 Cool Down', value: 'cooldown' },
-  { label: '⚡ EMOM', value: 'emom' },
-  { label: '⏱️ AMRAP', value: 'amrap' },
+
 ];
 
 const ClusterCreateForm = ({ defaultDate, onSaved }) => {

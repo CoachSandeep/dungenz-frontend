@@ -160,15 +160,26 @@ const Workouts = () => {
                 <div className="workout-list">
                   {groupedWorkouts[selectedDate].versions[version].sort((a, b) => a.order - b.order).map(w => (
                     <div key={w._id} className="workout-item" onClick={() => setModalWorkout(w)}>
-                      <div>
+                      
                         {w.icon && <img src={`/icons/${w.icon}.png`} alt={w.icon} className="workout-icon" style={{ width: '20px', marginRight: '10px' }} />}
-                        {w.title}
-                      </div>
+                         {/* Heading logic */}
+    <div className="workout-text">
+      <strong className="custom-name">
+        {w.customName || w.title}
+      </strong>
+      {w.customName && (
+        <div className="sub-title">
+          {w.title}
+        </div>
+      )}
+    </div>
+
+                     
                       {expandedVersions[version] && (
                         <div className="inline-details">
-                          <p><strong>Description:</strong> {w.description}</p>
+                          <p>{w.description}</p>
                           <div dangerouslySetInnerHTML={{ __html: w.description.replace(/\n/g, '<br/>') }} />
-                          <p><strong>Uploaded By:</strong> {w.createdBy?.name || 'Unknown'}</p>
+                         
                         </div>
                       )}
                     </div>
@@ -186,11 +197,13 @@ const Workouts = () => {
       {modalWorkout && (
         <div className="modal-overlay" onClick={() => setModalWorkout(null)}>
           <div className="modal-box" onClick={e => e.stopPropagation()}>
-            <h2>{modalWorkout.title}</h2>
-            <p><strong>Version:</strong> {modalWorkout.version}</p>
-            <p><strong>Description:</strong> {modalWorkout.description}</p>
-            <p><strong>Uploaded By:</strong> {modalWorkout.createdBy?.name || 'Unknown'}</p>
-            <p><strong>Date:</strong> {new Date(modalWorkout.date).toLocaleDateString()}</p>
+            <h2>{ modalWorkout.customName || modalWorkout.title}</h2>
+            <h3>{modalWorkout.title}</h3>
+            {/* <p><strong>Version:</strong> {modalWorkout.version}</p> */}
+            <p>{modalWorkout.description}</p>
+            {/* <p>{modalWorkout.capti}</p> */}
+            {/* <p><strong>Uploaded By:</strong> {modalWorkout.createdBy?.name || 'Unknown'}</p> */}
+            {/* <p><strong>Date:</strong> {new Date(modalWorkout.date).toLocaleDateString()}</p> */}
             <button onClick={() => setModalWorkout(null)}>Close</button>
           </div>
         </div>
