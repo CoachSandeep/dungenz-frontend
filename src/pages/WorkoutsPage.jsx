@@ -42,73 +42,40 @@ const Workouts = () => {
     }
   };
 
-  const fetchWorkoutsByDate = async (dateKey) => {
+  const fetchWorkoutsInRange = async (from, to) => {
     const token = localStorage.getItem('token');
     try {
-      const res = await fetch(`${process.env.REACT_APP_API_BASE_URL}/workouts?date=${dateKey}`, {
+      const res = await fetch(`${process.env.REACT_APP_API_BASE_URL}/workouts/range?from=${from}&to=${to}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       const data = await res.json();
 
-      const settingsRes = await fetch(`${process.env.REACT_APP_API_BASE_URL}/settings`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      const settings = await settingsRes.json();
-
-      const [releaseHour, releaseMinute] = settings.releaseTime?.split(':').map(Number) || [0, 0];
-      const now = new Date();
-      const nowIST = new Date(now.toLocaleString('en-US', { timeZone: 'Asia/Kolkata' }));
-      const releaseTime = new Date(nowIST);
-      releaseTime.setHours(releaseHour, releaseMinute, 0, 0);
-      const tomorrowKey = new Date(nowIST);
-      tomorrowKey.setDate(tomorrowKey.getDate() + 1);
-      const tomorrowDateKey = tomorrowKey.toISOString().split('T')[0];
-
-      const filtered = user?.role === 'admin' || user?.role === 'superadmin' ? data : data.filter(w => {
-        if (!w.date) return false;
-        const workoutDateKey = new Date(w.date).toISOString().split('T')[0];
-        if (workoutDateKey < tomorrowDateKey) return true;
-        if (workoutDateKey === tomorrowDateKey && nowIST >= releaseTime) return true;
-        return false;
-      });
-
-      const grouped = { ...groupedWorkouts };
-      const dateObj = new Date(dateKey);
-      const displayDate = dateObj.toLocaleDateString("en-GB");
-      const day = dateObj.toLocaleDateString("en-US", { weekday: 'short' });
-      grouped[dateKey] = { displayDate, day, versions: {} };
-      filtered.forEach(w => {
+      const grouped = {};
+      data.forEach((w) => {
+        const dateKey = new Date(w.date).toISOString().split('T')[0];
+        const dateObj = new Date(dateKey);
+        const displayDate = dateObj.toLocaleDateString("en-GB");
+        const day = dateObj.toLocaleDateString("en-US", { weekday: 'short' });
+        if (!grouped[dateKey]) {
+          grouped[dateKey] = { displayDate, day, versions: {} };
+        }
         const version = w.version?.trim() || "Uncategorized";
         if (!grouped[dateKey].versions[version]) {
           grouped[dateKey].versions[version] = [];
         }
         grouped[dateKey].versions[version].push(w);
       });
-      setGroupedWorkouts(prev => ({ ...prev, ...grouped }));
+
+      setGroupedWorkouts(grouped);
     } catch (err) {
       console.error(err);
     }
   };
 
-  const loadPreviousDates = async () => {
-    const newStart = new Date(startDate);
-    newStart.setDate(startDate.getDate() - 5);
-    for (let d = new Date(newStart); d < startDate; d.setDate(d.getDate() + 1)) {
-      const dateKey = d.toISOString().split('T')[0];
-      await fetchWorkoutsByDate(dateKey);
-    }
-    const updatedDates = [];
-    for (let d = new Date(newStart); d <= new Date(); d.setDate(d.getDate() + 1)) {
-      updatedDates.push(new Date(d).toISOString().split('T')[0]);
-    }
-    setDates([...new Set([...updatedDates, ...dates])].sort());
-    setStartDate(newStart);
-  };
-
   useEffect(() => {
     const today = new Date();
     const baseDates = [];
-    for (let i = -5; i <= 5; i++) {
+    for (let i = -5; i <= 1; i++) {
       const newDate = new Date(today);
       newDate.setDate(today.getDate() + i);
       baseDates.push(newDate.toISOString().split('T')[0]);
@@ -116,20 +83,19 @@ const Workouts = () => {
     setDates(baseDates);
     setStartDate(new Date(today.setDate(today.getDate() - 5)));
 
-    const fetchInitialDates = async () => {
-      for (let i = -5; i <= 1; i++) {
-        const d = new Date();
-        d.setDate(d.getDate() + i);
-        const dateKey = d.toISOString().split('T')[0];
-        await fetchWorkoutsByDate(dateKey);
-      }
+    const fetchInitial = async () => {
+      const fromDate = new Date();
+      fromDate.setDate(fromDate.getDate() - 5);
+      const toDate = new Date();
+      toDate.setDate(toDate.getDate() + 1);
+      await fetchWorkoutsInRange(fromDate.toISOString().split('T')[0], toDate.toISOString().split('T')[0]);
       setSelectedDate(todayKey);
       setTimeout(() => {
         scrollToCenter(todayKey);
         setIsLoading(false);
       }, 300);
     };
-    fetchInitialDates();
+    fetchInitial();
   }, []);
 
   const toggleExpandAll = (version) => {
@@ -138,9 +104,6 @@ const Workouts = () => {
 
   const handleDateSelect = async (dateKey) => {
     const isSameDate = selectedDate === dateKey;
-    if (!groupedWorkouts[dateKey]) {
-      await fetchWorkoutsByDate(dateKey);
-    }
     scrollToCenter(dateKey);
     if (!isSameDate) {
       setSelectedDate(dateKey);
@@ -153,9 +116,6 @@ const Workouts = () => {
   return (
     <div className="horizontal-container">
       <div className="timeline-horizontal" ref={scrollContainerRef}>
-        <div className="timeline-date-wrapper">
-          <div className="timeline-date-circle load-more-circle" onClick={loadPreviousDates}>+ Load</div>
-        </div>
         {dates.map((dateKey, index) => {
           const dateObj = new Date(dateKey);
           const isActive = selectedDate === dateKey;
