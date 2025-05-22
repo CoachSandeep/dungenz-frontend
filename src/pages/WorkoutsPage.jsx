@@ -55,7 +55,8 @@ const Workouts = () => {
       });
       const settings = await settingsRes.json();
 
-      const [releaseHour, releaseMinute] = settings.releaseTime.split(':').map(Number);
+      const releaseTimeString = settings?.releaseTime || "21:00";
+      const [releaseHour, releaseMinute] = releaseTimeString.split(':').map(Number);
       const now = new Date();
       const nowIST = new Date(now.toLocaleString('en-US', { timeZone: 'Asia/Kolkata' }));
       const releaseTime = new Date(nowIST);
