@@ -160,13 +160,15 @@ const Workouts = () => {
                 <div className="workout-list">
                   {groupedWorkouts[selectedDate].versions[version].sort((a, b) => a.order - b.order).map(w => (
                     <div key={w._id} className="workout-item" onClick={() => setModalWorkout(w)}>
-                      
+                      <div>
                         {w.icon && <img src={`/icons/${w.icon}.png`} alt={w.icon} className="workout-icon" style={{ width: '20px', marginRight: '10px' }} />}
-                         {/* Heading logic */}
-    <div className="workout-text">
-      <strong className="custom-name">
+                        <strong className="custom-name">
         {w.customName || w.title}
       </strong>
+                        </div>
+                         {/* Heading logic */}
+    <div className="workout-text">
+     
       {w.customName && (
         <div className="sub-title">
           {w.title}
