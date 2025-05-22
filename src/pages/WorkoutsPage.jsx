@@ -1,5 +1,3 @@
-// WorkoutsPage.jsx - Final Optimized with releaseTime fix, today center scroll, loading overlay
-
 import React, { useEffect, useRef, useState } from 'react';
 import './../styles/workout.css';
 
@@ -13,7 +11,6 @@ const Workouts = () => {
   const [expandedVersions, setExpandedVersions] = useState({});
   const [startDate, setStartDate] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [releaseTime, setReleaseTime] = useState("21:00");
   const scrollRef = useRef({});
   const scrollContainerRef = useRef(null);
   const user = JSON.parse(localStorage.getItem('user'));
@@ -53,12 +50,34 @@ const Workouts = () => {
       });
       const data = await res.json();
 
+      const settingsRes = await fetch(`${process.env.REACT_APP_API_BASE_URL}/settings`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      const settings = await settingsRes.json();
+
+      const [releaseHour, releaseMinute] = settings.releaseTime?.split(':').map(Number) || [0, 0];
+      const now = new Date();
+      const nowIST = new Date(now.toLocaleString('en-US', { timeZone: 'Asia/Kolkata' }));
+      const releaseTime = new Date(nowIST);
+      releaseTime.setHours(releaseHour, releaseMinute, 0, 0);
+      const tomorrowKey = new Date(nowIST);
+      tomorrowKey.setDate(tomorrowKey.getDate() + 1);
+      const tomorrowDateKey = tomorrowKey.toISOString().split('T')[0];
+
+      const filtered = user?.role === 'admin' || user?.role === 'superadmin' ? data : data.filter(w => {
+        if (!w.date) return false;
+        const workoutDateKey = new Date(w.date).toISOString().split('T')[0];
+        if (workoutDateKey < tomorrowDateKey) return true;
+        if (workoutDateKey === tomorrowDateKey && nowIST >= releaseTime) return true;
+        return false;
+      });
+
       const grouped = { ...groupedWorkouts };
       const dateObj = new Date(dateKey);
       const displayDate = dateObj.toLocaleDateString("en-GB");
       const day = dateObj.toLocaleDateString("en-US", { weekday: 'short' });
       grouped[dateKey] = { displayDate, day, versions: {} };
-      data.forEach(w => {
+      filtered.forEach(w => {
         const version = w.version?.trim() || "Uncategorized";
         if (!grouped[dateKey].versions[version]) {
           grouped[dateKey].versions[version] = [];
@@ -89,7 +108,7 @@ const Workouts = () => {
   useEffect(() => {
     const today = new Date();
     const baseDates = [];
-    for (let i = -5; i <= 5; i++) {
+    for (let i = -5; i <= 1; i++) {  // include tomorrow now
       const newDate = new Date(today);
       newDate.setDate(today.getDate() + i);
       baseDates.push(newDate.toISOString().split('T')[0]);
@@ -97,15 +116,8 @@ const Workouts = () => {
     setDates(baseDates);
     setStartDate(new Date(today.setDate(today.getDate() - 5)));
 
-    const fetchInitial = async () => {
-      const token = localStorage.getItem('token');
-      const settingsRes = await fetch(`${process.env.REACT_APP_API_BASE_URL}/settings`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      const settings = await settingsRes.json();
-      setReleaseTime(settings.releaseTime);
-
-      for (let i = -5; i <= 0; i++) {
+    const fetchInitialDates = async () => {
+      for (let i = -5; i <= 1; i++) {  // also fetch tomorrow's data
         const d = new Date();
         d.setDate(d.getDate() + i);
         const dateKey = d.toISOString().split('T')[0];
@@ -117,7 +129,7 @@ const Workouts = () => {
         setIsLoading(false);
       }, 300);
     };
-    fetchInitial();
+    fetchInitialDates();
   }, []);
 
   const toggleExpandAll = (version) => {
@@ -138,21 +150,6 @@ const Workouts = () => {
     }
   };
 
-  const shouldShowDate = (dateKey) => {
-    if (user?.role === 'admin' || user?.role === 'superadmin') return true;
-    const [hour, minute] = releaseTime.split(':').map(Number);
-    const now = new Date();
-    const nowIST = new Date(now.toLocaleString('en-US', { timeZone: 'Asia/Kolkata' }));
-    const releaseTimeIST = new Date(nowIST);
-    releaseTimeIST.setHours(hour, minute, 0, 0);
-    const dateObj = new Date(dateKey);
-    const workoutDate = dateObj.toISOString().split('T')[0];
-    const tomorrow = new Date(nowIST);
-    tomorrow.setDate(tomorrow.getDate() + 1);
-    const tomorrowKey = tomorrow.toISOString().split('T')[0];
-    return (workoutDate < tomorrowKey || (workoutDate === tomorrowKey && nowIST >= releaseTimeIST));
-  };
-
   return (
     <div className="horizontal-container">
       <div className="timeline-horizontal" ref={scrollContainerRef}>
@@ -162,7 +159,7 @@ const Workouts = () => {
         {dates.map((dateKey, index) => {
           const dateObj = new Date(dateKey);
           const isActive = selectedDate === dateKey;
-          const hasWorkouts = shouldShowDate(dateKey) && Object.keys(groupedWorkouts[dateKey]?.versions || {}).length > 0;
+          const hasWorkouts = Object.keys(groupedWorkouts[dateKey]?.versions || {}).length > 0;
           const showMonthHeading = index === 0 || new Date(dates[index - 1]).getMonth() !== dateObj.getMonth();
           const monthName = dateObj.toLocaleDateString('en-US', { month: 'long' });
 
@@ -171,7 +168,7 @@ const Workouts = () => {
               {showMonthHeading && <div className="month-heading">{monthName}</div>}
               <div
                 data-date={dateKey}
-                className={`timeline-date-circle ${isActive ? 'active' : ''} ${!hasWorkouts ? 'disabled' : ''}`}
+                className={`timeline-date-circle ${selectedDate === dateKey ? 'active' : ''} ${!hasWorkouts ? 'disabled' : ''}`}
                 onClick={() => handleDateSelect(dateKey)}
                 ref={el => { if (el) scrollRef.current[dateKey] = el; }}
               >
