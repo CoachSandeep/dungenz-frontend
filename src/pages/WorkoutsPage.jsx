@@ -108,7 +108,7 @@ const Workouts = () => {
   useEffect(() => {
     const today = new Date();
     const baseDates = [];
-    for (let i = -5; i <= 1; i++) {  // include tomorrow now
+    for (let i = -5; i <= 5; i++) {
       const newDate = new Date(today);
       newDate.setDate(today.getDate() + i);
       baseDates.push(newDate.toISOString().split('T')[0]);
@@ -117,7 +117,7 @@ const Workouts = () => {
     setStartDate(new Date(today.setDate(today.getDate() - 5)));
 
     const fetchInitialDates = async () => {
-      for (let i = -5; i <= 1; i++) {  // also fetch tomorrow's data
+      for (let i = -5; i <= 1; i++) {
         const d = new Date();
         d.setDate(d.getDate() + i);
         const dateKey = d.toISOString().split('T')[0];
