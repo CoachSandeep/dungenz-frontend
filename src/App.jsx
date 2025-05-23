@@ -44,6 +44,11 @@ const App = () => {
             });
         }
       });
+      // Listen for messages while site is open
+  onMessage(messaging, (payload) => {
+    console.log('🔔 Foreground Message:', payload);
+    alert(`🔔 New Notification: ${payload.notification?.title}`);
+  });
     }
   }, []);
 
