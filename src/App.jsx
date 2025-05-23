@@ -8,48 +8,49 @@ import Register from './pages/RegisterPage';
 import './styles/App.css';
 import UploadWorkout from './pages/UploadWorkoutPage';
 import AdminCalendar from './components/admin/AdminCalendar';
-import LibraryPage from './pages/LibraryPage'; // ✅
-import Settings from './components/admin/settings'; // ✅
+import LibraryPage from './pages/LibraryPage';
+import Settings from './components/admin/settings';
 import ClusterCopyPage from './pages/ClusterCopyPage';
 import { messaging, getToken, onMessage } from './firebase';
 
 const App = () => {
-
-  
   const [isLoggedIn, setIsLoggedIn] = useState(false);
 
   useEffect(() => {
     const token = localStorage.getItem('token');
     setIsLoggedIn(!!token);
 
-    // ✅ Ask Notification Permission
-    if ('Notification' in window && Notification.permission !== 'granted') {
+    // Request notification permission
+    if ('Notification' in window) {
       Notification.requestPermission().then((permission) => {
         if (permission === 'granted') {
           console.log('✅ Notification permission granted.');
-  
+
           getToken(messaging, {
             vapidKey: "BCHlImXNmJE5fjxK6Dnc9g74itDxN8KKBtkuQpPHn4HzgPd0AVt7zOFYSw_gvI6oOz9IolQY0AxuUwiIcA2LkBc"
           })
             .then((currentToken) => {
               if (currentToken) {
                 console.log('📬 FCM Token:', currentToken);
-                // ✅ Optionally save to your backend
+                // Optional: Send token to backend
               } else {
-                console.warn('No registration token available. Request permission to generate one.');
+                console.warn('No registration token available.');
               }
             })
             .catch((err) => {
-              console.error('An error occurred while retrieving token. ', err);
+              console.error('❌ Error retrieving token:', err);
             });
+        } else {
+          console.warn('🚫 Notification permission denied.');
         }
       });
-      // Listen for messages while site is open
-  onMessage(messaging, (payload) => {
-    console.log('🔔 Foreground Message:', payload);
-    alert(`🔔 New Notification: ${payload.notification?.title}`);
-  });
     }
+
+    // Listen for foreground notifications
+    onMessage(messaging, (payload) => {
+      console.log('🔔 Foreground Message:', payload);
+      alert(`🔔 New Notification: ${payload.notification?.title}`);
+    });
   }, []);
 
   return (
@@ -60,15 +61,12 @@ const App = () => {
         <Route path="/workouts" element={<Workouts />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
-<Route path="/upload" element={<UploadWorkout />} />
-
-  {/* 🔐 Superadmin-only routes */}
-  <Route path="/admin" element={<AdminCalendar />} />
-  <Route path="/admin/cluster-copy" element={<ClusterCopyPage />} />
+        <Route path="/upload" element={<UploadWorkout />} />
+        <Route path="/admin" element={<AdminCalendar />} />
+        <Route path="/admin/cluster-copy" element={<ClusterCopyPage />} />
         <Route path="/library" element={<LibraryPage />} />
         <Route path="/settings" element={<Settings />} />
-         {/* Default route */}
-         <Route path="*" element={<Workouts />} />
+        <Route path="*" element={<Workouts />} />
       </Routes>
     </Router>
   );
