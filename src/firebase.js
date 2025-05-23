@@ -1,5 +1,6 @@
-import { getMessaging, getToken } from "firebase/messaging";
+// src/firebase.js
 import { initializeApp } from "firebase/app";
+import { getMessaging, getToken, onMessage } from "firebase/messaging";
 
 const firebaseConfig = {
   apiKey: "AIzaSyDno7dgGj1MYs7VJaYd6Gnk3MwT26Fa7dk",
@@ -11,7 +12,10 @@ const firebaseConfig = {
   measurementId: "G-2VGC1V7X2S"
 };
 
+// Initialize Firebase
 const app = initializeApp(firebaseConfig);
+
+// ✅ Export messaging-related functions
 const messaging = getMessaging(app);
 
-export { messaging };
+export { messaging, getToken, onMessage };
