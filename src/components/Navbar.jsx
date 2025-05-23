@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate, NavLink, useLocation  } from 'react-router-dom';
+import { useNavigate, NavLink, useLocation, Link  } from 'react-router-dom';
 import './../styles/Header.css';
 import logo from '../assets/logo.png';
 import dp from '../assets/dp.png';
@@ -77,7 +77,7 @@ const Navbar = () => {
               <button onClick={() => navigate('/admin/cluster-copy')}>🔁 Cluster Copy</button>
               <button onClick={() => navigate('/library')}>📚 Library</button>
               <button onClick={() => navigate('/settings')}>Setting</button>
-              <a href="/admin/push">🔔 Push Panel</a> {/* ✅ Add this line */}
+              <Link to="/admin/push">🔔 Push Panel</Link>
             </div>
           )}
         </div>
