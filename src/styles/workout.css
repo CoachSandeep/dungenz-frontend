@@ -151,7 +151,7 @@
 
 .modal-box {
   background-color: #111;
-  padding: 2rem;
+  padding: 1rem;
   border-radius: 10px;
   width: 90%;
   max-width: 500px;
@@ -193,4 +193,27 @@
 .timeline-label {
   margin-top: 5px;
   font-size: 12px;
+}
+
+.workout-text {
+  display: flex;
+  flex-direction: column;
+}
+
+.custom-name {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #fff;
+}
+
+.sub-title {
+  font-size: 0.85rem;
+  color: #ccc;
+  margin-top: 2px;
+}
+
+.workout-line {
+  display: flex;
+  align-items: center;
+  gap: 10px;
 }
