@@ -11,6 +11,7 @@ import AdminCalendar from './components/admin/AdminCalendar';
 import LibraryPage from './pages/LibraryPage';
 import Settings from './components/admin/settings';
 import ClusterCopyPage from './pages/ClusterCopyPage';
+import AdminPushPage from './components/admin/AdminPushPage'
 import { messaging, getToken, onMessage } from './firebase';
 
 const App = () => {
@@ -66,6 +67,7 @@ const App = () => {
         <Route path="/admin/cluster-copy" element={<ClusterCopyPage />} />
         <Route path="/library" element={<LibraryPage />} />
         <Route path="/settings" element={<Settings />} />
+        <Route path="/admin/push" element={<AdminPushPage />} />
         <Route path="*" element={<Workouts />} />
       </Routes>
     </Router>
