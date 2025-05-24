@@ -34,6 +34,16 @@ const App = () => {
               if (currentToken) {
                 console.log('📬 FCM Token:', currentToken);
                 // Optional: Send token to backend
+   // ✅ Token save yahan initiate hota hai
+   fetch(`${process.env.REACT_APP_API_BASE_URL}/push/save`, {
+    method: 'POST',
+    headers: {
+      Authorization: `Bearer ${localStorage.getItem('token')}`,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ token: currentToken }),
+  });
+
               } else {
                 console.warn('No registration token available.');
               }
