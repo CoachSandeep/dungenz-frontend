@@ -47,7 +47,7 @@ const App = () => {
         console.log('📬 FCM Token:', currentToken);
 
         // ✅ Save token to backend
-        await fetch(`${process.env.REACT_APP_API_BASE_URL}/push/save`, {
+        await fetch(`${process.env.REACT_APP_API_BASE_URL}/push/register-token`, {
           method: 'POST',
           headers: {
             Authorization: `Bearer ${localStorage.getItem('token')}`,
