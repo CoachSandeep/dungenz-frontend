@@ -4,7 +4,7 @@ import Navbar from './components/Navbar';
 import Hero from './components/Hero';
 import Workouts from './pages/WorkoutsPage';
 import Login from './pages/LoginPage';
-import Register from './pages/RegisterPage';
+import Caccount from './pages/RegisterPage';
 import './styles/App.css';
 import UploadWorkout from './pages/UploadWorkoutPage';
 import AdminCalendar from './components/admin/AdminCalendar';
@@ -106,7 +106,7 @@ const App = () => {
         <Route path="/" element={<Hero />} />
         <Route path="/workouts" element={<Workouts />} />
         <Route path="/login" element={<Login />} />
-        <Route path="/register" element={<Register />} />
+        <Route path="/caccount" element={<Caccount />} />
         <Route path="/upload" element={<UploadWorkout />} />
         <Route path="/admin" element={<AdminCalendar />} />
         <Route path="/admin/cluster-copy" element={<ClusterCopyPage />} />

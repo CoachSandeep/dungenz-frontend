@@ -68,7 +68,7 @@ const Login = () => {
   {isLoggingIn ? 'Logging in...' : 'Login'}
 </button>
 
-        <p>New here? <a href="/register">Create account</a></p>
+        <p>New here? <a href="/caccount">Create account</a></p>
       </form>
     </div>
   );

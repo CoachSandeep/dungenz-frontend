@@ -52,13 +52,13 @@ const Navbar = () => {
       <div className={`navbar-right ${navOpen ? 'open' : ''}`}>
         {isLoggedIn ? (
           <>
-            <button onClick={() => navigate('/upload')}>Upload Workout</button>
+            {/* <button onClick={() => navigate('/upload')}>Upload Workout</button> */}
             <button onClick={handleLogout}>Logout</button>
           </>
         ) : (
           <>
             <button onClick={() => navigate('/login')}>Login</button>
-            <button onClick={() => navigate('/register')}>Register</button>
+            <button onClick={() => navigate('/caccount')}>Register</button>
           </>
         )}
       </div>
