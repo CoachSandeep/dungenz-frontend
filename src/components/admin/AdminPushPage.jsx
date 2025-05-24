@@ -10,29 +10,22 @@ const AdminPushPage = () => {
     setStatus('Sending...');
     const token = localStorage.getItem('token');
     try {
-      const res = await fetch(`${process.env.REACT_APP_API_BASE_URL}/push/all-tokens`, {
-        headers: { Authorization: `Bearer ${token}` }
+      const res = await fetch(`${process.env.REACT_APP_API_BASE_URL}/push/send`, {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ title, body })
       });
-      const tokens = await res.json();
-
-      const firebaseKey = 'BCHlImXNmJE5fjxK6Dnc9g74itDxN8KKBtkuQpPHn4HzgPd0AVt7zOFYSw_gvI6oOz9IolQY0AxuUwiIcA2LkBc'; // Replace this with your FCM server key
-
-      const sendAll = tokens.map(tk =>
-        fetch('https://fcm.googleapis.com/fcm/send', {
-          method: 'POST',
-          headers: {
-            Authorization: `key=${firebaseKey}`,
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            to: tk,
-            notification: { title, body },
-          })
-        })
-      );
-
-      await Promise.all(sendAll);
-      setStatus('✅ Notification sent to all devices!');
+  
+      const result = await res.json();
+      if (res.ok) {
+        setStatus('✅ Notification sent to all devices!');
+      } else {
+        console.error(result);
+        setStatus('❌ Failed: ' + result.error);
+      }
     } catch (err) {
       console.error(err);
       setStatus('❌ Failed to send notifications.');
