@@ -1,88 +1,78 @@
 import React, { useEffect, useState } from 'react';
-import './UserProfile.css';
+import './../styles/UserProfile.css';
 
-const UserProfile = () => {
-  const [user, setUser] = useState(null);
-  const [formData, setFormData] = useState({ name: '', bio: '', age: '', gender: '' });
-  const [image, setImage] = useState(null);
-  const [preview, setPreview] = useState(null);
+const ProfilePage = () => {
+  const [profile, setProfile] = useState({ name: '', email: '', photo: '', bio: '' });
+  const [file, setFile] = useState(null);
+  const [status, setStatus] = useState('');
+
+  const token = localStorage.getItem('token');
 
   useEffect(() => {
     fetch(`${process.env.REACT_APP_API_BASE_URL}/users/me`, {
-      headers: {
-        Authorization: `Bearer ${localStorage.getItem('token')}`,
-      },
+      headers: { Authorization: `Bearer ${token}` },
     })
-      .then((res) => res.json())
-      .then((data) => {
-        setUser(data);
-        setFormData({
-          name: data.name || '',
-          bio: data.bio || '',
-          age: data.age || '',
-          gender: data.gender || '',
-        });
-        setPreview(data.profileImage ? `${process.env.REACT_APP_API_BASE_URL}${data.profileImage}` : null);
-      });
-  }, []);
+      .then(res => res.json())
+      .then(data => setProfile(data))
+      .catch(err => console.error(err));
+  }, [token]);
 
   const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+    setProfile({ ...profile, [e.target.name]: e.target.value });
   };
 
-  const handleImageChange = (e) => {
-    const file = e.target.files[0];
-    setImage(file);
-    setPreview(URL.createObjectURL(file));
+  const handleFileChange = (e) => {
+    setFile(e.target.files[0]);
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const data = new FormData();
-    data.append('name', formData.name);
-    data.append('bio', formData.bio);
-    data.append('age', formData.age);
-    data.append('gender', formData.gender);
-    if (image) data.append('profileImage', image);
+    setStatus('Saving...');
+    try {
+      const formData = new FormData();
+      formData.append('name', profile.name);
+      formData.append('bio', profile.bio);
+      if (file) formData.append('photo', file);
 
-    const res = await fetch(`${process.env.REACT_APP_API_BASE_URL}/users/me`, {
-      method: 'PUT',
-      headers: {
-        Authorization: `Bearer ${localStorage.getItem('token')}`,
-      },
-      body: data,
-    });
+      const res = await fetch(`${process.env.REACT_APP_API_BASE_URL}/users/me`, {
+        method: 'PUT',
+        headers: { Authorization: `Bearer ${token}` },
+        body: formData
+      });
 
-    if (res.ok) {
-      alert('✅ Profile updated!');
-    } else {
-      alert('❌ Failed to update profile.');
+      if (res.ok) {
+        const updated = await res.json();
+        setProfile(updated);
+        setStatus('✅ Profile updated');
+      } else {
+        setStatus('❌ Failed to update profile');
+      }
+    } catch (err) {
+      console.error(err);
+      setStatus('❌ Error occurred');
     }
   };
 
   return (
     <div className="profile-container">
-      <h2>👤 Your Profile</h2>
+      <h2>🧍 Your Profile</h2>
       <form onSubmit={handleSubmit} className="profile-form">
-        <div className="profile-image-preview">
-          {preview && <img src={preview} alt="Preview" />}
-          <input type="file" onChange={handleImageChange} />
-        </div>
+        <label>Name</label>
+        <input type="text" name="name" value={profile.name} onChange={handleChange} />
 
-        <input name="name" value={formData.name} onChange={handleChange} placeholder="Name" />
-        <textarea name="bio" value={formData.bio} onChange={handleChange} placeholder="Short Bio" />
-        <input name="age" type="number" value={formData.age} onChange={handleChange} placeholder="Age" />
-        <select name="gender" value={formData.gender} onChange={handleChange}>
-          <option value="">Select Gender</option>
-          <option value="Male">Male</option>
-          <option value="Female">Female</option>
-          <option value="Other">Other</option>
-        </select>
+        <label>Bio</label>
+        <textarea name="bio" rows={3} value={profile.bio || ''} onChange={handleChange} />
 
-        <button type="submit">💾 Save Profile</button>
+        <label>Profile Picture</label>
+        <input type="file" accept="image/*" onChange={handleFileChange} />
+        {profile.photo && <img src={profile.photo} alt="profile" className="preview-img" />}
+
+        <button type="submit">💾 Save</button>
       </form>
+      <p>{status}</p>
     </div>
   );
 };
 
-export default UserProfile;
+export default ProfilePage;
+
