@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import logo from '../assets/logo.png';
 
 const Register = () => {
+  const navigate = useNavigate();
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -20,7 +22,7 @@ const Register = () => {
 
       if (res.ok) {
         alert('Registered Successfully!');
-        window.location.href = '/login';
+        navigate('/workouts');
       } else {
         alert(data.message || 'Registration failed');
       }

@@ -53,6 +53,7 @@ const Navbar = () => {
         {isLoggedIn ? (
           <>
             {/* <button onClick={() => navigate('/upload')}>Upload Workout</button> */}
+            <a href="/profile">👤 Profile</a>
             <button onClick={handleLogout}>Logout</button>
           </>
         ) : (
