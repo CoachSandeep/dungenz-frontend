@@ -69,17 +69,19 @@ const Workouts = () => {
     }
   };
 
-  const handleLoadMore = () => {
+  const handleLoadMore = async () => {
     const currentDates = dates.filter(d => d !== "__load_more__");
-    const lastDate = new Date(currentDates[currentDates.length - 1]);
+    const firstDate = new Date(currentDates[0]);
     const newDates = [];
     for (let i = 1; i <= 5; i++) {
-      const nextDate = new Date(lastDate);
-      nextDate.setDate(lastDate.getDate() + i);
-      newDates.push(nextDate.toISOString().split('T')[0]);
+      const prevDate = new Date(firstDate);
+      prevDate.setDate(firstDate.getDate() - i);
+      newDates.unshift(prevDate.toISOString().split('T')[0]);
     }
-    setDates([...currentDates, ...newDates, "__load_more__"]);
-    fetchWorkoutsInRange(newDates[0], newDates[newDates.length - 1]);
+    const fromDate = newDates[0];
+    const toDate = newDates[newDates.length - 1];
+    await fetchWorkoutsInRange(fromDate, toDate);
+    setDates([...newDates, ...currentDates, "__load_more__"]);
   };
 
   useEffect(() => {
@@ -128,108 +130,112 @@ const Workouts = () => {
 
   return (
     <div className="horizontal-container">
-    <div className="timeline-horizontal" ref={scrollContainerRef}>
-      {dates.map((dateKey, index) => {
-        const dateObj = new Date(dateKey);
-        const isActive = selectedDate === dateKey;
-        const hasWorkouts = Object.keys(groupedWorkouts[dateKey]?.versions || {}).length > 0;
-        const showMonthHeading = index === 0 || new Date(dates[index - 1]).getMonth() !== dateObj.getMonth();
-        const monthName = dateObj.toLocaleDateString('en-US', { month: 'long' });
-  
-        return (
-          <div key={index} className="timeline-date-wrapper">
-            {showMonthHeading && <div className="month-heading">{monthName}</div>}
-            <div
-              data-date={dateKey}
-              className={`timeline-date-circle ${isActive ? 'active' : ''} ${!hasWorkouts ? 'disabled' : ''}`}
-              onClick={() => handleDateSelect(dateKey)}
-              ref={el => { if (el) scrollRef.current[dateKey] = el; }}
-            >
-              <div className="circle-date">{groupedWorkouts[dateKey]?.displayDate?.split('/')[0] || dateKey.split('-')[2]}</div>
-              <div className="circle-day">{groupedWorkouts[dateKey]?.day || dateObj.toLocaleDateString("en-US", { weekday: 'short' })}</div>
-            </div>
-          </div>
-        );
-      })}
-    </div>
-  
-    {selectedDate && (
-      <div className="timeline-details-box">
-        <div className="timeline-header-w">
-          <h1>Hi {user.name}</h1>
-          <h3 style={{ color: "#ff2c2c", marginBottom: '20px' }}>
-            Workout for {getDisplayDate(selectedDate)}
-          </h3>
-          <button className="back-to-today-btn" onClick={() => handleDateSelect(todayKey)}>
-            Back to Today
-          </button>
-        </div>
-  
-        {versionOrder.map(version => (
-          groupedWorkouts[selectedDate]?.versions[version] ? (
-            <div key={version} className="version-container">
-              <div className="version-header">
-                <span className={`badge badge-${version.replace(/\s+/g, '').toLowerCase()}`}>{version}</span>
+      <div className="timeline-horizontal" ref={scrollContainerRef}>
+        {dates.map((dateKey, index) => {
+          if (dateKey === "__load_more__") {
+            return (
+              <div key="__load_more__" className="timeline-date-wrapper">
+                <div className="timeline-date-circle load-more-circle" onClick={handleLoadMore}>
+                  <div className="circle-date">⇤</div>
+                  <div className="circle-day">More</div>
+                </div>
               </div>
-              <div className="workout-list">
-                {groupedWorkouts[selectedDate].versions[version].sort((a, b) => a.order - b.order).map(w => (
-                  <div key={w._id} className="workout-item" onClick={() => setModalWorkout(w)}>
-                    <div className="workout-line">
-                      {w.icon && (
-                        <img
-                          src={`/icons/${w.icon}.png`}
-                          alt={w.icon}
-                          className="workout-icon"
-                          style={{ width: '20px', marginRight: '10px' }}
-                        />
-                      )}
-  
-                      <div className="workout-text">
-                        <strong className="custom-name">
-                          {w.customName || w.title}
-                        </strong>
-                        {w.customName && (
-                          <div className="sub-title">
-                            {w.title}
-                          </div>
-                        )}
-                      </div>
-                    </div>
-  
-                    {expandedVersions[version] && (
-                      <div className="inline-details">
-                        
-                        <div dangerouslySetInnerHTML={{ __html: w.description.replace(/\n/g, "<br/>") }} />
-                        <div>{w.capTime}</div>
-                        <div>{w.instructions}</div>
-                      </div>
-                    )}
-                  </div>
-                ))}
-              </div>
-              <button className="expand-btn" onClick={() => toggleExpandAll(version)}>
-                {expandedVersions[version] ? "Hide Workouts" : "Show Full Workout"}
-              </button>
-            </div>
-          ) : null
-        ))}
-      </div>
-      )}
+            );
+          }
 
-                     
+          const dateObj = new Date(dateKey);
+          const isActive = selectedDate === dateKey;
+          const hasWorkouts = Object.keys(groupedWorkouts[dateKey]?.versions || {}).length > 0;
+          const showMonthHeading = index === 0 || new Date(dates[index - 1]).getMonth() !== dateObj.getMonth();
+          const monthName = dateObj.toLocaleDateString('en-US', { month: 'long' });
+
+          return (
+            <div key={index} className="timeline-date-wrapper">
+              {showMonthHeading && <div className="month-heading">{monthName}</div>}
+              <div
+                data-date={dateKey}
+                className={`timeline-date-circle ${isActive ? 'active' : ''} ${!hasWorkouts ? 'disabled' : ''}`}
+                onClick={() => handleDateSelect(dateKey)}
+                ref={el => { if (el) scrollRef.current[dateKey] = el; }}
+              >
+                <div className="circle-date">{groupedWorkouts[dateKey]?.displayDate?.split('/')[0] || dateKey.split('-')[2]}</div>
+                <div className="circle-day">{groupedWorkouts[dateKey]?.day || dateObj.toLocaleDateString("en-US", { weekday: 'short' })}</div>
+              </div>
+            </div>
+          );
+        })}
+      </div>
+
+      {selectedDate && (
+        <div className="timeline-details-box">
+          <div className="timeline-header-w">
+            <h1>Hi {user.name}</h1>
+            <h3 style={{ color: "#ff2c2c", marginBottom: '20px' }}>
+              Workout for {getDisplayDate(selectedDate)}
+            </h3>
+            <button className="back-to-today-btn" onClick={() => handleDateSelect(todayKey)}>
+              Back to Today
+            </button>
+          </div>
+
+          {versionOrder.map(version => (
+            groupedWorkouts[selectedDate]?.versions[version] ? (
+              <div key={version} className="version-container">
+                <div className="version-header">
+                  <span className={`badge badge-${version.replace(/\s+/g, '').toLowerCase()}`}>{version}</span>
+                </div>
+                <div className="workout-list">
+                  {groupedWorkouts[selectedDate].versions[version].sort((a, b) => a.order - b.order).map(w => (
+                    <div key={w._id} className="workout-item" onClick={() => setModalWorkout(w)}>
+                      <div className="workout-line">
+                        {w.icon && (
+                          <img
+                            src={`/icons/${w.icon}.png`}
+                            alt={w.icon}
+                            className="workout-icon"
+                            style={{ width: '20px', marginRight: '10px' }}
+                          />
+                        )}
+                        <div className="workout-text">
+                          <strong className="custom-name">
+                            {w.customName || w.title}
+                          </strong>
+                          {w.customName && (
+                            <div className="sub-title">
+                              {w.title}
+                            </div>
+                          )}
+                        </div>
+                      </div>
+
+                      {expandedVersions[version] && (
+                        <div className="inline-details">
+                          <div dangerouslySetInnerHTML={{ __html: w.description.replace(/\n/g, "<br/>") }} />
+                          <div>{w.capTime}</div>
+                          <div>{w.instructions}</div>
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                </div>
+                <button className="expand-btn" onClick={() => toggleExpandAll(version)}>
+                  {expandedVersions[version] ? "Hide Workouts" : "Show Full Workout"}
+                </button>
+              </div>
+            ) : null
+          ))}
+        </div>
+      )}
 
       {modalWorkout && (
         <div className="modal-overlay" onClick={() => setModalWorkout(null)}>
           <div className="modal-box" onClick={e => e.stopPropagation()}>
-            <h2>{ modalWorkout.customName || modalWorkout.title}</h2>
+            <h2>{modalWorkout.customName || modalWorkout.title}</h2>
             <h3>{modalWorkout.title}</h3>
-            {/* <p><strong>Version:</strong> {modalWorkout.version}</p> */}
-          <div class="modal-inside-content">
-          <div dangerouslySetInnerHTML={{ __html: modalWorkout.description.replace(/\n/g, '<br/>') }} />
-          <div dangerouslySetInnerHTML={{ __html: modalWorkout.instructions.replace(/\n/g, '<br/>') }} />
-            <p>{modalWorkout.capTime}</p>
-            {/* <p><strong>Uploaded By:</strong> {modalWorkout.createdBy?.name || 'Unknown'}</p> */}
-            {/* <p><strong>Date:</strong> {new Date(modalWorkout.date).toLocaleDateString()}</p> */}
+            <div className="modal-inside-content">
+              <div dangerouslySetInnerHTML={{ __html: modalWorkout.description.replace(/\n/g, '<br/>') }} />
+              <div dangerouslySetInnerHTML={{ __html: modalWorkout.instructions.replace(/\n/g, '<br/>') }} />
+              <p>{modalWorkout.capTime}</p>
             </div>
             <button onClick={() => setModalWorkout(null)}>Close</button>
           </div>
