@@ -81,7 +81,7 @@ const Workouts = () => {
     const fromDate = newDates[0];
     const toDate = newDates[newDates.length - 1];
     await fetchWorkoutsInRange(fromDate, toDate);
-    setDates([...newDates, ...currentDates, "__load_more__"]);
+    setDates(["__load_more__", ...newDates, ...currentDates]);
   };
 
   useEffect(() => {
@@ -92,7 +92,7 @@ const Workouts = () => {
       newDate.setDate(today.getDate() + i);
       baseDates.push(newDate.toISOString().split('T')[0]);
     }
-    baseDates.push("__load_more__");
+    baseDates.unshift("__load_more__");
     setDates(baseDates);
 
     const fetchInitial = async () => {
