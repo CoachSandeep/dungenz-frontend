@@ -32,7 +32,7 @@ const ProfilePage = () => {
       const formData = new FormData();
       formData.append('name', profile.name);
       formData.append('bio', profile.bio);
-      if (file) formData.append('photo', file);
+      formData.append('profileImage', selectedFile); // ✅ THIS IS IMPORTANT
 
       const res = await fetch(`${process.env.REACT_APP_API_BASE_URL}/users/me`, {
         method: 'PUT',

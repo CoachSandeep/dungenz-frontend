@@ -69,6 +69,19 @@ const Workouts = () => {
     }
   };
 
+  const handleLoadMore = () => {
+    const currentDates = dates.filter(d => d !== "__load_more__");
+    const lastDate = new Date(currentDates[currentDates.length - 1]);
+    const newDates = [];
+    for (let i = 1; i <= 5; i++) {
+      const nextDate = new Date(lastDate);
+      nextDate.setDate(lastDate.getDate() + i);
+      newDates.push(nextDate.toISOString().split('T')[0]);
+    }
+    setDates([...currentDates, ...newDates, "__load_more__"]);
+    fetchWorkoutsInRange(newDates[0], newDates[newDates.length - 1]);
+  };
+
   useEffect(() => {
     const today = new Date();
     const baseDates = [];
@@ -77,6 +90,7 @@ const Workouts = () => {
       newDate.setDate(today.getDate() + i);
       baseDates.push(newDate.toISOString().split('T')[0]);
     }
+    baseDates.push("__load_more__");
     setDates(baseDates);
 
     const fetchInitial = async () => {
@@ -185,7 +199,7 @@ const Workouts = () => {
                     {expandedVersions[version] && (
                       <div className="inline-details">
                         
-                        <div dangerouslySetInnerHTML={{ __html: w.description.replace(/\n/g, '<br/>') }} />
+                        <div dangerouslySetInnerHTML={{ __html: w.description.replace(/\n/g, "<br/>") }} />
                         <div>{w.capTime}</div>
                         <div>{w.instructions}</div>
                       </div>

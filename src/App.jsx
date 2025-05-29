@@ -12,7 +12,7 @@ import LibraryPage from './pages/LibraryPage';
 import Settings from './components/admin/settings';
 import ClusterCopyPage from './pages/ClusterCopyPage';
 import AdminPushPage from './components/admin/AdminPushPage';
-import UserProfile from './pages/UserProfile'; // ✅ Add this
+import UserProfile from './pages/UserProfile';
 import { messaging, getToken, onMessage } from './firebase';
 
 const App = () => {
@@ -22,6 +22,11 @@ const App = () => {
   useEffect(() => {
     const token = localStorage.getItem('token');
     setIsLoggedIn(!!token);
+
+    // 🔔 Check permission on load
+    if (Notification.permission === 'granted') {
+      setNotificationStatus('enabled');
+    }
 
     // 🔔 Listen for foreground notifications
     onMessage(messaging, (payload) => {
@@ -47,7 +52,6 @@ const App = () => {
       if (currentToken) {
         console.log('📬 FCM Token:', currentToken);
 
-        // ✅ Save token to backend
         await fetch(`${process.env.REACT_APP_API_BASE_URL}/push/register-token`, {
           method: 'POST',
           headers: {
@@ -71,37 +75,37 @@ const App = () => {
   return (
     <Router>
       <Navbar />
-      {isLoggedIn && notificationStatus !== 'enabled' && (
-       <div style={{
-        padding: '12px 20px',
-        backgroundColor: '#1f1f1f',
-        color: '#fff',
-        textAlign: 'center',
-        borderBottom: '2px solid #ff2c2c',
-        display: 'flex',
-        justifyContent: 'center',
-        alignItems: 'center',
-        gap: '12px',
-        position: 'sticky',
-        top: 0,
-        zIndex: 999
-      }}>
-        <span>🚀 Stay updated with new workouts!</span>
-        <button
-          onClick={handleEnableNotifications}
-          style={{
-            backgroundColor: '#ff2c2c',
-            border: 'none',
-            padding: '8px 16px',
-            borderRadius: '6px',
-            color: '#fff',
-            cursor: 'pointer',
-            fontWeight: 'bold'
-          }}
-        >
-          🔔 Enable Notifications
-        </button>
-      </div>
+      {isLoggedIn && notificationStatus !== 'enabled' && Notification.permission !== 'granted' && (
+        <div style={{
+          padding: '12px 20px',
+          backgroundColor: '#1f1f1f',
+          color: '#fff',
+          textAlign: 'center',
+          borderBottom: '2px solid #ff2c2c',
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          gap: '12px',
+          position: 'sticky',
+          top: 0,
+          zIndex: 999
+        }}>
+          <span>🚀 Stay updated with new workouts!</span>
+          <button
+            onClick={handleEnableNotifications}
+            style={{
+              backgroundColor: '#ff2c2c',
+              border: 'none',
+              padding: '8px 16px',
+              borderRadius: '6px',
+              color: '#fff',
+              cursor: 'pointer',
+              fontWeight: 'bold'
+            }}
+          >
+            🔔 Enable Notifications
+          </button>
+        </div>
       )}
       <Routes>
         <Route path="/" element={<Hero />} />
