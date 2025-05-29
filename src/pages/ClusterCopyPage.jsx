@@ -59,7 +59,10 @@ const ClusterCopyPage = () => {
         for (let w of selected) {
           await axios.post(
             `${process.env.REACT_APP_API_BASE_URL}/admin/workouts/${w._id}/copy`,
-            { toVersion },
+            { toVersion,
+              targetDate: targetDate.toISOString().split('T')[0]
+             },
+            
             {
               headers: { Authorization: `Bearer ${token}` },
             }
