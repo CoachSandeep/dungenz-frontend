@@ -42,6 +42,21 @@ const Workouts = () => {
     }
   };
 
+  const handleRefresh = async () => {
+    setIsLoading(true);
+    const fromDate = new Date();
+    fromDate.setDate(fromDate.getDate() - 5);
+    const toDate = new Date();
+    toDate.setDate(toDate.getDate() + 5);
+  
+    await fetchWorkoutsInRange(
+      fromDate.toISOString().split('T')[0],
+      toDate.toISOString().split('T')[0]
+    );
+  
+    setIsLoading(false);
+  };
+
   const fetchWorkoutsInRange = async (from, to) => {
     const token = localStorage.getItem('token');
     try {
@@ -130,7 +145,7 @@ const Workouts = () => {
   };
 
   return (
-    <PullToRefresh onRefresh={fetchInitial}>
+    <PullToRefresh onRefresh={handleRefresh} style={{ minHeight: '100vh' }}>
     <div className="horizontal-container">
       <div className="timeline-horizontal" ref={scrollContainerRef}>
         {dates.map((dateKey, index) => {
