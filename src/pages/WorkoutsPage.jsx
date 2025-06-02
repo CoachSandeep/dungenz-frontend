@@ -165,7 +165,8 @@ const newGrouped = {};
 
           const dateObj = new Date(dateKey);
           const isActive = selectedDate === dateKey;
-          const hasWorkouts = Object.keys(groupedWorkouts[dateKey]?.versions || {}).length > 0;
+          // const hasWorkouts = Object.keys(groupedWorkouts[dateKey]?.versions || {}).length > 0;
+          const hasWorkouts = groupedWorkouts.hasOwnProperty(dateKey);
           const showMonthHeading = index === 0 || new Date(dates[index - 1]).getMonth() !== dateObj.getMonth();
           const monthName = dateObj.toLocaleDateString('en-US', { month: 'long' });
 
@@ -173,11 +174,11 @@ const newGrouped = {};
             <div key={index} className="timeline-date-wrapper">
               {showMonthHeading && <div className="month-heading">{monthName}</div>}
               <div
-                data-date={dateKey}
-                className={`timeline-date-circle ${isActive ? 'active' : ''} ${!hasWorkouts ? 'disabled' : ''}`}
-                onClick={() => handleDateSelect(dateKey)}
-                ref={el => { if (el) scrollRef.current[dateKey] = el; }}
-              >
+  data-date={dateKey}
+  className={`timeline-date-circle ${isActive ? 'active' : ''} ${!hasWorkouts ? 'no-workout' : ''}`}
+  onClick={() => handleDateSelect(dateKey)}
+  ref={el => { if (el) scrollRef.current[dateKey] = el; }}
+>
                 <div className="circle-date">{groupedWorkouts[dateKey]?.displayDate?.split('/')[0] || dateKey.split('-')[2]}</div>
                 <div className="circle-day">{groupedWorkouts[dateKey]?.day || dateObj.toLocaleDateString("en-US", { weekday: 'short' })}</div>
               </div>
