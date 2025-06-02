@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
+import PullToRefresh from 'react-pull-to-refresh';
 import './../styles/workout.css';
 
 const versionOrder = ["Ultra Train", "Super Train", "Minimal Equipment", "Beginner"];
@@ -129,6 +130,7 @@ const Workouts = () => {
   };
 
   return (
+    <PullToRefresh onRefresh={fetchInitial}>
     <div className="horizontal-container">
       <div className="timeline-horizontal" ref={scrollContainerRef}>
         {dates.map((dateKey, index) => {
@@ -248,6 +250,7 @@ const Workouts = () => {
         </div>
       )}
     </div>
+    </PullToRefresh>
   );
 };
 
