@@ -64,22 +64,25 @@ const Workouts = () => {
         headers: { Authorization: `Bearer ${token}` },
       });
       const data = await res.json();
-      const grouped = {};
-      data.forEach((w) => {
-        const dateKey = new Date(w.date).toISOString().split('T')[0];
-        const dateObj = new Date(dateKey);
-        const displayDate = dateObj.toLocaleDateString("en-GB");
-        const day = dateObj.toLocaleDateString("en-US", { weekday: 'short' });
-        if (!grouped[dateKey]) {
-          grouped[dateKey] = { displayDate, day, versions: {} };
-        }
-        const version = w.version?.trim() || "Uncategorized";
-        if (!grouped[dateKey].versions[version]) {
-          grouped[dateKey].versions[version] = [];
-        }
-        grouped[dateKey].versions[version].push(w);
-      });
-      setGroupedWorkouts(grouped);
+
+const newGrouped = {};
+    data.forEach((w) => {
+      const dateKey = new Date(w.date).toISOString().split('T')[0];
+      const dateObj = new Date(dateKey);
+      const displayDate = dateObj.toLocaleDateString("en-GB");
+      const day = dateObj.toLocaleDateString("en-US", { weekday: 'short' });
+      if (!newGrouped[dateKey]) {
+        newGrouped[dateKey] = { displayDate, day, versions: {} };
+      }
+      const version = w.version?.trim() || "Uncategorized";
+      if (!newGrouped[dateKey].versions[version]) {
+        newGrouped[dateKey].versions[version] = [];
+      }
+      newGrouped[dateKey].versions[version].push(w);
+    });
+      // 🧠 Merge with existing groupedWorkouts
+    setGroupedWorkouts(prev => ({ ...prev, ...newGrouped }));
+
     } catch (err) {
       console.error(err);
     }
