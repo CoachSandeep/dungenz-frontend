@@ -48,13 +48,12 @@ const Workouts = () => {
     fromDate.setDate(fromDate.getDate() - 5);
     const toDate = new Date();
     toDate.setDate(toDate.getDate() + 1); // only fetch till tomorrow
-  
+
     await fetchWorkoutsInRange(
       fromDate.toISOString().split('T')[0],
       toDate.toISOString().split('T')[0]
     );
   };
-  
 
   const fetchWorkoutsInRange = async (from, to) => {
     const token = localStorage.getItem('token');
@@ -64,24 +63,22 @@ const Workouts = () => {
       });
       const data = await res.json();
 
-const newGrouped = {};
-    data.forEach((w) => {
-      const dateKey = new Date(w.date).toISOString().split('T')[0];
-      const dateObj = new Date(dateKey);
-      const displayDate = dateObj.toLocaleDateString("en-GB");
-      const day = dateObj.toLocaleDateString("en-US", { weekday: 'short' });
-      if (!newGrouped[dateKey]) {
-        newGrouped[dateKey] = { displayDate, day, versions: {} };
-      }
-      const version = w.version?.trim() || "Uncategorized";
-      if (!newGrouped[dateKey].versions[version]) {
-        newGrouped[dateKey].versions[version] = [];
-      }
-      newGrouped[dateKey].versions[version].push(w);
-    });
-      // 🧠 Merge with existing groupedWorkouts
-    setGroupedWorkouts(prev => ({ ...prev, ...newGrouped }));
-
+      const newGrouped = {};
+      data.forEach((w) => {
+        const dateKey = new Date(w.date).toISOString().split('T')[0];
+        const dateObj = new Date(dateKey);
+        const displayDate = dateObj.toLocaleDateString("en-GB");
+        const day = dateObj.toLocaleDateString("en-US", { weekday: 'short' });
+        if (!newGrouped[dateKey]) {
+          newGrouped[dateKey] = { displayDate, day, versions: {} };
+        }
+        const version = w.version?.trim() || "Uncategorized";
+        if (!newGrouped[dateKey].versions[version]) {
+          newGrouped[dateKey].versions[version] = [];
+        }
+        newGrouped[dateKey].versions[version].push(w);
+      });
+      setGroupedWorkouts(prev => ({ ...prev, ...newGrouped }));
     } catch (err) {
       console.error(err);
     }
@@ -148,128 +145,56 @@ const newGrouped = {};
 
   return (
     <PullToRefresh onRefresh={handleRefresh} style={{ minHeight: '100vh' }}>
-    <div className="horizontal-container">
-      <div className="timeline-horizontal" ref={scrollContainerRef}>
-        {dates.map((dateKey, index) => {
-          if (dateKey === "__load_more__") {
+      <div className="horizontal-container">
+        <div className="timeline-horizontal" ref={scrollContainerRef}>
+          {dates.map((dateKey, index) => {
+            if (dateKey === "__load_more__") {
+              return (
+                <div key="__load_more__" className="timeline-date-wrapper">
+                  <div className="timeline-date-circle load-more-circle" onClick={handleLoadMore}>
+                    <div className="circle-date">⇤</div>
+                    <div className="circle-day">More</div>
+                  </div>
+                </div>
+              );
+            }
+
+            const dateObj = new Date(dateKey);
+            const isActive = selectedDate === dateKey;
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            const dateToCheck = new Date(dateKey);
+            dateToCheck.setHours(0, 0, 0, 0);
+
+            let hasWorkouts = false;
+            if (groupedWorkouts.hasOwnProperty(dateKey)) {
+              if (dateToCheck <= today) {
+                hasWorkouts = true;
+              } else if (dateToCheck.getTime() === today.getTime() + 86400000) {
+                hasWorkouts = true;
+              }
+            }
+
+            const showMonthHeading = index === 0 || new Date(dates[index - 1]).getMonth() !== dateObj.getMonth();
+            const monthName = dateObj.toLocaleDateString('en-US', { month: 'long' });
+
             return (
-              <div key="__load_more__" className="timeline-date-wrapper">
-                <div className="timeline-date-circle load-more-circle" onClick={handleLoadMore}>
-                  <div className="circle-date">⇤</div>
-                  <div className="circle-day">More</div>
+              <div key={index} className="timeline-date-wrapper">
+                {showMonthHeading && <div className="month-heading">{monthName}</div>}
+                <div
+                  data-date={dateKey}
+                  className={`timeline-date-circle ${isActive ? 'active' : ''} ${!hasWorkouts ? 'no-workout' : ''}`}
+                  onClick={() => handleDateSelect(dateKey)}
+                  ref={el => { if (el) scrollRef.current[dateKey] = el; }}
+                >
+                  <div className="circle-date">{groupedWorkouts[dateKey]?.displayDate?.split('/')[0] || dateKey.split('-')[2]}</div>
+                  <div className="circle-day">{groupedWorkouts[dateKey]?.day || dateObj.toLocaleDateString("en-US", { weekday: 'short' })}</div>
                 </div>
               </div>
             );
-          }
-
-          const dateObj = new Date(dateKey);
-          const isActive = selectedDate === dateKey;
-          // const hasWorkouts = Object.keys(groupedWorkouts[dateKey]?.versions || {}).length > 0;
-          const hasWorkouts = groupedWorkouts.hasOwnProperty(dateKey);
-          const showMonthHeading = index === 0 || new Date(dates[index - 1]).getMonth() !== dateObj.getMonth();
-          const monthName = dateObj.toLocaleDateString('en-US', { month: 'long' });
-
-          return (
-            <div key={index} className="timeline-date-wrapper">
-              {showMonthHeading && <div className="month-heading">{monthName}</div>}
-              <div
-  data-date={dateKey}
-  className={`timeline-date-circle ${isActive ? 'active' : ''} ${!hasWorkouts ? 'no-workout' : ''}`}
-  onClick={() => handleDateSelect(dateKey)}
-  ref={el => { if (el) scrollRef.current[dateKey] = el; }}
->
-                <div className="circle-date">{groupedWorkouts[dateKey]?.displayDate?.split('/')[0] || dateKey.split('-')[2]}</div>
-                <div className="circle-day">{groupedWorkouts[dateKey]?.day || dateObj.toLocaleDateString("en-US", { weekday: 'short' })}</div>
-              </div>
-            </div>
-          );
-        })}
+          })}
+        </div>
       </div>
-
-      {selectedDate && (
-        <div className="timeline-details-box">
-          <div className="timeline-header-w">
-            <h1>Hi {user.name}</h1>
-            <h3 style={{ color: "#ff2c2c", marginBottom: '20px' }}>
-              Workout for {getDisplayDate(selectedDate)}
-            </h3>
-            <button className="back-to-today-btn" onClick={() => handleDateSelect(todayKey)}>
-              Back to Today
-            </button>
-          </div>
-
-          {versionOrder.map(version => (
-            groupedWorkouts[selectedDate]?.versions[version] ? (
-              <div key={version} className="version-container">
-                <div className="version-header">
-                  <span className={`badge badge-${version.replace(/\s+/g, '').toLowerCase()}`}>{version}</span>
-                </div>
-                <div className="workout-list">
-                  {groupedWorkouts[selectedDate].versions[version].sort((a, b) => a.order - b.order).map(w => (
-                    <div key={w._id} className="workout-item" onClick={() => setModalWorkout(w)}>
-                      <div className="workout-line">
-                        {w.icon && (
-                          <img
-                            src={`/icons/${w.icon}.png`}
-                            alt={w.icon}
-                            className="workout-icon"
-                            style={{ width: '20px', marginRight: '10px' }}
-                          />
-                        )}
-                        <div className="workout-text">
-                          <strong className="custom-name">
-                            {w.customName || w.title}
-                          </strong>
-                          {w.customName && (
-                            <div className="sub-title">
-                              {w.title}
-                            </div>
-                          )}
-                        </div>
-                      </div>
-
-                      {expandedVersions[version] && (
-                        <div className="inline-details">
-                          <div dangerouslySetInnerHTML={{ __html: w.description.replace(/\n/g, "<br/>") }} />
-                          <div>{w.capTime}</div>
-                          <div>{w.instructions}</div>
-                        </div>
-                      )}
-                       <LikeCommentLog workoutId={w._id} />
-                    </div>
-                   
-                  ))}
-                </div>
-                <button className="expand-btn" onClick={() => toggleExpandAll(version)}>
-                  {expandedVersions[version] ? "Hide Workouts" : "Show Full Workout"}
-                </button>
-              </div>
-            ) : null
-          ))}
-        </div>
-      )}
-
-      {modalWorkout && (
-        <div className="modal-overlay" onClick={() => setModalWorkout(null)}>
-          <div className="modal-box" onClick={e => e.stopPropagation()}>
-            <h2>{modalWorkout.customName || modalWorkout.title}</h2>
-            <h3>{modalWorkout.title}</h3>
-            <div className="modal-inside-content">
-              <div dangerouslySetInnerHTML={{ __html: modalWorkout.description.replace(/\n/g, '<br/>') }} />
-              <div dangerouslySetInnerHTML={{ __html: modalWorkout.instructions.replace(/\n/g, '<br/>') }} />
-              <p>{modalWorkout.capTime}</p>
-            </div>
-            <button onClick={() => setModalWorkout(null)}>Close</button>
-          </div>
-        </div>
-      )}
-
-      {isLoading && (
-        <div className="loading-overlay">
-          Loading your workouts...
-        </div>
-      )}
-    </div>
     </PullToRefresh>
   );
 };
