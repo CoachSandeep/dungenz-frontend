@@ -104,31 +104,32 @@ const newGrouped = {};
   };
 
   useEffect(() => {
-    const today = new Date();
     const baseDates = [];
-    for (let i = -5; i <= 5; i++) {
-      const newDate = new Date(today);
-      newDate.setDate(today.getDate() + i);
-      baseDates.push(newDate.toISOString().split('T')[0]);
+    for (let i = -5; i <= 4; i++) {
+      const d = new Date();
+      d.setDate(today.getDate() + i);
+      baseDates.push(d.toISOString().split('T')[0]);
     }
-    baseDates.unshift("__load_more__");
     setDates(baseDates);
-
+  
     const fetchInitial = async () => {
       const fromDate = new Date();
-      fromDate.setDate(fromDate.getDate() - 5);
+      fromDate.setDate(today.getDate() - 5);
       const toDate = new Date();
-      toDate.setDate(toDate.getDate() + 1);
+      toDate.setDate(today.getDate() + 1); // 👈 Yahi tak hona chahiye
+  
       await fetchWorkoutsInRange(
         fromDate.toISOString().split('T')[0],
         toDate.toISOString().split('T')[0]
       );
+  
       setSelectedDate(todayKey);
       setTimeout(() => {
         scrollToCenter(todayKey);
         setIsLoading(false);
       }, 300);
     };
+  
     fetchInitial();
   }, []);
 
