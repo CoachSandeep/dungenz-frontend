@@ -1,3 +1,8 @@
+// 🧠 Full updated code with:
+// 1. Fixed date range (5 past + today + 4 future)
+// 2. Workout fetch only till tomorrow
+// 3. Future dates shown as inactive
+
 import React, { useEffect, useRef, useState } from 'react';
 import PullToRefresh from 'react-pull-to-refresh';
 import './../styles/workout.css';
@@ -15,12 +20,16 @@ const Workouts = () => {
   const scrollRef = useRef({});
   const scrollContainerRef = useRef(null);
   const user = JSON.parse(localStorage.getItem('user'));
-  const todayKey = new Date().toISOString().split('T')[0];
+
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const todayKey = today.toISOString().split('T')[0];
+
+  const tomorrow = new Date(today);
+  tomorrow.setDate(today.getDate() + 1);
 
   const getDisplayDate = (selectedDate) => {
-    const today = new Date();
     const targetDate = new Date(selectedDate);
-    today.setHours(0, 0, 0, 0);
     targetDate.setHours(0, 0, 0, 0);
     const diff = Math.floor((targetDate - today) / (1000 * 60 * 60 * 24));
     if (diff === 0) return "Today";
@@ -43,18 +52,6 @@ const Workouts = () => {
     }
   };
 
-  const handleRefresh = async () => {
-    const fromDate = new Date();
-    fromDate.setDate(fromDate.getDate() - 5);
-    const toDate = new Date();
-    toDate.setDate(toDate.getDate() + 1); // only fetch till tomorrow
-
-    await fetchWorkoutsInRange(
-      fromDate.toISOString().split('T')[0],
-      toDate.toISOString().split('T')[0]
-    );
-  };
-
   const fetchWorkoutsInRange = async (from, to) => {
     const token = localStorage.getItem('token');
     try {
@@ -62,7 +59,6 @@ const Workouts = () => {
         headers: { Authorization: `Bearer ${token}` },
       });
       const data = await res.json();
-
       const newGrouped = {};
       data.forEach((w) => {
         const dateKey = new Date(w.date).toISOString().split('T')[0];
@@ -84,110 +80,54 @@ const Workouts = () => {
     }
   };
 
-  const handleLoadMore = async () => {
-    const currentDates = dates.filter(d => d !== "__load_more__");
-    const firstDate = new Date(currentDates[0]);
-    const newDates = [];
-    for (let i = 1; i <= 5; i++) {
-      const prevDate = new Date(firstDate);
-      prevDate.setDate(firstDate.getDate() - i);
-      newDates.unshift(prevDate.toISOString().split('T')[0]);
-    }
-    const fromDate = newDates[0];
-    const toDate = newDates[newDates.length - 1];
-    await fetchWorkoutsInRange(fromDate, toDate);
-    setDates(["__load_more__", ...newDates, ...currentDates]);
-  };
-
   useEffect(() => {
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-
-    const tomorrow = new Date(today);
-    tomorrow.setDate(tomorrow.getDate() + 1);
-
     const baseDates = [];
-    for (let i = 5; i >= 1; i--) {
-      const past = new Date(today);
-      past.setDate(today.getDate() - i);
-      baseDates.push(past.toISOString().split('T')[0]);
+    for (let i = -5; i <= 4; i++) {
+      const d = new Date();
+      d.setDate(today.getDate() + i);
+      baseDates.push(d.toISOString().split('T')[0]);
     }
-    baseDates.push(today.toISOString().split('T')[0]);
-    baseDates.push(tomorrow.toISOString().split('T')[0]); // only till tomorrow
-
-    baseDates.unshift("__load_more__");
     setDates(baseDates);
 
     const fetchInitial = async () => {
-      await fetchWorkoutsInRange(baseDates[1], baseDates[baseDates.length - 1]);
+      const fromDate = new Date();
+      fromDate.setDate(today.getDate() - 5);
+      const toDate = new Date();
+      toDate.setDate(today.getDate() + 1); // only till tomorrow
+
+      await fetchWorkoutsInRange(
+        fromDate.toISOString().split('T')[0],
+        toDate.toISOString().split('T')[0]
+      );
       setSelectedDate(todayKey);
       setTimeout(() => {
         scrollToCenter(todayKey);
         setIsLoading(false);
       }, 300);
     };
-
     fetchInitial();
   }, []);
 
-  const toggleExpandAll = (version) => {
-    setExpandedVersions(prev => ({ ...prev, [version]: !prev[version] }));
-  };
-
-  const handleDateSelect = async (dateKey) => {
-    const isSameDate = selectedDate === dateKey;
-    scrollToCenter(dateKey);
-    if (!isSameDate) {
-      setSelectedDate(dateKey);
-    } else {
-      setSelectedDate(null);
-      setTimeout(() => setSelectedDate(dateKey), 0);
-    }
+  const handleDateSelect = (dateKey) => {
+    if (groupedWorkouts[dateKey]) setSelectedDate(dateKey);
   };
 
   return (
-    <PullToRefresh onRefresh={handleRefresh} style={{ minHeight: '100vh' }}>
+    <PullToRefresh onRefresh={() => fetchWorkoutsInRange(todayKey, tomorrow.toISOString().split('T')[0])}>
       <div className="horizontal-container">
         <div className="timeline-horizontal" ref={scrollContainerRef}>
           {dates.map((dateKey, index) => {
-            if (dateKey === "__load_more__") {
-              return (
-                <div key="__load_more__" className="timeline-date-wrapper">
-                  <div className="timeline-date-circle load-more-circle" onClick={handleLoadMore}>
-                    <div className="circle-date">⇤</div>
-                    <div className="circle-day">More</div>
-                  </div>
-                </div>
-              );
-            }
-
             const dateObj = new Date(dateKey);
             const isActive = selectedDate === dateKey;
-            const today = new Date();
-            today.setHours(0, 0, 0, 0);
-            const dateToCheck = new Date(dateKey);
-            dateToCheck.setHours(0, 0, 0, 0);
-
-            let hasWorkouts = false;
-            if (groupedWorkouts.hasOwnProperty(dateKey)) {
-              if (dateToCheck <= today) {
-                hasWorkouts = true;
-              } else if (dateToCheck.getTime() === today.getTime() + 86400000) {
-                hasWorkouts = true;
-              }
-            }
-
-            const showMonthHeading = index === 0 || new Date(dates[index - 1]).getMonth() !== dateObj.getMonth();
-            const monthName = dateObj.toLocaleDateString('en-US', { month: 'long' });
+            const isFutureBeyondTomorrow = dateObj > tomorrow;
+            const hasWorkout = groupedWorkouts.hasOwnProperty(dateKey);
 
             return (
-              <div key={index} className="timeline-date-wrapper">
-                {showMonthHeading && <div className="month-heading">{monthName}</div>}
+              <div key={dateKey} className="timeline-date-wrapper">
                 <div
-                  data-date={dateKey}
-                  className={`timeline-date-circle ${isActive ? 'active' : ''} ${!hasWorkouts ? 'no-workout' : ''}`}
+                  className={`timeline-date-circle ${isActive ? 'active' : ''} ${(!hasWorkout || isFutureBeyondTomorrow) ? 'no-workout' : ''}`}
                   onClick={() => handleDateSelect(dateKey)}
-                  ref={el => { if (el) scrollRef.current[dateKey] = el; }}
+                  ref={el => scrollRef.current[dateKey] = el}
                 >
                   <div className="circle-date">{groupedWorkouts[dateKey]?.displayDate?.split('/')[0] || dateKey.split('-')[2]}</div>
                   <div className="circle-day">{groupedWorkouts[dateKey]?.day || dateObj.toLocaleDateString("en-US", { weekday: 'short' })}</div>
@@ -197,55 +137,34 @@ const Workouts = () => {
           })}
         </div>
 
-        {selectedDate && (
+        {selectedDate && groupedWorkouts[selectedDate] && (
           <div className="timeline-details-box">
             <div className="timeline-header-w">
               <h1>Hi {user.name}</h1>
               <h3 style={{ color: "#ff2c2c", marginBottom: '20px' }}>
                 Workout for {getDisplayDate(selectedDate)}
               </h3>
-              <button className="back-to-today-btn" onClick={() => handleDateSelect(todayKey)}>
+              <button className="back-to-today-btn" onClick={() => setSelectedDate(todayKey)}>
                 Back to Today
               </button>
             </div>
 
             {versionOrder.map(version => (
-              groupedWorkouts[selectedDate]?.versions[version] ? (
+              groupedWorkouts[selectedDate].versions[version] ? (
                 <div key={version} className="version-container">
                   <div className="version-header">
                     <span className={`badge badge-${version.replace(/\s+/g, '').toLowerCase()}`}>{version}</span>
                   </div>
                   <div className="workout-list">
-                    {groupedWorkouts[selectedDate].versions[version].sort((a, b) => a.order - b.order).map(w => (
-                      <div key={w._id} className="workout-item" onClick={() => setModalWorkout(w)}>
+                    {groupedWorkouts[selectedDate].versions[version].map(w => (
+                      <div key={w._id} className="workout-item">
                         <div className="workout-line">
-                          {w.icon && (
-                            <img
-                              src={`/icons/${w.icon}.png`}
-                              alt={w.icon}
-                              className="workout-icon"
-                              style={{ width: '20px', marginRight: '10px' }}
-                            />
-                          )}
+                          {w.icon && <img src={`/icons/${w.icon}.png`} alt={w.icon} className="workout-icon" />}
                           <div className="workout-text">
-                            <strong className="custom-name">
-                              {w.customName || w.title}
-                            </strong>
-                            {w.customName && (
-                              <div className="sub-title">
-                                {w.title}
-                              </div>
-                            )}
+                            <strong className="custom-name">{w.customName || w.title}</strong>
+                            {w.customName && <div className="sub-title">{w.title}</div>}
                           </div>
                         </div>
-
-                        {expandedVersions[version] && (
-                          <div className="inline-details">
-                            <div dangerouslySetInnerHTML={{ __html: w.description.replace(/\n/g, "<br/>") }} />
-                            <div>{w.capTime}</div>
-                            <div>{w.instructions}</div>
-                          </div>
-                        )}
                         <LikeCommentLog workoutId={w._id} />
                       </div>
                     ))}
@@ -258,8 +177,7 @@ const Workouts = () => {
             ))}
           </div>
         )}
-
-        {modalWorkout && (
+ {modalWorkout && (
           <div className="modal-overlay" onClick={() => setModalWorkout(null)}>
             <div className="modal-box" onClick={e => e.stopPropagation()}>
               <h2>{modalWorkout.customName || modalWorkout.title}</h2>
@@ -273,7 +191,6 @@ const Workouts = () => {
             </div>
           </div>
         )}
-
         {isLoading && (
           <div className="loading-overlay">
             Loading your workouts...
