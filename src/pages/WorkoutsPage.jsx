@@ -47,7 +47,7 @@ const Workouts = () => {
     const fromDate = new Date();
     fromDate.setDate(fromDate.getDate() - 5);
     const toDate = new Date();
-    toDate.setDate(toDate.getDate() + 1); // only fetch till tomorrow
+    toDate.setDate(toDate.getDate() + 1);
 
     await fetchWorkoutsInRange(
       fromDate.toISOString().split('T')[0],
@@ -102,7 +102,7 @@ const Workouts = () => {
   useEffect(() => {
     const today = new Date();
     const baseDates = [];
-    for (let i = -5; i <= 5; i++) {
+    for (let i = -5; i <= 1; i++) {
       const newDate = new Date(today);
       newDate.setDate(today.getDate() + i);
       baseDates.push(newDate.toISOString().split('T')[0]);
@@ -114,7 +114,7 @@ const Workouts = () => {
       const fromDate = new Date();
       fromDate.setDate(fromDate.getDate() - 5);
       const toDate = new Date();
-      toDate.setDate(toDate.getDate() + 5);
+      toDate.setDate(toDate.getDate() + 1);
       await fetchWorkoutsInRange(
         fromDate.toISOString().split('T')[0],
         toDate.toISOString().split('T')[0]
@@ -163,14 +163,14 @@ const Workouts = () => {
             const isActive = selectedDate === dateKey;
             const today = new Date();
             today.setHours(0, 0, 0, 0);
+            const tomorrow = new Date(today);
+            tomorrow.setDate(today.getDate() + 1);
             const dateToCheck = new Date(dateKey);
             dateToCheck.setHours(0, 0, 0, 0);
 
             let hasWorkouts = false;
             if (groupedWorkouts.hasOwnProperty(dateKey)) {
-              if (dateToCheck <= today) {
-                hasWorkouts = true;
-              } else if (dateToCheck.getTime() === today.getTime() + 86400000) {
+              if (dateToCheck <= today || dateToCheck.getTime() === tomorrow.getTime()) {
                 hasWorkouts = true;
               }
             }
