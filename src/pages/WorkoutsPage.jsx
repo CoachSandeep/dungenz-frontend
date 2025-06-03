@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import PullToRefresh from 'react-pull-to-refresh';
 import './../styles/workout.css';
+import LikeCommentLog from '../components/LikeCommentLog';
 
 const versionOrder = ["Ultra Train", "Super Train", "Minimal Equipment", "Beginner"];
 
@@ -236,7 +237,9 @@ const newGrouped = {};
                           <div>{w.instructions}</div>
                         </div>
                       )}
+                       <LikeCommentLog workoutId={w._id} />
                     </div>
+                   
                   ))}
                 </div>
                 <button className="expand-btn" onClick={() => toggleExpandAll(version)}>
