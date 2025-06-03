@@ -14,7 +14,15 @@ const Workouts = () => {
   const scrollRef = useRef({});
   const scrollContainerRef = useRef(null);
   const user = JSON.parse(localStorage.getItem('user'));
-  const todayKey = new Date().toISOString().split('T')[0];
+ // const todayKey = new Date().toISOString().split('T')[0];
+
+// ✅ Declare today here so it's available everywhere
+const today = new Date();
+today.setHours(0, 0, 0, 0);
+const todayKey = today.toISOString().split('T')[0];
+
+const tomorrow = new Date(today);
+tomorrow.setDate(today.getDate() + 1);
 
   const getDisplayDate = (selectedDate) => {
     const today = new Date();
