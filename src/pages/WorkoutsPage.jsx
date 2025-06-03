@@ -44,19 +44,17 @@ const Workouts = () => {
   };
 
   const handleRefresh = async () => {
-    setIsLoading(true);
     const fromDate = new Date();
     fromDate.setDate(fromDate.getDate() - 5);
     const toDate = new Date();
-    toDate.setDate(toDate.getDate() + 5);
+    toDate.setDate(toDate.getDate() + 1); // only fetch till tomorrow
   
     await fetchWorkoutsInRange(
       fromDate.toISOString().split('T')[0],
       toDate.toISOString().split('T')[0]
     );
-  
-    setIsLoading(false);
   };
+  
 
   const fetchWorkoutsInRange = async (from, to) => {
     const token = localStorage.getItem('token');
