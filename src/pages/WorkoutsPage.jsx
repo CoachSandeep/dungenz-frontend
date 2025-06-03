@@ -135,6 +135,7 @@ const newGrouped = {};
       setTimeout(() => {
         scrollToCenter(todayKey);
       }, 0);
+  
       setIsLoading(false);
     };
   
