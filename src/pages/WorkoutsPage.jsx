@@ -2,6 +2,7 @@
 // 1. Fixed date range (5 past + today + 4 future)
 // 2. Workout fetch only till tomorrow
 // 3. Future dates shown as inactive
+// 4. Back to today bug fixed
 
 import React, { useEffect, useRef, useState } from 'react';
 import PullToRefresh from 'react-pull-to-refresh';
@@ -27,6 +28,7 @@ const Workouts = () => {
 
   const tomorrow = new Date(today);
   tomorrow.setDate(today.getDate() + 1);
+  const tomorrowKey = tomorrow.toISOString().split('T')[0];
 
   const getDisplayDate = (selectedDate) => {
     const targetDate = new Date(selectedDate);
@@ -93,7 +95,7 @@ const Workouts = () => {
       const fromDate = new Date();
       fromDate.setDate(today.getDate() - 5);
       const toDate = new Date();
-      toDate.setDate(today.getDate() + 1); // only till tomorrow
+      toDate.setDate(today.getDate() + 1);
 
       await fetchWorkoutsInRange(
         fromDate.toISOString().split('T')[0],
@@ -109,14 +111,17 @@ const Workouts = () => {
   }, []);
 
   const handleDateSelect = (dateKey) => {
-    if (groupedWorkouts[dateKey]) setSelectedDate(dateKey);
+    const dateObj = new Date(dateKey);
+    if (!groupedWorkouts[dateKey] && dateObj > tomorrow) return;
+    setSelectedDate(dateKey);
+    scrollToCenter(dateKey);
   };
 
   return (
-    <PullToRefresh onRefresh={() => fetchWorkoutsInRange(todayKey, tomorrow.toISOString().split('T')[0])}>
+    <PullToRefresh onRefresh={() => fetchWorkoutsInRange(todayKey, tomorrowKey)}>
       <div className="horizontal-container">
         <div className="timeline-horizontal" ref={scrollContainerRef}>
-          {dates.map((dateKey, index) => {
+          {dates.map((dateKey) => {
             const dateObj = new Date(dateKey);
             const isActive = selectedDate === dateKey;
             const isFutureBeyondTomorrow = dateObj > tomorrow;
@@ -144,7 +149,7 @@ const Workouts = () => {
               <h3 style={{ color: "#ff2c2c", marginBottom: '20px' }}>
                 Workout for {getDisplayDate(selectedDate)}
               </h3>
-              <button className="back-to-today-btn" onClick={() => setSelectedDate(todayKey)}>
+              <button className="back-to-today-btn" onClick={() => handleDateSelect(todayKey)}>
                 Back to Today
               </button>
             </div>
@@ -169,15 +174,13 @@ const Workouts = () => {
                       </div>
                     ))}
                   </div>
-                  <button className="expand-btn" onClick={() => toggleExpandAll(version)}>
-                    {expandedVersions[version] ? "Hide Workouts" : "Show Full Workout"}
-                  </button>
                 </div>
               ) : null
             ))}
           </div>
         )}
- {modalWorkout && (
+
+        {modalWorkout && (
           <div className="modal-overlay" onClick={() => setModalWorkout(null)}>
             <div className="modal-box" onClick={e => e.stopPropagation()}>
               <h2>{modalWorkout.customName || modalWorkout.title}</h2>
@@ -191,6 +194,7 @@ const Workouts = () => {
             </div>
           </div>
         )}
+
         {isLoading && (
           <div className="loading-overlay">
             Loading your workouts...
