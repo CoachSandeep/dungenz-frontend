@@ -134,8 +134,8 @@ const newGrouped = {};
       setSelectedDate(todayKey);
       setTimeout(() => {
         scrollToCenter(todayKey);
-        setIsLoading(false);
-      }, 300);
+      }, 0);
+      setIsLoading(false);
     };
   
     fetchInitial();
