@@ -47,7 +47,7 @@ const Workouts = () => {
     const fromDate = new Date();
     fromDate.setDate(fromDate.getDate() - 5);
     const toDate = new Date();
-    toDate.setDate(toDate.getDate() + 1);
+    toDate.setDate(toDate.getDate() + 1); // only fetch till tomorrow
 
     await fetchWorkoutsInRange(
       fromDate.toISOString().split('T')[0],
@@ -101,30 +101,32 @@ const Workouts = () => {
 
   useEffect(() => {
     const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    const tomorrow = new Date(today);
+    tomorrow.setDate(tomorrow.getDate() + 1);
+
     const baseDates = [];
-    for (let i = -5; i <= 1; i++) {
-      const newDate = new Date(today);
-      newDate.setDate(today.getDate() + i);
-      baseDates.push(newDate.toISOString().split('T')[0]);
+    for (let i = 5; i >= 1; i--) {
+      const past = new Date(today);
+      past.setDate(today.getDate() - i);
+      baseDates.push(past.toISOString().split('T')[0]);
     }
+    baseDates.push(today.toISOString().split('T')[0]);
+    baseDates.push(tomorrow.toISOString().split('T')[0]); // only till tomorrow
+
     baseDates.unshift("__load_more__");
     setDates(baseDates);
 
     const fetchInitial = async () => {
-      const fromDate = new Date();
-      fromDate.setDate(fromDate.getDate() - 5);
-      const toDate = new Date();
-      toDate.setDate(toDate.getDate() + 1);
-      await fetchWorkoutsInRange(
-        fromDate.toISOString().split('T')[0],
-        toDate.toISOString().split('T')[0]
-      );
+      await fetchWorkoutsInRange(baseDates[1], baseDates[baseDates.length - 1]);
       setSelectedDate(todayKey);
       setTimeout(() => {
         scrollToCenter(todayKey);
         setIsLoading(false);
       }, 300);
     };
+
     fetchInitial();
   }, []);
 
@@ -163,14 +165,14 @@ const Workouts = () => {
             const isActive = selectedDate === dateKey;
             const today = new Date();
             today.setHours(0, 0, 0, 0);
-            const tomorrow = new Date(today);
-            tomorrow.setDate(today.getDate() + 1);
             const dateToCheck = new Date(dateKey);
             dateToCheck.setHours(0, 0, 0, 0);
 
             let hasWorkouts = false;
             if (groupedWorkouts.hasOwnProperty(dateKey)) {
-              if (dateToCheck <= today || dateToCheck.getTime() === tomorrow.getTime()) {
+              if (dateToCheck <= today) {
+                hasWorkouts = true;
+              } else if (dateToCheck.getTime() === today.getTime() + 86400000) {
                 hasWorkouts = true;
               }
             }
@@ -194,6 +196,89 @@ const Workouts = () => {
             );
           })}
         </div>
+
+        {selectedDate && (
+          <div className="timeline-details-box">
+            <div className="timeline-header-w">
+              <h1>Hi {user.name}</h1>
+              <h3 style={{ color: "#ff2c2c", marginBottom: '20px' }}>
+                Workout for {getDisplayDate(selectedDate)}
+              </h3>
+              <button className="back-to-today-btn" onClick={() => handleDateSelect(todayKey)}>
+                Back to Today
+              </button>
+            </div>
+
+            {versionOrder.map(version => (
+              groupedWorkouts[selectedDate]?.versions[version] ? (
+                <div key={version} className="version-container">
+                  <div className="version-header">
+                    <span className={`badge badge-${version.replace(/\s+/g, '').toLowerCase()}`}>{version}</span>
+                  </div>
+                  <div className="workout-list">
+                    {groupedWorkouts[selectedDate].versions[version].sort((a, b) => a.order - b.order).map(w => (
+                      <div key={w._id} className="workout-item" onClick={() => setModalWorkout(w)}>
+                        <div className="workout-line">
+                          {w.icon && (
+                            <img
+                              src={`/icons/${w.icon}.png`}
+                              alt={w.icon}
+                              className="workout-icon"
+                              style={{ width: '20px', marginRight: '10px' }}
+                            />
+                          )}
+                          <div className="workout-text">
+                            <strong className="custom-name">
+                              {w.customName || w.title}
+                            </strong>
+                            {w.customName && (
+                              <div className="sub-title">
+                                {w.title}
+                              </div>
+                            )}
+                          </div>
+                        </div>
+
+                        {expandedVersions[version] && (
+                          <div className="inline-details">
+                            <div dangerouslySetInnerHTML={{ __html: w.description.replace(/\n/g, "<br/>") }} />
+                            <div>{w.capTime}</div>
+                            <div>{w.instructions}</div>
+                          </div>
+                        )}
+                        <LikeCommentLog workoutId={w._id} />
+                      </div>
+                    ))}
+                  </div>
+                  <button className="expand-btn" onClick={() => toggleExpandAll(version)}>
+                    {expandedVersions[version] ? "Hide Workouts" : "Show Full Workout"}
+                  </button>
+                </div>
+              ) : null
+            ))}
+          </div>
+        )}
+
+        {modalWorkout && (
+          <div className="modal-overlay" onClick={() => setModalWorkout(null)}>
+            <div className="modal-box" onClick={e => e.stopPropagation()}>
+              <h2>{modalWorkout.customName || modalWorkout.title}</h2>
+              <h3>{modalWorkout.title}</h3>
+              <div className="modal-inside-content">
+                <div dangerouslySetInnerHTML={{ __html: modalWorkout.description.replace(/\n/g, '<br/>') }} />
+                <div dangerouslySetInnerHTML={{ __html: modalWorkout.instructions.replace(/\n/g, '<br/>') }} />
+                <p>{modalWorkout.capTime}</p>
+              </div>
+              <button onClick={() => setModalWorkout(null)}>Close</button>
+            </div>
+          </div>
+        )}
+
+        {isLoading && (
+          <div className="loading-overlay">
+            Loading your workouts...
+          </div>
+        )}
       </div>
     </PullToRefresh>
   );
