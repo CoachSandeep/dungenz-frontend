@@ -18,7 +18,8 @@ const Workouts = () => {
   const user = JSON.parse(localStorage.getItem('user'));
 
   // ✅ Define only once globally
-  const today = new Date(now.getFullYear(), now.getMonth(), now.getDate()); // 👈 always sets local midnight
+  const now = new Date();
+  const today = new Date(now.getFullYear(), now.getMonth(), now.getDate()); // 👈 ensures local midnight
   today.setHours(0, 0, 0, 0);
   const todayKey = today.toISOString().split('T')[0];
 
