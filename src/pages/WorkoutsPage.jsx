@@ -1,5 +1,3 @@
-// 🧠 Complete cleaned up version of Workouts component
-
 import React, { useEffect, useRef, useState } from 'react';
 import PullToRefresh from 'react-pull-to-refresh';
 import './../styles/workout.css';
@@ -17,17 +15,18 @@ const Workouts = () => {
   const scrollContainerRef = useRef(null);
   const user = JSON.parse(localStorage.getItem('user'));
 
-  // ✅ Define only once globally
+  // ✅ IST-based todayKey and tomorrowKey
   const today = new Date();
   const todayKey = today.toLocaleDateString('en-CA', { timeZone: 'Asia/Kolkata' });
-console.log(today);
-  const tomorrow = new Date(today);
-  tomorrow.setDate(today.getDate() + 1);
+
+  const tomorrow = new Date();
+  tomorrow.setDate(tomorrow.getDate() + 1);
+  const tomorrowKey = tomorrow.toLocaleDateString('en-CA', { timeZone: 'Asia/Kolkata' });
 
   const getDisplayDate = (selectedDate) => {
     const targetDate = new Date(selectedDate);
-    targetDate.setHours(0, 0, 0, 0);
-    const diff = Math.floor((targetDate - today) / (1000 * 60 * 60 * 24));
+    const todayLocal = new Date(todayKey);
+    const diff = Math.floor((targetDate - todayLocal) / (1000 * 60 * 60 * 24));
     if (diff === 0) return "Today";
     if (diff === 1) return "Tomorrow";
     if (diff === -1) return "Yesterday";
@@ -48,6 +47,21 @@ console.log(today);
     }
   };
 
+  const handleRefresh = async () => {
+    setIsLoading(true);
+    const fromDate = new Date();
+    fromDate.setDate(fromDate.getDate() - 5);
+    const toDate = new Date();
+    toDate.setDate(toDate.getDate() + 1);
+    await fetchWorkoutsInRange(
+      fromDate.toISOString().split('T')[0],
+      toDate.toISOString().split('T')[0]
+    );
+    setSelectedDate(todayKey); // reset on refresh
+    scrollToCenter(todayKey);
+    setIsLoading(false);
+  };
+
   const fetchWorkoutsInRange = async (from, to) => {
     const token = localStorage.getItem('token');
     try {
@@ -57,7 +71,7 @@ console.log(today);
       const data = await res.json();
       const newGrouped = {};
       data.forEach((w) => {
-        const dateKey = new Date(w.date).toISOString().split('T')[0];
+        const dateKey = new Date(w.date).toLocaleDateString('en-CA', { timeZone: 'Asia/Kolkata' });
         const dateObj = new Date(dateKey);
         const displayDate = dateObj.toLocaleDateString("en-GB");
         const day = dateObj.toLocaleDateString("en-US", { weekday: 'short' });
@@ -76,42 +90,34 @@ console.log(today);
     }
   };
 
-  const handleRefresh = async () => {
-    setIsLoading(true);
-    const fromDate = new Date();
-    fromDate.setDate(today.getDate() - 5);
-    const toDate = new Date();
-    toDate.setDate(today.getDate() + 1);
-    await fetchWorkoutsInRange(fromDate.toISOString().split('T')[0], toDate.toISOString().split('T')[0]);
-    setSelectedDate(todayKey);
-    setTimeout(() => {
-      scrollToCenter(todayKey);
-      setIsLoading(false);
-    }, 300);
-  };
-
   useEffect(() => {
     const baseDates = [];
     for (let i = -5; i <= 4; i++) {
-      const d = new Date(today);
-      d.setDate(today.getDate() + i);
-      baseDates.push(d.toISOString().split('T')[0]);
+      const d = new Date();
+      d.setDate(d.getDate() + i);
+      baseDates.push(d.toLocaleDateString('en-CA', { timeZone: 'Asia/Kolkata' }));
     }
     setDates(baseDates);
 
-    const init = async () => {
-      const fromDate = new Date(today);
-      fromDate.setDate(today.getDate() - 5);
-      const toDate = new Date(today);
-      toDate.setDate(today.getDate() + 1);
-      await fetchWorkoutsInRange(fromDate.toISOString().split('T')[0], toDate.toISOString().split('T')[0]);
+    const fetchInitial = async () => {
+      const fromDate = new Date();
+      fromDate.setDate(fromDate.getDate() - 5);
+      const toDate = new Date();
+      toDate.setDate(toDate.getDate() + 1);
+
+      await fetchWorkoutsInRange(
+        fromDate.toISOString().split('T')[0],
+        toDate.toISOString().split('T')[0]
+      );
+
       setSelectedDate(todayKey);
       setTimeout(() => {
         scrollToCenter(todayKey);
         setIsLoading(false);
       }, 300);
     };
-    init();
+
+    fetchInitial();
   }, []);
 
   const handleDateSelect = (dateKey) => {
@@ -122,18 +128,18 @@ console.log(today);
   };
 
   return (
-    <PullToRefresh onRefresh={handleRefresh}>
+    <PullToRefresh onRefresh={handleRefresh} style={{ minHeight: '100vh' }}>
       <div className="horizontal-container">
         <div className="timeline-horizontal" ref={scrollContainerRef}>
-          {dates.map((dateKey) => {
+          {dates.map((dateKey, index) => {
             const dateObj = new Date(dateKey);
             const isActive = selectedDate === dateKey;
-            const isFuture = dateObj > tomorrow;
+            const isFutureBeyondTomorrow = dateObj > new Date(tomorrowKey);
             const hasWorkout = groupedWorkouts.hasOwnProperty(dateKey);
             return (
               <div key={dateKey} className="timeline-date-wrapper">
                 <div
-                  className={`timeline-date-circle ${isActive ? 'active' : ''} ${(!hasWorkout || isFuture) ? 'no-workout' : ''}`}
+                  className={`timeline-date-circle ${isActive ? 'active' : ''} ${(!hasWorkout || isFutureBeyondTomorrow) ? 'no-workout' : ''}`}
                   onClick={() => handleDateSelect(dateKey)}
                   ref={el => scrollRef.current[dateKey] = el}
                 >
@@ -144,7 +150,7 @@ console.log(today);
             );
           })}
         </div>
-        {selectedDate && (
+        {selectedDate && groupedWorkouts[selectedDate] && (
           <div className="timeline-details-box">
             <div className="timeline-header-w">
               <h1>Hi {user.name}</h1>
