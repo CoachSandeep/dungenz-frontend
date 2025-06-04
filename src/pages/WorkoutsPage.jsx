@@ -58,6 +58,8 @@ const Workouts = () => {
       fromDate.toISOString().split('T')[0],
       toDate.toISOString().split('T')[0]
     );
+
+    
     setSelectedDate(todayKey); // reset on refresh
     scrollToCenter(todayKey);
     setIsLoading(false);
@@ -117,10 +119,14 @@ const Workouts = () => {
         toDate.toISOString().split('T')[0]
       );
 
-      setSelectedDate(todayKey);
+
+      const resolvedToday = new Date().toLocaleDateString('en-CA', { timeZone: 'Asia/Kolkata' });
+      setSelectedDate(resolvedToday); // ✅ ensures it’s defined
+  
+      //setSelectedDate(todayKey);
       setTimeout(() => {
-        scrollToCenter(todayKey);
-        setIsLoading(false);
+        scrollToCenter(resolvedToday);
+      setIsLoading(false);
       }, 300);
     };
 
