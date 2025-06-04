@@ -19,9 +19,10 @@ const Workouts = () => {
 
   // ✅ Define only once globally
   const now = new Date();
-  const today = new Date(now.getFullYear(), now.getMonth(), now.getDate()); // 👈 ensures local midnight
-  today.setHours(0, 0, 0, 0);
-  const todayKey = today.toISOString().split('T')[0];
+const istOffset = 5.5 * 60 * 60 * 1000; // IST is +5:30
+const istNow = new Date(now.getTime() + istOffset);
+const today = new Date(istNow.getFullYear(), istNow.getMonth(), istNow.getDate());
+const todayKey = today.toISOString().split('T')[0];
 
   const tomorrow = new Date(today);
   tomorrow.setDate(today.getDate() + 1);
