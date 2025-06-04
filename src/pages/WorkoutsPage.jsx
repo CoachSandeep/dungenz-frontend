@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import PullToRefresh from 'react-pull-to-refresh';
 import './../styles/workout.css';
+import CommentSection from '../components/CommentSection';
 
 const versionOrder = ["Ultra Train", "Super Train", "Minimal Equipment", "Beginner"];
 
@@ -196,7 +197,10 @@ const Workouts = () => {
               <button className="back-to-today-btn" onClick={() => handleDateSelect(todayKey)}>
                 Back to Today
               </button>
+
+              <CommentSection dateKey={selectedDate} />
             </div>
+           
   
             {versionOrder.map(version => (
               groupedWorkouts[selectedDate]?.versions[version] ? (
