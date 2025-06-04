@@ -126,6 +126,10 @@ const Workouts = () => {
     fetchInitial();
   }, []);
 
+  const toggleExpandAll = (version) => {
+    setExpandedVersions(prev => ({ ...prev, [version]: !prev[version] }));
+  };
+
   const handleDateSelect = (dateKey) => {
     if (groupedWorkouts[dateKey]) {
       setSelectedDate(dateKey);
