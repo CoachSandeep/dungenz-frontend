@@ -18,12 +18,9 @@ const Workouts = () => {
   const user = JSON.parse(localStorage.getItem('user'));
 
   // ✅ Define only once globally
-  const now = new Date();
-const istOffset = 5.5 * 60 * 60 * 1000; // IST is +5:30
-const istNow = new Date(now.getTime() + istOffset);
-const today = new Date(istNow.getFullYear(), istNow.getMonth(), istNow.getDate());
-const todayKey = today.toISOString().split('T')[0];
-
+  const today = new Date();
+  const todayKey = today.toLocaleDateString('en-CA', { timeZone: 'Asia/Kolkata' });
+console.log(today);
   const tomorrow = new Date(today);
   tomorrow.setDate(today.getDate() + 1);
 
