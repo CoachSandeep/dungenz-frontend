@@ -97,7 +97,7 @@ const Workouts = () => {
       d.setDate(d.getDate() + i);
       baseDates.push(d.toLocaleDateString('en-CA', { timeZone: 'Asia/Kolkata' }));
     }
-    setDates(baseDates);
+    setDates(["__load_more__", ...baseDates]);
 
     const fetchInitial = async () => {
       const fromDate = new Date();
@@ -127,28 +127,54 @@ const Workouts = () => {
     }
   };
 
+  const handleLoadMore = async () => {
+    const currentDates = dates.filter(d => d !== "__load_more__");
+    const firstDate = new Date(currentDates[0]);
+    const newDates = [];
+    for (let i = 1; i <= 5; i++) {
+      const prevDate = new Date(firstDate);
+      prevDate.setDate(firstDate.getDate() - i);
+      newDates.unshift(prevDate.toLocaleDateString('en-CA', { timeZone: 'Asia/Kolkata' }));
+    }
+    const fromDate = newDates[0];
+    const toDate = newDates[newDates.length - 1];
+    await fetchWorkoutsInRange(fromDate, toDate);
+    setDates(["__load_more__", ...newDates, ...currentDates]);
+  };
+
   return (
     <PullToRefresh onRefresh={handleRefresh} style={{ minHeight: '100vh' }}>
       <div className="horizontal-container">
         <div className="timeline-horizontal" ref={scrollContainerRef}>
           {dates.map((dateKey, index) => {
-            const dateObj = new Date(dateKey);
-            const isActive = selectedDate === dateKey;
-            const isFutureBeyondTomorrow = dateObj > new Date(tomorrowKey);
-            const hasWorkout = groupedWorkouts.hasOwnProperty(dateKey);
-            return (
-              <div key={dateKey} className="timeline-date-wrapper">
-                <div
-                  className={`timeline-date-circle ${isActive ? 'active' : ''} ${(!hasWorkout || isFutureBeyondTomorrow) ? 'no-workout' : ''}`}
-                  onClick={() => handleDateSelect(dateKey)}
-                  ref={el => scrollRef.current[dateKey] = el}
-                >
-                  <div className="circle-date">{groupedWorkouts[dateKey]?.displayDate?.split('/')[0] || dateKey.split('-')[2]}</div>
-                  <div className="circle-day">{groupedWorkouts[dateKey]?.day || dateObj.toLocaleDateString("en-US", { weekday: 'short' })}</div>
-                </div>
-              </div>
-            );
-          })}
+       if (dateKey === "__load_more__") {
+        return (
+          <div key="__load_more__" className="timeline-date-wrapper">
+            <div className="timeline-date-circle load-more-circle" onClick={handleLoadMore}>
+              <div className="circle-date">⇤</div>
+              <div className="circle-day">More</div>
+            </div>
+          </div>
+        );
+      }
+    
+      const dateObj = new Date(dateKey);
+      const isActive = selectedDate === dateKey;
+      const isFutureBeyondTomorrow = dateObj > new Date(tomorrowKey);
+      const hasWorkout = groupedWorkouts.hasOwnProperty(dateKey);
+      return (
+        <div key={dateKey} className="timeline-date-wrapper">
+          <div
+            className={`timeline-date-circle ${isActive ? 'active' : ''} ${(!hasWorkout || isFutureBeyondTomorrow) ? 'no-workout' : ''}`}
+            onClick={() => handleDateSelect(dateKey)}
+            ref={el => scrollRef.current[dateKey] = el}
+          >
+            <div className="circle-date">{groupedWorkouts[dateKey]?.displayDate?.split('/')[0] || dateKey.split('-')[2]}</div>
+            <div className="circle-day">{groupedWorkouts[dateKey]?.day || dateObj.toLocaleDateString("en-US", { weekday: 'short' })}</div>
+          </div>
+        </div>
+      );
+    })}
         </div>
         {selectedDate && groupedWorkouts[selectedDate] && (
           <div className="timeline-details-box">
