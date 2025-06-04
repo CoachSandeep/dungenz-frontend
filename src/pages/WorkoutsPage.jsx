@@ -198,7 +198,7 @@ const Workouts = () => {
                 Back to Today
               </button>
 
-              <CommentSection dateKey={selectedDate} />
+              {selectedDate && <CommentSection dateKey={selectedDate} />}
             </div>
            
   
