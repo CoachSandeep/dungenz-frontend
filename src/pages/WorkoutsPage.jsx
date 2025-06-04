@@ -69,6 +69,7 @@ const Workouts = () => {
         headers: { Authorization: `Bearer ${token}` },
       });
       const data = await res.json();
+      if (Array.isArray(data)) {
       const newGrouped = {};
       data.forEach((w) => {
         const dateKey = new Date(w.date).toLocaleDateString('en-CA', { timeZone: 'Asia/Kolkata' });
@@ -84,7 +85,12 @@ const Workouts = () => {
         }
         newGrouped[dateKey].versions[version].push(w);
       });
+      
       setGroupedWorkouts(prev => ({ ...prev, ...newGrouped }));
+    } else {
+      console.error("❌ Workout API returned non-array:", data);
+    }
+
     } catch (err) {
       console.error(err);
     }
