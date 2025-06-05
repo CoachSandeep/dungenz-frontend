@@ -49,35 +49,27 @@ const CommentSection = ({ date, user }) => {
   }, [date]);
 
   return (
-    <div className="comment-box">
-      <h3>💬 Log your result here </h3>
-      <div className="comment-input">
+    <div className="comment-section-genz">
+      <h4 className="comment-heading">💬 Today's Buzz</h4>
+      <form onSubmit={handleAddComment} className="comment-form">
         <input
           type="text"
           value={newComment}
           onChange={(e) => setNewComment(e.target.value)}
-          placeholder="Drop your thoughts..."
+          placeholder="Share your thoughts..."
+          className="comment-input-bar"
         />
-        <button onClick={handleAddComment}>Send</button>
-      </div>
+      </form>
       <div className="comment-list">
         {comments.map((c) => (
-          <div className="comment" key={c._id}>
-          <img src={c?.user?.avatar || '/default-avatar.png'} alt="avatar" className="avatar" />
-          <div className="bubble">
-            <div className="meta">
-              <strong>{c?.user?.name || 'Unknown'}</strong>
-              <span onClick={() => handleLike(c._id)}>❤️ {c.likes.length}</span>
+          <div className="comment-item" key={c._id}>
+            <img src={c?.user?.avatar || '/default-avatar.png'} alt="avatar" className="comment-avatar" />
+            <div className="comment-body">
+              <div className="comment-meta">
+                <span className="comment-name">{c?.user?.name || 'Unknown'}</span>
+                <span className="comment-likes">❤️ {c.likes.length}</span>
               </div>
-              <div className="text">{c.text}</div>
-              <div className="replies">
-                {c.replies.map((r, idx) => (
-                  <div className="reply" key={idx}>
-                    <strong>{r.user.name}</strong>: {r.text}
-                  </div>
-                ))}
-                <ReplyBox commentId={c._id} onReply={handleReply} />
-              </div>
+              <div className="comment-text">{c.text}</div>
             </div>
           </div>
         ))}
@@ -85,6 +77,7 @@ const CommentSection = ({ date, user }) => {
     </div>
   );
 };
+
 
 const ReplyBox = ({ commentId, onReply }) => {
   const [reply, setReply] = useState('');

@@ -1,152 +1,116 @@
-.comment-section {
-    padding: 20px;
-    background-color: #121212;
-    color: #f1f1f1;
-    border-radius: 16px;
-    box-shadow: 0 0 10px rgba(255, 44, 44, 0.3);
-    margin-bottom: 30px;
-  }
-  
-  .comment-header {
-    font-size: 1.6rem;
-    font-weight: 700;
-    margin-bottom: 16px;
-    color: #ff2c2c;
-  }
-  
-  .comment-input-box {
-    display: flex;
-    gap: 10px;
-    align-items: flex-start;
-    margin-bottom: 20px;
-  }
-  
-  .comment-input-box textarea {
-    flex-grow: 1;
-    background-color: #1e1e1e;
-    border: 1px solid #333;
-    color: white;
+.comment-section-genz {
+    padding: 16px;
     border-radius: 12px;
-    padding: 12px;
-    font-size: 0.95rem;
-    resize: none;
-    min-height: 60px;
+    background: #f9f9f9;
+    font-family: 'Inter', sans-serif;
+    font-size: 16px; /* prevents mobile zoom */
+    margin-top: 20px;
   }
   
-  .comment-input-box button {
-    background-color: #ff2c2c;
-    border: none;
-    color: white;
-    padding: 10px 16px;
-    border-radius: 10px;
-    cursor: pointer;
+  .comment-section-genz h3 {
+    font-size: 18px;
     font-weight: 600;
-    transition: background 0.3s;
+    margin-bottom: 10px;
+    color: #333;
   }
   
-  .comment-input-box button:hover {
-    background-color: #ff5151;
+  /* Input bar */
+  .comment-input-bar {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: #fff;
+    border: 1px solid #ddd;
+    padding: 8px 12px;
+    border-radius: 24px;
+    margin-bottom: 16px;
   }
   
+  .comment-input-bar input {
+    flex: 1;
+    border: none;
+    outline: none;
+    font-size: 16px;
+    background: transparent;
+  }
+  
+  /* Comment list */
   .comment-list {
     display: flex;
     flex-direction: column;
-    gap: 20px;
+    gap: 12px;
   }
   
-  .comment-item {
-    background-color: #1a1a1a;
-    padding: 14px;
-    border-radius: 12px;
-    position: relative;
-    border-left: 4px solid #ff2c2c;
+  /* Each comment */
+  .comment-bubble {
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
   }
   
-  .comment-avatar {
-    width: 40px;
-    height: 40px;
+  .comment-bubble .avatar {
+    width: 36px;
+    height: 36px;
     border-radius: 50%;
     object-fit: cover;
-    margin-right: 10px;
   }
   
-  .comment-content {
-    display: flex;
-    align-items: flex-start;
-    gap: 10px;
+  .comment-bubble .bubble-body {
+    background: #fff;
+    padding: 10px 14px;
+    border-radius: 16px;
+    border: 1px solid #eee;
+    flex: 1;
   }
   
-  .comment-text {
-    flex-grow: 1;
-  }
-  
-  .comment-text .username {
-    font-weight: 700;
-    color: #ffffff;
-  }
-  
-  .comment-text .timestamp {
-    font-size: 0.75rem;
-    color: #888;
-    margin-top: 4px;
-  }
-  
-  .comment-actions {
-    display: flex;
-    align-items: center;
-    margin-top: 8px;
-    gap: 15px;
-    font-size: 0.85rem;
-    color: #aaa;
-  }
-  
-  .comment-actions span {
-    cursor: pointer;
-    transition: color 0.3s;
-  }
-  
-  .comment-actions span:hover {
-    color: #fff;
-  }
-  
-  .reply-box {
-    margin-top: 10px;
-    margin-left: 50px;
-  }
-  
-  .reply-box textarea {
-    width: 100%;
-    background-color: #1e1e1e;
-    color: white;
-    border: 1px solid #333;
-    border-radius: 10px;
-    padding: 10px;
-    resize: none;
-    font-size: 0.9rem;
-    min-height: 50px;
-  }
-  
-  .reply-box button {
-    margin-top: 6px;
-    background-color: #ff2c2c;
-    color: white;
-    padding: 8px 14px;
-    border: none;
-    border-radius: 8px;
-    cursor: pointer;
+  .comment-bubble .bubble-body .meta {
+    font-size: 14px;
     font-weight: 600;
-    transition: background 0.3s;
+    margin-bottom: 4px;
   }
   
-  .reply-box button:hover {
-    background-color: #ff5050;
+  .comment-bubble .bubble-body .text {
+    font-size: 15px;
+    color: #444;
   }
   
-  .replies {
-    margin-top: 12px;
-    margin-left: 50px;
+  /* Replies */
+  .reply-list {
+    margin-left: 44px;
+    margin-top: 6px;
     display: flex;
     flex-direction: column;
-    gap: 14px;
+    gap: 6px;
+  }
+  
+  .reply-list .reply {
+    font-size: 14px;
+    background: #f1f1f1;
+    padding: 6px 10px;
+    border-radius: 12px;
+  }
+  
+  .reply-input-box {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-left: 44px;
+    margin-top: 8px;
+  }
+  
+  .reply-input-box input {
+    flex: 1;
+    padding: 6px 10px;
+    font-size: 15px;
+    border-radius: 20px;
+    border: 1px solid #ccc;
+    outline: none;
+  }
+  
+  .reply-input-box button {
+    background: none;
+    border: none;
+    font-size: 18px;
+    cursor: pointer;
   }
   
