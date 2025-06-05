@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import '../styles/Hero.css';
+import dp from '../assets/dp.png';
+import logo from '../assets/logo.png';
 
 const quotes = [
   "One rep won't break you. But showing up will make you.",
@@ -38,6 +40,10 @@ const HeroSection = () => {
   return (
     <section className="hero">
       <div className="hero-overlay">
+        <div>
+      <img src={logo} alt="DUNGENZ Logo" className="logo" />
+        <img src={dp} alt="DUNGENZ" className="navbar-logo" />
+      </div>
         <h1 className="hero-title">{quote}</h1>
         <button className="hero-btn" onClick={handleClick}>Enter The Arena</button>
       </div>
