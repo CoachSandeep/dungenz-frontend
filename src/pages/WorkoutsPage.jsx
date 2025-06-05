@@ -16,7 +16,6 @@ const Workouts = () => {
   const scrollContainerRef = useRef(null);
   const user = JSON.parse(localStorage.getItem('user'));
 
-  // ✅ IST-based todayKey and tomorrowKey
   const today = new Date();
   const todayKey = today.toLocaleDateString('en-CA', { timeZone: 'Asia/Kolkata' });
 
@@ -58,9 +57,7 @@ const Workouts = () => {
       fromDate.toISOString().split('T')[0],
       toDate.toISOString().split('T')[0]
     );
-
-    
-    setSelectedDate(todayKey); // reset on refresh
+    setSelectedDate(todayKey);
     scrollToCenter(todayKey);
     setIsLoading(false);
   };
@@ -73,34 +70,31 @@ const Workouts = () => {
       });
       const data = await res.json();
       if (Array.isArray(data)) {
-      const newGrouped = {};
-      data.forEach((w) => {
-        const dateKey = new Date(w.date).toLocaleDateString('en-CA', { timeZone: 'Asia/Kolkata' });
-        const dateObj = new Date(dateKey);
-        const displayDate = dateObj.toLocaleDateString("en-GB");
-        const day = dateObj.toLocaleDateString("en-US", { weekday: 'short' });
-        if (!newGrouped[dateKey]) {
-          newGrouped[dateKey] = { displayDate, day, versions: {} };
-        }
-        const version = w.version?.trim() || "Uncategorized";
-        if (!newGrouped[dateKey].versions[version]) {
-          newGrouped[dateKey].versions[version] = [];
-        }
-        newGrouped[dateKey].versions[version].push(w);
-      });
-      
-      setGroupedWorkouts(prev => ({ ...prev, ...newGrouped }));
-    } else {
-      console.error("❌ Workout API returned non-array:", data);
-    }
-
+        const newGrouped = {};
+        data.forEach((w) => {
+          const dateKey = new Date(w.date).toLocaleDateString('en-CA', { timeZone: 'Asia/Kolkata' });
+          const dateObj = new Date(dateKey);
+          const displayDate = dateObj.toLocaleDateString("en-GB");
+          const day = dateObj.toLocaleDateString("en-US", { weekday: 'short' });
+          if (!newGrouped[dateKey]) {
+            newGrouped[dateKey] = { displayDate, day, versions: {} };
+          }
+          const version = w.version?.trim() || "Uncategorized";
+          if (!newGrouped[dateKey].versions[version]) {
+            newGrouped[dateKey].versions[version] = [];
+          }
+          newGrouped[dateKey].versions[version].push(w);
+        });
+        setGroupedWorkouts(prev => ({ ...prev, ...newGrouped }));
+      } else {
+        console.error("❌ Workout API returned non-array:", data);
+      }
     } catch (err) {
       console.error(err);
     }
   };
 
   useEffect(() => {
-    console.log("🟢 selectedDate updated:", selectedDate);
     const baseDates = [];
     for (let i = -5; i <= 4; i++) {
       const d = new Date();
@@ -109,26 +103,20 @@ const Workouts = () => {
     }
     setDates(["__load_more__", ...baseDates]);
 
-    
     const fetchInitial = async () => {
       const fromDate = new Date();
       fromDate.setDate(fromDate.getDate() - 5);
       const toDate = new Date();
       toDate.setDate(toDate.getDate() + 1);
-
       await fetchWorkoutsInRange(
         fromDate.toISOString().split('T')[0],
         toDate.toISOString().split('T')[0]
       );
-
-
       const resolvedToday = new Date().toLocaleDateString('en-CA', { timeZone: 'Asia/Kolkata' });
-      setSelectedDate(resolvedToday); // ✅ ensures it’s defined
-  
-      //setSelectedDate(todayKey);
+      setSelectedDate(resolvedToday);
       setTimeout(() => {
         scrollToCenter(resolvedToday);
-      setIsLoading(false);
+        setIsLoading(false);
       }, 300);
     };
 
@@ -165,36 +153,36 @@ const Workouts = () => {
     <PullToRefresh onRefresh={handleRefresh} style={{ minHeight: '100vh' }}>
       <div className="horizontal-container">
         <div className="timeline-horizontal" ref={scrollContainerRef}>
-          {dates.map((dateKey, index) => {
-       if (dateKey === "__load_more__") {
-        return (
-          <div key="__load_more__" className="timeline-date-wrapper">
-            <div className="timeline-date-circle load-more-circle" onClick={handleLoadMore}>
-              <div className="circle-date">⇤</div>
-              <div className="circle-day">More</div>
-            </div>
-          </div>
-        );
-      }
-    
-      const dateObj = new Date(dateKey);
-      const isActive = selectedDate === dateKey;
-      const isFutureBeyondTomorrow = dateObj > new Date(tomorrowKey);
-      const hasWorkout = groupedWorkouts.hasOwnProperty(dateKey);
-      return (
-        <div key={dateKey} className="timeline-date-wrapper">
-          <div
-            className={`timeline-date-circle ${isActive ? 'active' : ''} ${(!hasWorkout || isFutureBeyondTomorrow) ? 'no-workout' : ''}`}
-            onClick={() => handleDateSelect(dateKey)}
-            ref={el => scrollRef.current[dateKey] = el}
-          >
-            <div className="circle-date">{groupedWorkouts[dateKey]?.displayDate?.split('/')[0] || dateKey.split('-')[2]}</div>
-            <div className="circle-day">{groupedWorkouts[dateKey]?.day || dateObj.toLocaleDateString("en-US", { weekday: 'short' })}</div>
-          </div>
+          {dates.map((dateKey) => {
+            if (dateKey === "__load_more__") {
+              return (
+                <div key="__load_more__" className="timeline-date-wrapper">
+                  <div className="timeline-date-circle load-more-circle" onClick={handleLoadMore}>
+                    <div className="circle-date">⇤</div>
+                    <div className="circle-day">More</div>
+                  </div>
+                </div>
+              );
+            }
+            const dateObj = new Date(dateKey);
+            const isActive = selectedDate === dateKey;
+            const isFutureBeyondTomorrow = dateObj > new Date(tomorrowKey);
+            const hasWorkout = groupedWorkouts.hasOwnProperty(dateKey);
+            return (
+              <div key={dateKey} className="timeline-date-wrapper">
+                <div
+                  className={`timeline-date-circle ${isActive ? 'active' : ''} ${(!hasWorkout || isFutureBeyondTomorrow) ? 'no-workout' : ''}`}
+                  onClick={() => handleDateSelect(dateKey)}
+                  ref={el => scrollRef.current[dateKey] = el}
+                >
+                  <div className="circle-date">{groupedWorkouts[dateKey]?.displayDate?.split('/')[0] || dateKey.split('-')[2]}</div>
+                  <div className="circle-day">{groupedWorkouts[dateKey]?.day || dateObj.toLocaleDateString("en-US", { weekday: 'short' })}</div>
+                </div>
+              </div>
+            );
+          })}
         </div>
-      );
-    })}
-        </div>
+
         {selectedDate && groupedWorkouts[selectedDate] && (
           <div className="timeline-details-box">
             <div className="timeline-header-w">
@@ -205,11 +193,9 @@ const Workouts = () => {
               <button className="back-to-today-btn" onClick={() => handleDateSelect(todayKey)}>
                 Back to Today
               </button>
-
               <CommentSection date={selectedDate} />
             </div>
-           
-  
+
             {versionOrder.map(version => (
               groupedWorkouts[selectedDate]?.versions[version] ? (
                 <div key={version} className="version-container">
@@ -239,7 +225,6 @@ const Workouts = () => {
                             )}
                           </div>
                         </div>
-  
                         {expandedVersions[version] && (
                           <div className="inline-details">
                             <div dangerouslySetInnerHTML={{ __html: w.description.replace(/\n/g, "<br/>") }} />
@@ -248,7 +233,6 @@ const Workouts = () => {
                           </div>
                         )}
                       </div>
-                      
                     ))}
                   </div>
                   <button className="expand-btn" onClick={() => toggleExpandAll(version)}>
@@ -259,7 +243,7 @@ const Workouts = () => {
             ))}
           </div>
         )}
-  
+
         {modalWorkout && (
           <div className="modal-overlay" onClick={() => setModalWorkout(null)}>
             <div className="modal-box" onClick={e => e.stopPropagation()}>
@@ -274,7 +258,7 @@ const Workouts = () => {
             </div>
           </div>
         )}
-  
+
         {isLoading && (
           <div className="loading-overlay">
             Loading your workouts...
