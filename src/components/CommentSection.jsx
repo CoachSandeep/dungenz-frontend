@@ -63,11 +63,11 @@ const CommentSection = ({ date, user }) => {
       <div className="comment-list">
         {comments.map((c) => (
           <div className="comment" key={c._id}>
-            {/* <img src={c.user.avatar} alt="avatar" className="avatar" /> */}
-            <div className="bubble">
-              <div className="meta">
-                <strong>{c.user.name}</strong>
-                <span onClick={() => handleLike(c._id)}>❤️ {c.likes.length}</span>
+          <img src={c?.user?.avatar || '/default-avatar.png'} alt="avatar" className="avatar" />
+          <div className="bubble">
+            <div className="meta">
+              <strong>{c?.user?.name || 'Unknown'}</strong>
+              <span onClick={() => handleLike(c._id)}>❤️ {c.likes.length}</span>
               </div>
               <div className="text">{c.text}</div>
               <div className="replies">
