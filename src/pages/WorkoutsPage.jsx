@@ -205,8 +205,8 @@ const Workouts = () => {
               <button className="back-to-today-btn" onClick={() => handleDateSelect(todayKey)}>
                 Back to Today
               </button>
-              console.log("💬 Rendering CommentSection for:", selectedDate);
-              {selectedDate && <CommentSection dateKey={selectedDate} />}
+
+              <CommentSection date={selectedDate} />
             </div>
            
   
