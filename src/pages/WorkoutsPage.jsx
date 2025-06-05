@@ -100,6 +100,7 @@ const Workouts = () => {
   };
 
   useEffect(() => {
+    console.log("🟢 selectedDate updated:", selectedDate);
     const baseDates = [];
     for (let i = -5; i <= 4; i++) {
       const d = new Date();
@@ -108,6 +109,7 @@ const Workouts = () => {
     }
     setDates(["__load_more__", ...baseDates]);
 
+    
     const fetchInitial = async () => {
       const fromDate = new Date();
       fromDate.setDate(fromDate.getDate() - 5);
@@ -203,7 +205,7 @@ const Workouts = () => {
               <button className="back-to-today-btn" onClick={() => handleDateSelect(todayKey)}>
                 Back to Today
               </button>
-
+              console.log("💬 Rendering CommentSection for:", selectedDate);
               {selectedDate && <CommentSection dateKey={selectedDate} />}
             </div>
            

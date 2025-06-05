@@ -4,6 +4,7 @@ import React, { useEffect, useState } from 'react';
 import '../styles/CommentSection.css';
 
 const CommentSection = ({ date, user }) => {
+    if (!date) return null; // 🛑 Block everything if no date
   const [comments, setComments] = useState([]);
   const [newComment, setNewComment] = useState('');
 
