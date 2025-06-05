@@ -42,6 +42,8 @@ const HeroSection = () => {
       <div className="hero-overlay">
         <div>
       <img src={logo} alt="DUNGENZ Logo" className="logo" />
+      </div>
+      <div>
         <img src={dp} alt="DUNGENZ" className="navbar-logo" />
       </div>
         <h1 className="hero-title">{quote}</h1>
