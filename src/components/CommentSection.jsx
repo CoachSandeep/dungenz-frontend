@@ -72,7 +72,7 @@ const CommentSection = ({ date, user }) => {
         {comments.map((c) => (
           <div className="comment-item" key={c._id}>
            <div className="avatar-initials">
-  {getInitials(c.user.name)}
+  {getInitials(c?.user?.name || 'Unknown')}
 </div>
             <div className="comment-body">
               <div className="comment-meta">
