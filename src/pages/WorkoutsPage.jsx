@@ -113,6 +113,7 @@ const Workouts = () => {
         toDate.toISOString().split('T')[0]
       );
       const resolvedToday = new Date().toLocaleDateString('en-CA', { timeZone: 'Asia/Kolkata' });
+
       setSelectedDate(resolvedToday);
       setTimeout(() => {
         scrollToCenter(resolvedToday);
@@ -193,7 +194,7 @@ const Workouts = () => {
               <button className="back-to-today-btn" onClick={() => handleDateSelect(todayKey)}>
                 Back to Today
               </button>
-              <CommentSection date={selectedDate} />
+              <CommentSection date={selectedDate} user={user} />
             </div>
 
             {versionOrder.map(version => (

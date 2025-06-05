@@ -9,14 +9,14 @@ const CommentSection = ({ date, user }) => {
   const [newComment, setNewComment] = useState('');
 
   const fetchComments = async () => {
-    const res = await fetch(`/api/comments/${date}`);
+    const res = await fetch(`${API_BASE}/api/comments/${date}`)
     const data = await res.json();
     setComments(data);
   };
 
   const handleAddComment = async () => {
     if (!newComment.trim()) return;
-    const res = await fetch(`/api/comments/${date}`, {
+    const res = await fetch(`${API_BASE}/api/comments/${date}`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ text: newComment, user })
@@ -27,7 +27,7 @@ const CommentSection = ({ date, user }) => {
   };
 
   const handleLike = async (commentId) => {
-    await fetch(`/api/comments/${date}/${commentId}/like`, {
+    await fetch(`${API_BASE}/api/comments/${date}/${commentId}/like`, {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ userId: user._id })
@@ -36,7 +36,7 @@ const CommentSection = ({ date, user }) => {
   };
 
   const handleReply = async (commentId, text) => {
-    await fetch(`/api/comments/${date}/${commentId}/reply`, {
+    await fetch(`${API_BASE}/api/comments/${date}/${commentId}/reply`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ text, user })
