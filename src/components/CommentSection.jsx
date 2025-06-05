@@ -60,13 +60,30 @@ const CommentSection = ({ date, user }) => {
     <div className="comment-section-genz">
       <h4 className="comment-heading">💬 Log your Results</h4>
       <form onSubmit={handleAddComment} className="comment-form">
-        <input
-          type="text"
-          value={newComment}
-          onChange={(e) => setNewComment(e.target.value)}
-          placeholder="Share your thoughts..."
-          className="comment-input-bar"
-        />
+      <div className="comment-input-box">
+  <div className="comment-avatar">
+    {user?.avatar ? (
+      <img src={user.avatar} alt="avatar" className="avatar" />
+    ) : (
+      <div className="avatar-initials">
+        {user?.name?.slice(0, 2).toUpperCase() || 'Un Known'}
+      </div>
+    )}
+  </div>
+
+  <div className="input-with-arrow">
+    <input
+      type="text"
+      value={newComment}
+      onChange={(e) => setNewComment(e.target.value)}
+      placeholder="Share your thoughts..."
+      inputMode="text"
+    />
+    <button className="send-arrow-btn" onClick={handleAddComment}>
+      ➤
+    </button>
+  </div>
+</div>
       </form>
       <div className="comment-list">
         {comments.map((c) => (
@@ -76,7 +93,7 @@ const CommentSection = ({ date, user }) => {
 </div>
             <div className="comment-body">
               <div className="comment-meta">
-                <span className="comment-name">{c?.user?.name || 'Unknown'}</span>
+                <span className="comment-name">{c?.user?.name || 'Un known'}</span>
                 <span className="comment-likes">❤️ {c.likes.length}</span>
               </div>
               <div className="comment-text">{c.text}</div>
