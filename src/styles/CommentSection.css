@@ -2,7 +2,7 @@
     padding: 16px;
     border-radius: 12px;
     background: #f9f9f9;
-    font-family: 'Inter', sans-serif;
+    font-family: 'Bebas Neue', sans-serif; /* 👈 or whatever your main font is */
     font-size: 16px; /* prevents mobile zoom */
     margin-top: 20px;
     color:#000;
@@ -115,3 +115,17 @@
     cursor: pointer;
   }
   
+  .avatar-initials {
+    width: 36px;
+    height: 36px;
+    background-color: #ff2c2c;
+    color: white;
+    border-radius: 50%;
+    font-weight: bold;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    box-shadow: 0 0 4px rgba(0,0,0,0.15);
+  }

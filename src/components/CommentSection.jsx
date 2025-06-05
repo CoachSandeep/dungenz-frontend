@@ -63,7 +63,9 @@ const CommentSection = ({ date, user }) => {
       <div className="comment-list">
         {comments.map((c) => (
           <div className="comment-item" key={c._id}>
-            <img src={c?.user?.avatar || '/default-avatar.png'} alt="avatar" className="comment-avatar" />
+           <div className="avatar-initials">
+  {getInitials(c.user.name)}
+</div>
             <div className="comment-body">
               <div className="comment-meta">
                 <span className="comment-name">{c?.user?.name || 'Unknown'}</span>
