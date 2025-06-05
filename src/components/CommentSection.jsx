@@ -14,6 +14,14 @@ const CommentSection = ({ date, user }) => {
     setComments(data);
   };
 
+  const getInitials = (name) => {
+    return name
+      .split(" ")
+      .map(n => n[0])
+      .join("")
+      .toUpperCase();
+  };
+
   const handleAddComment = async () => {
     if (!newComment.trim()) return;
     const res = await fetch(`${process.env.REACT_APP_API_BASE_URL}/comments/${date}`, {
@@ -50,7 +58,7 @@ const CommentSection = ({ date, user }) => {
 
   return (
     <div className="comment-section-genz">
-      <h4 className="comment-heading">💬 Today's Buzz</h4>
+      <h4 className="comment-heading">💬 Log your Results</h4>
       <form onSubmit={handleAddComment} className="comment-form">
         <input
           type="text"
