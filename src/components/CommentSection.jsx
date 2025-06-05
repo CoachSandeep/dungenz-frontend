@@ -50,7 +50,7 @@ const CommentSection = ({ date, user }) => {
 
   return (
     <div className="comment-box">
-      <h3>💬 Community Buzz</h3>
+      <h3>💬 Log your result here </h3>
       <div className="comment-input">
         <input
           type="text"
@@ -63,7 +63,7 @@ const CommentSection = ({ date, user }) => {
       <div className="comment-list">
         {comments.map((c) => (
           <div className="comment" key={c._id}>
-            <img src={c.user.avatar} alt="avatar" className="avatar" />
+            {/* <img src={c.user.avatar} alt="avatar" className="avatar" /> */}
             <div className="bubble">
               <div className="meta">
                 <strong>{c.user.name}</strong>
