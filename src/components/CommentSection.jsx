@@ -85,7 +85,7 @@ const CommentSection = ({ date, user }) => {
     value={newComment}
     onChange={(e) => setNewComment(e.target.value)}
     placeholder="Log your workout result here"
-    style={{ width: '100%', marginRight: '0.5rem' }}
+    style={{ width: '100% !important', marginRight: '0.5rem' }}
   />
   <Button 
     color="red"
