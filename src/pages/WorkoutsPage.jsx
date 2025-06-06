@@ -194,7 +194,9 @@ const Workouts = () => {
               <button className="back-to-today-btn" onClick={() => handleDateSelect(todayKey)}>
                 Back to Today
               </button>
+              <div className="semantic-zone">
               <CommentSection date={selectedDate} user={user} />
+              </div>
             </div>
 
             {versionOrder.map(version => (

@@ -34,7 +34,7 @@ const CommentSection = ({ date, user }) => {
   };
 
   const handleLike = async (commentId) => {
-    if (!user?._id) return;
+    // if (!user?._id) return;
     await fetch(`${process.env.REACT_APP_API_BASE_URL}/comments/${date}/${commentId}/like`, {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
@@ -107,7 +107,7 @@ const CommentSection = ({ date, user }) => {
                 </Comment>
               </Comment.Group>
             ))}
-            <ReplyBox commentId={c._id} onReply={handleReply} />
+            {/* <ReplyBox commentId={c._id} onReply={handleReply} /> */}
           </Comment.Content>
         </Comment>
       ))}
