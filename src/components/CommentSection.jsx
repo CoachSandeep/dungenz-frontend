@@ -84,9 +84,17 @@ const CommentSection = ({ date, user }) => {
           value={newComment}
           onChange={(e) => setNewComment(e.target.value)}
           placeholder="Log your workout result here"
+          icon={{
+            name: 'paper plane',
+            circular: true,
+            link: true,
+            onClick: handleAddComment,
+            color: 'red'
+          }}
+          iconPosition="right"
 
         />
-        <Button icon='paper plane' primary />
+        {/* <Button icon='paper plane' primary /> */}
       </Form>
       </Header>
 
