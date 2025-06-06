@@ -3,7 +3,7 @@ import React from 'react';
 import Frame from 'react-frame-component';
 import CommentSection from './CommentSection';
 
-// 🧩 Sandboxed Frame Component\const SandboxedCommentSection = ({ date, user }) => {
+SandboxedCommentSection = ({ date, user }) => {
   return (
     <Frame
       style={{ width: '100%', border: 'none', minHeight: '200px' }}
@@ -28,6 +28,6 @@ import CommentSection from './CommentSection';
       </div>
     </Frame>
   );
-
+};
 
 export default SandboxedCommentSection;
