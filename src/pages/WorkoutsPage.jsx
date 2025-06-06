@@ -1,7 +1,8 @@
 import React, { useEffect, useRef, useState } from 'react';
 import PullToRefresh from 'react-pull-to-refresh';
 import './../styles/workout.css';
-import CommentSection from '../components/CommentSection';
+// import CommentSection from '../components/CommentSection';
+import SandboxedCommentSection from '../components/SandboxedCommentSection';
 
 const versionOrder = ["Ultra Train", "Super Train", "Minimal Equipment", "Beginner"];
 
@@ -195,7 +196,7 @@ const Workouts = () => {
                 Back to Today
               </button>
               <div className="semantic-zone">
-              <CommentSection date={selectedDate} user={user} />
+              <SandboxedCommentSection date={selectedDate} user={user} />
               </div>
             </div>
 
