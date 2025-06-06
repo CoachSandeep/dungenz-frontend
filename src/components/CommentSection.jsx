@@ -92,7 +92,7 @@ const CommentSection = ({ date, user }) => {
     icon="send"
     onClick={handleAddComment}
     type="submit"
-    style={{ margin: 0 }}
+    style={{ margin: 0, marginBottom:'15px' }}
   />
       </Form>
       </Header>
