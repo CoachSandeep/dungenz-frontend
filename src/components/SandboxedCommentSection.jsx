@@ -22,6 +22,16 @@ const SandboxedCommentSection = ({ date, user }) => {
             .field{
                 width:100%;
             }
+
+            .comment-zone input::placeholder {
+                color: #999 !important; /* or #ccc or anything darker than default */
+                opacity: 1 !important;
+              }
+              
+              /* Prevent mobile zoom on focus */
+              .comment-zone input[type="text"] {
+                font-size: 16px; /* 16px prevents zoom on iOS */
+              }
           `}</style>
         </>
       }
