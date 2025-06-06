@@ -17,7 +17,7 @@ const CommentSection = ({ date, user }) => {
     if (!newComment.trim()) return;
 
     const fallbackUser = {
-      _id: user?._id || 'anonymous',
+      _id: user?.id || 'anonymous',
       name: user?.name || 'Unknown',
       avatar: user?.avatar || '',
     };
@@ -38,7 +38,7 @@ const CommentSection = ({ date, user }) => {
     await fetch(`${process.env.REACT_APP_API_BASE_URL}/comments/${date}/${commentId}/like`, {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ userId: user._id })
+      body: JSON.stringify({ userId: user.id })
     });
     fetchComments();
   };
@@ -47,7 +47,7 @@ const CommentSection = ({ date, user }) => {
     if (!user?.name) return;
 
     const fallbackUser = {
-      _id: user?._id || 'anonymous',
+      _id: user?.id || 'anonymous',
       name: user?.name || 'Unknown',
       avatar: user?.avatar || '',
     };
@@ -84,6 +84,7 @@ const CommentSection = ({ date, user }) => {
           value={newComment}
           onChange={(e) => setNewComment(e.target.value)}
           placeholder="Log your workout result here"
+
         />
         <Button icon='paper plane' primary />
       </Form>
