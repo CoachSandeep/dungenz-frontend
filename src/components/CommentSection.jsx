@@ -79,11 +79,12 @@ const CommentSection = ({ date, user }) => {
   return (
     <Comment.Group threaded>
       <Header as='h3' dividing>
-      <Form reply onSubmit={handleAddComment}>
+      <Form reply onSubmit={handleAddComment} style={{ display: 'flex', alignItems: 'center', width: '100%' }} >
         <Form.Input
           value={newComment}
           onChange={(e) => setNewComment(e.target.value)}
           placeholder="Log your workout result here"
+          
           icon={{
             name: 'paper plane',
             circular: true,
