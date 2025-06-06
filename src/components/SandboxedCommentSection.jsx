@@ -19,6 +19,9 @@ const SandboxedCommentSection = ({ date, user }) => {
               font-family: 'Poppins', sans-serif;
               background: transparent;
             }
+            .field{
+                width:100%;
+            }
           `}</style>
         </>
       }
