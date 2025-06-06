@@ -79,7 +79,7 @@ const CommentSection = ({ date, user }) => {
   return (
     <Comment.Group threaded>
       <Header as='h3' dividing>
-      <Form reply onSubmit={handleAddComment} style={{ display: 'flex', alignItems: 'center', width: '100%' }} >
+      <Form className="comment-form" reply onSubmit={handleAddComment} style={{ display: 'flex', alignItems: 'center', width: '100%' }} >
       <Form.Input
     fluid
     value={newComment}
