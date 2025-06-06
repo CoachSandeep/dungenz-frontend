@@ -97,7 +97,7 @@ const CommentSection = ({ date, user }) => {
       </Form>
       </Header>
 
-      {comments.map((c) => (
+      {comments.slice().reverse().map((c) => (
         <Comment key={c._id}>
           <AvatarOrInitials user={c.user} />
           <Comment.Content>
