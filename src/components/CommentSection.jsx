@@ -79,7 +79,14 @@ const CommentSection = ({ date, user }) => {
   return (
     <Comment.Group threaded>
       <Header as='h3' dividing>
-        <Icon name="users" color="red" /> Community Buzz
+      <Form reply onSubmit={handleAddComment}>
+        <Form.Input
+          value={newComment}
+          onChange={(e) => setNewComment(e.target.value)}
+          placeholder="Log your workout result here"
+        />
+        <Button icon='paper plane' primary />
+      </Form>
       </Header>
 
       {comments.map((c) => (
@@ -112,14 +119,7 @@ const CommentSection = ({ date, user }) => {
         </Comment>
       ))}
 
-      <Form reply onSubmit={handleAddComment}>
-        <Form.Input
-          value={newComment}
-          onChange={(e) => setNewComment(e.target.value)}
-          placeholder="Share your thoughts..."
-        />
-        <Button icon='paper plane' content='Send' primary />
-      </Form>
+      
     </Comment.Group>
   );
 };
