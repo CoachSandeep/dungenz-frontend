@@ -80,22 +80,20 @@ const CommentSection = ({ date, user }) => {
     <Comment.Group threaded>
       <Header as='h3' dividing>
       <Form reply onSubmit={handleAddComment} style={{ display: 'flex', alignItems: 'center', width: '100%' }} >
-        <Form.Input
-          value={newComment}
-          onChange={(e) => setNewComment(e.target.value)}
-          placeholder="Log your workout result here"
-          
-          icon={{
-            name: 'paper plane',
-            circular: true,
-            link: true,
-            onClick: handleAddComment,
-            color: 'red'
-          }}
-          iconPosition="right"
-
-        />
-        {/* <Button icon='paper plane' primary /> */}
+      <Form.Input
+    fluid
+    value={newComment}
+    onChange={(e) => setNewComment(e.target.value)}
+    placeholder="Log your workout result here"
+    style={{ flexGrow: 1, marginRight: '0.5rem' }}
+  />
+  <Button 
+    color="red"
+    icon="send"
+    onClick={handleAddComment}
+    type="submit"
+    style={{ margin: 0 }}
+  />
       </Form>
       </Header>
 
