@@ -1,194 +1,29 @@
-.comment-section-genz {
-    padding: 16px;
-    border-radius: 12px;
-    background: #f9f9f9;
-    font-family: 'Bebas Neue', sans-serif; /* 👈 or whatever your main font is */
-    font-size: 16px; /* prevents mobile zoom */
-    margin-top: 20px;
-    color:#000;
-  }
-  
-  .comment-section-genz h3 {
-    font-size: 18px;
-    font-weight: 600;
-    margin-bottom: 10px;
-    color: #333;
-  }
-  
-  /* Input bar */
-  .comment-input-bar {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    background: #fff;
-    border: 1px solid #ddd;
-    padding: 8px 12px;
-    border-radius: 24px;
-    margin-bottom: 16px;
-  }
-  
-  .comment-input-bar input {
-    flex: 1;
+.comment-zone-wrapper .ui.comments {
+    margin: 0 !important;
+    padding: 0 !important;
     border: none;
-    outline: none;
-    font-size: 16px;
-    background: transparent;
+    box-shadow: none;
   }
   
-  /* Comment list */
-  .comment-list {
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
+  /* Prevent space when no comments */
+  .comment-zone-wrapper .ui.comments:not(:has(.comment)) {
+    padding: 0 !important;
+    margin: 0 !important;
+    min-height: auto !important;
   }
   
-  /* Each comment */
-  .comment-bubble {
-    display: flex;
-    gap: 10px;
-    align-items: flex-start;
-  }
-  
-  .comment-bubble .avatar {
-    width: 36px;
-    height: 36px;
-    border-radius: 50%;
-    object-fit: cover;
-  }
-  
-  .comment-bubble .bubble-body {
-    background: #fff;
-    padding: 10px 14px;
-    border-radius: 16px;
-    border: 1px solid #eee;
-    flex: 1;
-  }
-  
-  .comment-bubble .bubble-body .meta {
-    font-size: 14px;
-    font-weight: 600;
-    margin-bottom: 4px;
-  }
-  
-  .comment-bubble .bubble-body .text {
-    font-size: 15px;
-    color: #444;
-  }
-  
-  /* Replies */
-  .reply-list {
-    margin-left: 44px;
-    margin-top: 6px;
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
-  }
-  
-  .reply-list .reply {
-    font-size: 14px;
-    background: #f1f1f1;
-    padding: 6px 10px;
-    border-radius: 12px;
-  }
-  
-  .reply-input-box {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    margin-left: 44px;
-    margin-top: 8px;
-  }
-  
-  .reply-input-box input {
-    flex: 1;
-    padding: 6px 10px;
-    font-size: 15px;
-    border-radius: 20px;
-    border: 1px solid #ccc;
-    outline: none;
-  }
-  
-  .reply-input-box button {
-    background: none;
-    border: none;
-    font-size: 18px;
-    cursor: pointer;
-  }
-  
-  .avatar-initials {
-    width: 36px;
-    height: 36px;
+  /* Avatar initials */
+  .avatar-initials-circle {
+    width: 32px;
+    height: 32px;
     background-color: #ff2c2c;
     color: white;
-    border-radius: 50%;
     font-weight: bold;
-    font-size: 14px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-shrink: 0;
-    box-shadow: 0 0 4px rgba(0,0,0,0.15);
-  }
-
-  .comment-input-box {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    margin-top: 15px;
-    margin-bottom: 20px;
-  }
-  
-  .input-with-arrow {
-    position: relative;
-    flex: 1;
-  }
-  
-  .input-with-arrow input {
-    width: 100%;
-    padding: 10px 38px 10px 14px;
-    border-radius: 18px;
-    border: 1px solid #444;
-    background: #121212;
-    color: white;
-    font-size: 14px;
-    font-family: 'Bebas Neue', sans-serif;
-    outline: none;
-  }
-  
-  .input-with-arrow input:focus {
-    border-color: #ff2c2c;
-  }
-  
-  .send-arrow-btn {
-    position: absolute;
-    right: 10px;
-    top: 50%;
-    transform: translateY(-50%);
-    background: transparent;
-    border: none;
-    font-size: 18px;
-    color: #ff2c2c;
-    cursor: pointer;
-  }
-  
-  .comment-avatar {
-    width: 36px;
-    height: 36px;
-    flex-shrink: 0;
-  }
-  
-  .avatar-initials {
-    width: 36px;
-    height: 36px;
-    background-color: #ff2c2c;
-    color: white;
+    font-size: 0.9rem;
     border-radius: 50%;
-    font-weight: bold;
-    font-size: 14px;
     display: flex;
-    align-items: center;
     justify-content: center;
-    font-family: 'Bebas Neue', sans-serif;
-    letter-spacing: 1px;
-    text-transform: uppercase;
+    align-items: center;
+    margin-right: 8px;
   }
+  
