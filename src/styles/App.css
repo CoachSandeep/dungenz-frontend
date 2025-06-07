@@ -374,3 +374,13 @@ a {
   padding: 0 !important;
   margin: 0 !important;
 }
+
+.comment-zone-wrapper .ui.comments {
+  margin: 0 !important;
+  padding: 0 !important;
+  min-height: 0 !important;
+}
+
+.comment-zone-wrapper .ui.comments:empty {
+  display: none !important;
+}

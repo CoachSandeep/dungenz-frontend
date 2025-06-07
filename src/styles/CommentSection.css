@@ -17,3 +17,10 @@
     display: none !important;
   }
   
+  .comment-zone + .ui.comments:empty {
+    margin: 0 !important;
+    padding: 0 !important;
+    min-height: 0 !important;
+    height: auto !important;
+    display: none !important;
+  }
