@@ -384,3 +384,7 @@ a {
 .comment-zone-wrapper .ui.comments:empty {
   display: none !important;
 }
+
+.section-card-indvidual{
+  background-color: white;
+}

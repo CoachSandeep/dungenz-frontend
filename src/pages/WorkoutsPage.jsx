@@ -186,7 +186,7 @@ const Workouts = () => {
 
         {selectedDate && groupedWorkouts[selectedDate] && (
           <>
-            <div className="section-card">
+            <div className="section-card-indvidual">
               <h1>Hi {user.name}</h1>
               <h3 style={{ color: "#ff2c2c", marginBottom: '20px' }}>
                 Workout for {getDisplayDate(selectedDate)}
@@ -196,11 +196,11 @@ const Workouts = () => {
               </button>
             </div>
 
-            <div className="section-card">
+            <div className="section-card-indvidual">
               <SandboxedCommentSection date={selectedDate} user={user} />
             </div>
 
-            <div className="section-card">
+            <div className="section-card-indvidual">
               {versionOrder.map(version => (
                 groupedWorkouts[selectedDate]?.versions[version] ? (
                   <div key={version} className="version-container">
