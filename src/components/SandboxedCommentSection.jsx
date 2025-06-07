@@ -45,6 +45,22 @@ const SandboxedCommentSection = ({ date, user }) => {
                 margin-bottom: 0 !important;
               }
 
+              .comment-zone-wrapper {
+                margin: 0 !important;
+                padding: 0 !important;
+              }
+              
+              .comment-zone-wrapper .ui.comments {
+                padding: 0 !important;
+                margin: 0 !important;
+                min-height: 0 !important;
+                border: none !important;
+              }
+              
+              .comment-zone-wrapper iframe {
+                display: none !important;
+              }
+
           `}</style>
         </>
       }
