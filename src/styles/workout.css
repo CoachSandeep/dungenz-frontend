@@ -245,12 +245,13 @@
 }
 
 .back-to-today-btns {
-  background-color: #ff2c2c;
+  background-color: #222;
   border: none;
   color: white;
-  padding: 6px 14px;
+  padding: 6px 8px;
   border-radius: 6px;
   font-weight: bold;
-  font-size: 0.85rem;
+  font-size: 10px;
   cursor: pointer;
+  width:25%;
 }
