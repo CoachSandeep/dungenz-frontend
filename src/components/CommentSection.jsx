@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Comment, Form, Button } from 'semantic-ui-react';
-import '../styles/CommentSection.css'; // Scoped CSS
+import { Comment, Form, Button, Header } from 'semantic-ui-react';
 
 const CommentSection = ({ date, user }) => {
   const [comments, setComments] = useState([]);
@@ -94,7 +93,7 @@ const CommentSection = ({ date, user }) => {
         />
       </Form>
 
-      {comments.length > 0 && (
+      {comments.length > 0 ? (
         <Comment.Group threaded style={{ marginTop: '1rem' }}>
           {comments.slice().reverse().map((c) => (
             <Comment key={c._id}>
@@ -125,7 +124,7 @@ const CommentSection = ({ date, user }) => {
             </Comment>
           ))}
         </Comment.Group>
-      )}
+      ) : null}
     </div>
   );
 };
