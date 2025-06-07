@@ -191,11 +191,13 @@ const Workouts = () => {
               <button className="back-to-today-btns" onClick={() => handleDateSelect(todayKey)}>
                 Back to Today
               </button>
-              <h3 style={{ color: "#ff2c2c", marginBottom: '20px' }}>
+             
+            
+            </div>
+            <h3 style={{ color: "#ff2c2c", marginBottom: '20px' }}>
                 Workout for {getDisplayDate(selectedDate)}
               </h3>
-            
-            </div></div>
+            </div>
              
 
             <div className="section-card-indvidual">
