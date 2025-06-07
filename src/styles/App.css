@@ -385,6 +385,10 @@ a {
   display: none !important;
 }
 
+.semantic-zone .ui.comments {
+  min-height: 0 !important;
+}
+
 .section-card-indvidual{
   background-color: white;
   padding: 5px;
