@@ -1,29 +1,19 @@
+/* Prevent white space when no comments exist */
 .comment-zone-wrapper .ui.comments {
-    margin: 0 !important;
     padding: 0 !important;
+    margin: 0 !important;
     border: none;
     box-shadow: none;
   }
   
-  /* Prevent space when no comments */
+  .comment-zone-wrapper .ui.comments:empty {
+    display: none !important;
+  }
+  
   .comment-zone-wrapper .ui.comments:not(:has(.comment)) {
     padding: 0 !important;
     margin: 0 !important;
-    min-height: auto !important;
-  }
-  
-  /* Avatar initials */
-  .avatar-initials-circle {
-    width: 32px;
-    height: 32px;
-    background-color: #ff2c2c;
-    color: white;
-    font-weight: bold;
-    font-size: 0.9rem;
-    border-radius: 50%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    margin-right: 8px;
+    min-height: 0 !important;
+    display: none !important;
   }
   
