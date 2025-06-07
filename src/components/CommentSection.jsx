@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Comment, Form, Button, Header, Icon } from 'semantic-ui-react';
+import { Comment, Form, Button, Header } from 'semantic-ui-react';
 
 const CommentSection = ({ date, user }) => {
   const [comments, setComments] = useState([]);
@@ -34,7 +34,6 @@ const CommentSection = ({ date, user }) => {
   };
 
   const handleLike = async (commentId) => {
-    // if (!user?._id) return;
     await fetch(`${process.env.REACT_APP_API_BASE_URL}/comments/${date}/${commentId}/like`, {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
@@ -79,25 +78,24 @@ const CommentSection = ({ date, user }) => {
   return (
     <Comment.Group threaded>
       <Header as='h3' dividing>
-      <Form className="comment-zone" reply onSubmit={handleAddComment} style={{ display: 'flex', alignItems: 'center', width: '100%' }} >
-      <Form.Input
-    
-    value={newComment}
-    onChange={(e) => setNewComment(e.target.value)}
-    placeholder="Log your workout result here"
-    style={{ flex: 1, marginRight: '0.5rem' }}
-  />
-  <Button 
-    color="red"
-    icon="send"
-    onClick={handleAddComment}
-    type="submit"
-    style={{ margin: 0, marginBottom:'15px' }}
-  />
-      </Form>
+        <Form className="comment-zone" reply onSubmit={handleAddComment} style={{ display: 'flex', alignItems: 'center', width: '100%' }}>
+          <Form.Input
+            value={newComment}
+            onChange={(e) => setNewComment(e.target.value)}
+            placeholder="Log your workout result here"
+            style={{ flex: 1, marginRight: '0.5rem' }}
+          />
+          <Button 
+            color="red"
+            icon="send"
+            onClick={handleAddComment}
+            type="submit"
+            style={{ margin: 0, marginBottom: '15px' }}
+          />
+        </Form>
       </Header>
 
-      {comments.slice().reverse().map((c) => (
+      {comments.length > 0 && comments.slice().reverse().map((c) => (
         <Comment key={c._id}>
           <AvatarOrInitials user={c.user} />
           <Comment.Content>
@@ -122,36 +120,10 @@ const CommentSection = ({ date, user }) => {
                 </Comment>
               </Comment.Group>
             ))}
-            {/* <ReplyBox commentId={c._id} onReply={handleReply} /> */}
           </Comment.Content>
         </Comment>
       ))}
-
-      
     </Comment.Group>
-  );
-};
-
-const ReplyBox = ({ commentId, onReply }) => {
-  const [reply, setReply] = useState('');
-  const submit = () => {
-    if (reply.trim()) {
-      onReply(commentId, reply);
-      setReply('');
-    }
-  };
-  return (
-    <Form reply>
-      <Form.Input
-        placeholder="Reply..."
-        value={reply}
-        onChange={(e) => setReply(e.target.value)}
-        action={{
-          icon: 'reply',
-          onClick: submit
-        }}
-      />
-    </Form>
   );
 };
 
