@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Comment, Form, Button, Header } from 'semantic-ui-react';
+import { Comment, Form, Button } from 'semantic-ui-react';
 
 const CommentSection = ({ date, user }) => {
   const [comments, setComments] = useState([]);
@@ -10,13 +10,11 @@ const CommentSection = ({ date, user }) => {
   const fetchComments = async () => {
     try {
       const res = await fetch(`${process.env.REACT_APP_API_BASE_URL}/comments/${date}`);
-      
       if (res.status === 200) {
         const data = await res.json();
         setComments(data);
       } else {
-        // 🔕 No comments or not modified
-        setComments([]);  // ✅ explicitly set to empty
+        setComments([]);
       }
     } catch (err) {
       console.error("❌ Comment fetch error:", err);
@@ -26,19 +24,16 @@ const CommentSection = ({ date, user }) => {
 
   const handleAddComment = async () => {
     if (!newComment.trim()) return;
-
     const fallbackUser = {
       _id: user?.id || 'anonymous',
       name: user?.name || 'Unknown',
       avatar: user?.avatar || '',
     };
-
     const res = await fetch(`${process.env.REACT_APP_API_BASE_URL}/comments/${date}`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ text: newComment, user: fallbackUser })
     });
-
     const data = await res.json();
     setComments(data);
     setNewComment('');
@@ -55,13 +50,11 @@ const CommentSection = ({ date, user }) => {
 
   const handleReply = async (commentId, text) => {
     if (!user?.name) return;
-
     const fallbackUser = {
       _id: user?.id || 'anonymous',
       name: user?.name || 'Unknown',
       avatar: user?.avatar || '',
     };
-
     await fetch(`${process.env.REACT_APP_API_BASE_URL}/comments/${date}/${commentId}/reply`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -74,16 +67,23 @@ const CommentSection = ({ date, user }) => {
     fetchComments();
   }, [date]);
 
+  // 💥 Remove injected min-height from any comment block or iframe
+  useEffect(() => {
+    const observer = new MutationObserver(() => {
+      const els = document.querySelectorAll('.ui.comments, iframe');
+      els.forEach(el => {
+        el.style.minHeight = '0px';
+        el.style.border = 'none';
+      });
+    });
+    observer.observe(document.body, { childList: true, subtree: true });
+    return () => observer.disconnect();
+  }, []);
+
   const AvatarOrInitials = ({ user }) => {
-    if (user?.avatar) {
-      return <Comment.Avatar src={user.avatar} />;
-    }
+    if (user?.avatar) return <Comment.Avatar src={user.avatar} />;
     const initials = (user?.name || 'U').slice(0, 2).toUpperCase();
-    return (
-      <div className="avatar-initials-circle">
-        {initials}
-      </div>
-    );
+    return <div className="avatar-initials-circle">{initials}</div>;
   };
 
   return (
@@ -104,8 +104,8 @@ const CommentSection = ({ date, user }) => {
         />
       </Form>
 
-      {comments.length > 0 ? (
-        <Comment.Group as="div" threaded className="no-min-height">
+      {comments.length > 0 && (
+        <Comment.Group threaded className="no-min-height-comment">
           {comments.slice().reverse().map((c) => (
             <Comment key={c._id}>
               <AvatarOrInitials user={c.user} />
@@ -135,7 +135,7 @@ const CommentSection = ({ date, user }) => {
             </Comment>
           ))}
         </Comment.Group>
-      ) : null}
+      )}
     </div>
   );
 };

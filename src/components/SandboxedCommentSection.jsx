@@ -38,6 +38,13 @@ const SandboxedCommentSection = ({ date, user }) => {
                 font-size: 16px; /* 16px prevents zoom on iOS */
               }
 
+              .comment-zone-wrapper .no-min-height-comment {
+                min-height: 0 !important;
+                border: none !important;
+                padding-bottom: 0 !important;
+                margin-bottom: 0 !important;
+              }
+
           `}</style>
         </>
       }
