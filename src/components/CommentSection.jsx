@@ -8,9 +8,20 @@ const CommentSection = ({ date, user }) => {
   if (!date) return null;
 
   const fetchComments = async () => {
-    const res = await fetch(`${process.env.REACT_APP_API_BASE_URL}/comments/${date}`);
-    const data = await res.json();
-    setComments(data);
+    try {
+      const res = await fetch(`${process.env.REACT_APP_API_BASE_URL}/comments/${date}`);
+      
+      if (res.status === 200) {
+        const data = await res.json();
+        setComments(data);
+      } else {
+        // 🔕 No comments or not modified
+        setComments([]);  // ✅ explicitly set to empty
+      }
+    } catch (err) {
+      console.error("❌ Comment fetch error:", err);
+      setComments([]);
+    }
   };
 
   const handleAddComment = async () => {
