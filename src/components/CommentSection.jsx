@@ -84,7 +84,7 @@ const CommentSection = ({ date, user }) => {
           placeholder="Log your workout result here"
           style={{ flex: 1, marginRight: '0.5rem' }}
         />
-        <Button
+        <Button 
           color="red"
           icon="send"
           onClick={handleAddComment}
@@ -92,9 +92,9 @@ const CommentSection = ({ date, user }) => {
           style={{ margin: 0, marginBottom: '15px' }}
         />
       </Form>
-  
+
       {comments.length > 0 && (
-        <Comment.Group threaded>
+        <Comment.Group threaded style={{ marginTop: '1rem' }}>
           {comments.slice().reverse().map((c) => (
             <Comment key={c._id}>
               <AvatarOrInitials user={c.user} />
@@ -127,5 +127,6 @@ const CommentSection = ({ date, user }) => {
       )}
     </>
   );
-  
+};
+
 export default CommentSection;
