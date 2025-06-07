@@ -22,7 +22,11 @@ const SandboxedCommentSection = ({ date, user }) => {
             .field{
                 width:100%;
             }
-           
+            .semantic-zone .ui.comments {
+                min-height: 0 !important;
+                padding-bottom: 0 !important;
+                margin-bottom: 0 !important;
+              }
 
             .comment-zone input::placeholder {
                 color: #999 !important; /* or #ccc or anything darker than default */
