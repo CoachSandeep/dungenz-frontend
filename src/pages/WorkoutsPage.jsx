@@ -187,14 +187,16 @@ const Workouts = () => {
         {selectedDate && groupedWorkouts[selectedDate] && (
           <>
             <div className="section-card-indvidual">
-              <h1>Hi {user.name}</h1>
+            <div className="section-header-row"> <h1>Hi {user.name}</h1>
+              <button className="back-to-today-btns" onClick={() => handleDateSelect(todayKey)}>
+                Back to Today
+              </button>
               <h3 style={{ color: "#ff2c2c", marginBottom: '20px' }}>
                 Workout for {getDisplayDate(selectedDate)}
               </h3>
-              <button className="back-to-today-btn" onClick={() => handleDateSelect(todayKey)}>
-                Back to Today
-              </button>
-            </div>
+            
+            </div></div>
+             
 
             <div className="section-card-indvidual">
               <SandboxedCommentSection date={selectedDate} user={user} />
