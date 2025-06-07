@@ -22,9 +22,12 @@ const SandboxedCommentSection = ({ date, user }) => {
             .field{
                 width:100%;
             }
-            .comment-box:empty {
-                display: none;
+            .comment-zone:empty {
+                min-height: 0 !important;
+                padding: 0 !important;
+                margin: 0 !important;
               }
+              
             .comment-zone input::placeholder {
                 color: #999 !important; /* or #ccc or anything darker than default */
                 opacity: 1 !important;

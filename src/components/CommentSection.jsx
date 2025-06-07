@@ -76,55 +76,56 @@ const CommentSection = ({ date, user }) => {
   };
 
   return (
-    <Comment.Group threaded>
-      <Header as='h3' dividing>
-        <Form className="comment-zone" reply onSubmit={handleAddComment} style={{ display: 'flex', alignItems: 'center', width: '100%' }}>
-          <Form.Input
-            value={newComment}
-            onChange={(e) => setNewComment(e.target.value)}
-            placeholder="Log your workout result here"
-            style={{ flex: 1, marginRight: '0.5rem' }}
-          />
-          <Button 
-            color="red"
-            icon="send"
-            onClick={handleAddComment}
-            type="submit"
-            style={{ margin: 0, marginBottom: '15px' }}
-          />
-        </Form>
-      </Header>
-
-      {comments.length > 0 && comments.slice().reverse().map((c) => (
-        <Comment key={c._id}>
-          <AvatarOrInitials user={c.user} />
-          <Comment.Content>
-            <Comment.Author as='span'>{c.user?.name || 'Unknown'}</Comment.Author>
-            <Comment.Metadata>
-              <div>{new Date(c.createdAt).toLocaleTimeString()}</div>
-            </Comment.Metadata>
-            <Comment.Text>{c.text}</Comment.Text>
-            <Comment.Actions>
-              <Comment.Action onClick={() => handleLike(c._id)}>
-                ❤️ {c.likes.length}
-              </Comment.Action>
-            </Comment.Actions>
-            {c.replies.map((r, idx) => (
-              <Comment.Group key={idx}>
-                <Comment>
-                  <AvatarOrInitials user={r.user} />
-                  <Comment.Content>
-                    <Comment.Author>{r.user?.name || 'Unknown'}</Comment.Author>
-                    <Comment.Text>{r.text}</Comment.Text>
-                  </Comment.Content>
-                </Comment>
-              </Comment.Group>
-            ))}
-          </Comment.Content>
-        </Comment>
-      ))}
-    </Comment.Group>
+    <>
+      <Form className="comment-zone" reply onSubmit={handleAddComment} style={{ display: 'flex', alignItems: 'center', width: '100%' }}>
+        <Form.Input
+          value={newComment}
+          onChange={(e) => setNewComment(e.target.value)}
+          placeholder="Log your workout result here"
+          style={{ flex: 1, marginRight: '0.5rem' }}
+        />
+        <Button
+          color="red"
+          icon="send"
+          onClick={handleAddComment}
+          type="submit"
+          style={{ margin: 0, marginBottom: '15px' }}
+        />
+      </Form>
+  
+      {comments.length > 0 && (
+        <Comment.Group threaded>
+          {comments.slice().reverse().map((c) => (
+            <Comment key={c._id}>
+              <AvatarOrInitials user={c.user} />
+              <Comment.Content>
+                <Comment.Author as='span'>{c.user?.name || 'Unknown'}</Comment.Author>
+                <Comment.Metadata>
+                  <div>{new Date(c.createdAt).toLocaleTimeString()}</div>
+                </Comment.Metadata>
+                <Comment.Text>{c.text}</Comment.Text>
+                <Comment.Actions>
+                  <Comment.Action onClick={() => handleLike(c._id)}>
+                    ❤️ {c.likes.length}
+                  </Comment.Action>
+                </Comment.Actions>
+                {c.replies.map((r, idx) => (
+                  <Comment.Group key={idx}>
+                    <Comment>
+                      <AvatarOrInitials user={r.user} />
+                      <Comment.Content>
+                        <Comment.Author>{r.user?.name || 'Unknown'}</Comment.Author>
+                        <Comment.Text>{r.text}</Comment.Text>
+                      </Comment.Content>
+                    </Comment>
+                  </Comment.Group>
+                ))}
+              </Comment.Content>
+            </Comment>
+          ))}
+        </Comment.Group>
+      )}
+    </>
   );
-};
-
+  
 export default CommentSection;
