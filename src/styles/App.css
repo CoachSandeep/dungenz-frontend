@@ -387,4 +387,7 @@ a {
 
 .section-card-indvidual{
   background-color: white;
+  padding: 5px;
+  border-radius: 3px;
+  margin-bottom: 8px;
 }
