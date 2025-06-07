@@ -105,7 +105,7 @@ const CommentSection = ({ date, user }) => {
       </Form>
 
       {comments.length > 0 ? (
-        <Comment.Group threaded style={{ marginTop: '1rem' }}>
+        <Comment.Group threaded style={{ minHeight: '0px', marginTop: '1rem' }}>
           {comments.slice().reverse().map((c) => (
             <Comment key={c._id}>
               <AvatarOrInitials user={c.user} />
