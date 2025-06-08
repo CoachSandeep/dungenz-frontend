@@ -185,25 +185,7 @@ const Workouts = () => {
   const isRestDay = (dayName === "Thursday" || dayName === "Sunday") && !hasWorkoutToday;
 
   return (
-    <div
-  id="scroll-wrapper"
-  ref={scrollWrapperRef}
-  style={{
-    height: '100vh',
-    overflowY: 'auto',
-    WebkitOverflowScrolling: 'touch',
-  }}
->
-<PullToRefresh
-  onRefresh={handleRefresh}
-  disabled={!isAtTop}
-  scrollableTarget="scroll-wrapper"
-        style={{
-          minHeight: '100%',
-          display: 'flex',
-          flexDirection: 'column',
-        }}
-      >
+
         <div className="horizontal-container" style={{ flex: 1 }}>
           {/* Timeline section */}
           <div className="timeline-horizontal" ref={scrollContainerRef}>
@@ -356,8 +338,7 @@ const Workouts = () => {
             <div className="loading-overlay">Loading your workouts...</div>
           )}
         </div>
-      </PullToRefresh>
-    </div>
+     
   );
   
 };
