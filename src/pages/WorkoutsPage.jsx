@@ -225,91 +225,85 @@ const Workouts = () => {
             })}
           </div>
   
-          {/* Selected Date Content */}
-          {selectedDate && groupedWorkouts[selectedDate] && (
-            <>
-              <div className="section-card-indvidual">
-                <div className="section-header-row">
-                  <h1>Hi {user.name}</h1>
-                  <button className="back-to-today-btns" onClick={() => handleDateSelect(todayKey)}>
-                    Back to Today
-                  </button>
+         
+          {selectedDate && (
+  <>
+    <div className="section-card-indvidual">
+      <div className="section-header-row">
+        <h1>Hi {user.name}</h1>
+        <button className="back-to-today-btns" onClick={() => handleDateSelect(todayKey)}>
+          Back to Today
+        </button>
+      </div>
+      <h3 style={{ color: "#ff2c2c", marginBottom: '10px' }}>
+        Workout for {getDisplayDate(selectedDate)}
+      </h3>
+    </div>
+
+    {isRestDay ? (
+      <div className="section-card-indvidual">
+        <div style={{ textAlign: 'center', fontStyle: 'italic', padding: '10px', color: '#ff2c2c' }}>
+          {dayName === "Thursday"
+            ? "It's Thursday – you've earned this pause 💩"
+            : "Sundays are for stretching the soul, not the hamstrings ☀️"}
+        </div>
+      </div>
+    ) : (
+      <>
+        <div className="section-card-indvidual">
+          <SandboxedCommentSection date={selectedDate} user={user} />
+        </div>
+
+        {versionOrder.map((version) =>
+          groupedWorkouts[selectedDate]?.versions?.[version]?.length > 0 ? (
+            <div className="section-card-indvidual" key={version}>
+              <div className="version-container">
+                <div className="version-header">
+                  <span className={`badge badge-${version.replace(/\s+/g, '').toLowerCase()}`}>
+                    {version}
+                  </span>
                 </div>
-                <h3 style={{ color: "#ff2c2c", marginBottom: '10px' }}>
-                  Workout for {getDisplayDate(selectedDate)}
-                </h3>
-              </div>
-  
-              {isRestDay ? (
-                <div className="section-card-indvidual">
-                  <div style={{ textAlign: 'center', fontStyle: 'italic', padding: '10px', color: '#ff2c2c' }}>
-                    {dayName === "Thursday"
-                      ? "It's Thursday – you've earned this pause 💩"
-                      : "Sundays are for stretching the soul, not the hamstrings ☀️"}
-                  </div>
-                </div>
-              ) : (
-                <div className="section-card-indvidual">
-                  <SandboxedCommentSection date={selectedDate} user={user} />
-                </div>
-              )}
-  
-              {!isRestDay &&
-                versionOrder.map((version) =>
-                  groupedWorkouts[selectedDate]?.versions[version] ? (
-                    <div className="section-card-indvidual" key={version}>
-                      <div className="version-container">
-                        <div className="version-header">
-                          <span className={`badge badge-${version.replace(/\s+/g, '').toLowerCase()}`}>
-                            {version}
-                          </span>
+                <div className="workout-list">
+                  {groupedWorkouts[selectedDate].versions[version]
+                    .sort((a, b) => a.order - b.order)
+                    .map((w) => (
+                      <div key={w._id} className="workout-item" onClick={() => setModalWorkout(w)}>
+                        <div className="workout-line">
+                          {w.icon && (
+                            <img
+                              src={`/icons/${w.icon}.png`}
+                              alt={w.icon}
+                              className="workout-icon"
+                              style={{ width: '20px' }}
+                            />
+                          )}
+                          <div className="workout-text">
+                            <strong className="custom-name">{w.customName || w.title}</strong>
+                            {w.customName && <div className="sub-title">{w.title}</div>}
+                          </div>
                         </div>
-                        <div className="workout-list">
-                          {groupedWorkouts[selectedDate].versions[version]
-                            .sort((a, b) => a.order - b.order)
-                            .map((w) => (
-                              <div key={w._id} className="workout-item" onClick={() => setModalWorkout(w)}>
-                                <div className="workout-line">
-                                  {w.icon && (
-                                    <img
-                                      src={`/icons/${w.icon}.png`}
-                                      alt={w.icon}
-                                      className="workout-icon"
-                                      style={{ width: '20px' }}
-                                    />
-                                  )}
-                                  <div className="workout-text">
-                                    <strong className="custom-name">
-                                      {w.customName || w.title}
-                                    </strong>
-                                    {w.customName && (
-                                      <div className="sub-title">{w.title}</div>
-                                    )}
-                                  </div>
-                                </div>
-                                {expandedVersions[version] && (
-                                  <div className="inline-details">
-                                    <div
-                                      dangerouslySetInnerHTML={{
-                                        __html: w.description.replace(/\n/g, '<br/>'),
-                                      }}
-                                    />
-                                    <div>{w.capTime}</div>
-                                    <div>{w.instructions}</div>
-                                  </div>
-                                )}
-                              </div>
-                            ))}
-                        </div>
-                        <button className="expand-btn" onClick={() => toggleExpandAll(version)}>
-                          {expandedVersions[version] ? "Hide Workouts" : "Show Full Workout"}
-                        </button>
+                        {expandedVersions[version] && (
+                          <div className="inline-details">
+                            <div dangerouslySetInnerHTML={{ __html: w.description.replace(/\n/g, '<br/>') }} />
+                            <div>{w.capTime}</div>
+                            <div>{w.instructions}</div>
+                          </div>
+                        )}
                       </div>
-                    </div>
-                  ) : null
-                )}
-            </>
-          )}
+                    ))}
+                </div>
+                <button className="expand-btn" onClick={() => toggleExpandAll(version)}>
+                  {expandedVersions[version] ? "Hide Workouts" : "Show Full Workout"}
+                </button>
+              </div>
+            </div>
+          ) : null
+        )}
+      </>
+    )}
+  </>
+)}
+
   
           {modalWorkout && (
             <div className="modal-overlay" onClick={() => setModalWorkout(null)}>
