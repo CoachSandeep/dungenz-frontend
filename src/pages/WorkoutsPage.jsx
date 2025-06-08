@@ -52,17 +52,14 @@ const Workouts = () => {
   const handleRefresh = async () => {
     const prevSelectedDate = selectedDate || todayKey;
     setIsLoading(true);
-  
     const fromDate = new Date();
     fromDate.setDate(fromDate.getDate() - 5);
     const toDate = new Date();
     toDate.setDate(toDate.getDate() + 1);
-  
     await fetchWorkoutsInRange(
       fromDate.toISOString().split('T')[0],
       toDate.toISOString().split('T')[0]
     );
-  
     setSelectedDate(prevSelectedDate);
     setTimeout(() => {
       scrollToCenter(prevSelectedDate);
@@ -110,7 +107,7 @@ const Workouts = () => {
       baseDates.push(d.toLocaleDateString('en-CA', { timeZone: 'Asia/Kolkata' }));
     }
     setDates(["__load_more__", ...baseDates]);
-  
+
     const fetchInitial = async () => {
       const fromDate = new Date();
       fromDate.setDate(fromDate.getDate() - 5);
@@ -127,14 +124,13 @@ const Workouts = () => {
         setIsLoading(false);
       }, 300);
     };
-  
+
     fetchInitial();
-  
-    // ✅ Scroll listener for PullToRefresh
+
     const wrapper = scrollWrapperRef.current;
     let timeout;
     if (!wrapper) return;
-  
+
     const handleScroll = () => {
       if (timeout) clearTimeout(timeout);
       timeout = setTimeout(() => {
@@ -143,14 +139,13 @@ const Workouts = () => {
         }
       }, 100);
     };
-  
-  
+
     wrapper.addEventListener('scroll', handleScroll);
     return () => {
       wrapper.removeEventListener('scroll', handleScroll);
     };
   }, []);
-  
+
   const toggleExpandAll = (version) => {
     setExpandedVersions(prev => ({ ...prev, [version]: !prev[version] }));
   };
@@ -177,12 +172,13 @@ const Workouts = () => {
     setDates(["__load_more__", ...newDates, ...currentDates]);
   };
 
-  const selectedDateObj = new Date(selectedDate);
-  const dayName = selectedDateObj.toLocaleDateString("en-US", { weekday: 'long', timeZone: 'Asia/Kolkata' });
-  const hasWorkoutToday = versionOrder.some(
+  const selectedDateObj = selectedDate ? new Date(selectedDate) : null;
+  const dayName = selectedDateObj ? selectedDateObj.toLocaleDateString("en-US", { weekday: 'long', timeZone: 'Asia/Kolkata' }) : '';
+  const hasWorkoutToday = selectedDate && versionOrder.some(
     version => groupedWorkouts[selectedDate]?.versions?.[version]?.length > 0
   );
-  const isRestDay = (dayName === "Thursday" || dayName === "Sunday") && !hasWorkoutToday;
+  const isRestDay = selectedDateObj && (dayName === "Thursday" || dayName === "Sunday") && !hasWorkoutToday;
+
 
   return (
 
