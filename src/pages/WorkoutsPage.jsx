@@ -104,8 +104,6 @@ const Workouts = () => {
     }
     setDates(["__load_more__", ...baseDates]);
 
-
-
     const fetchInitial = async () => {
       const fromDate = new Date();
       fromDate.setDate(fromDate.getDate() - 5);
@@ -129,7 +127,7 @@ const Workouts = () => {
     const handleScroll = () => {
       setIsAtTop(window.scrollY < 10);
     };
-  
+
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
@@ -159,6 +157,32 @@ const Workouts = () => {
     await fetchWorkoutsInRange(fromDate, toDate);
     setDates(["__load_more__", ...newDates, ...currentDates]);
   };
+
+  const restDayMessage = {
+    Thursday: "It's Thursday – you've earned this pause 💩",
+    Sunday: "Sundays are for stretching the soul, not the hamstrings ☀️"
+  };
+
+  const punMessages = [
+    "Looks like your rest day did a PR in relaxation 🛌",
+    "No pain, still gain! You dodged today's grind 😎",
+    "Rest day served. Calories still hiding.",
+    "Lucky you... today the gym gods said 'chill' 🧘",
+    "You survived another day without burpees 🎉"
+  ];
+
+  const selectedDateObj = new Date(selectedDate);
+  const dayName = selectedDateObj.toLocaleDateString("en-US", { weekday: 'long', timeZone: 'Asia/Kolkata' });
+  const hasWorkoutToday = versionOrder.some(
+    version => groupedWorkouts[selectedDate]?.versions?.[version]?.length > 0
+  );
+
+  const restOrPunMessage =
+    dayName === "Thursday" || dayName === "Sunday"
+      ? restDayMessage[dayName]
+      : !hasWorkoutToday
+      ? punMessages[Math.floor(Math.random() * punMessages.length)]
+      : null;
 
   return (
     <PullToRefresh onRefresh={handleRefresh} disabled={!isAtTop} style={{ minHeight: '100vh' }}>
@@ -197,28 +221,33 @@ const Workouts = () => {
         {selectedDate && groupedWorkouts[selectedDate] && (
           <>
             <div className="section-card-indvidual">
-            <div className="section-header-row"> <h1>Hi {user.name}</h1>
-              <button className="back-to-today-btns" onClick={() => handleDateSelect(todayKey)}>
-                Back to Today
-              </button>
-             
-            
-            </div>
-            <h3 style={{ color: "#ff2c2c", marginBottom: '10px' }}>
+              <div className="section-header-row">
+                <h1>Hi {user.name}</h1>
+                <button className="back-to-today-btns" onClick={() => handleDateSelect(todayKey)}>
+                  Back to Today
+                </button>
+              </div>
+              <h3 style={{ color: "#ff2c2c", marginBottom: '10px' }}>
                 Workout for {getDisplayDate(selectedDate)}
               </h3>
             </div>
-             
 
             <div className="section-card-indvidual">
               <SandboxedCommentSection date={selectedDate} user={user} />
             </div>
 
-            
-              {versionOrder.map(version => (
-                groupedWorkouts[selectedDate]?.versions[version] ? (
-<div className="section-card-indvidual">
-<div key={version} className="version-container">
+            {restOrPunMessage && (
+              <div className="section-card-indvidual">
+                <div style={{ textAlign: 'center', fontStyle: 'italic', padding: '10px', color: '#ff2c2c' }}>
+                  {restOrPunMessage}
+                </div>
+              </div>
+            )}
+
+            {versionOrder.map(version => (
+              groupedWorkouts[selectedDate]?.versions[version] ? (
+                <div className="section-card-indvidual" key={version}>
+                  <div className="version-container">
                     <div className="version-header">
                       <span className={`badge badge-${version.replace(/\s+/g, '').toLowerCase()}`}>{version}</span>
                     </div>
@@ -259,10 +288,9 @@ const Workouts = () => {
                       {expandedVersions[version] ? "Hide Workouts" : "Show Full Workout"}
                     </button>
                   </div>
-                  </div>
-                ) : null
-              ))}
-            
+                </div>
+              ) : null
+            ))}
           </>
         )}
 
