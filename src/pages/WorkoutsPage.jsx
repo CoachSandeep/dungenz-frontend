@@ -209,7 +209,7 @@ const Workouts = () => {
               return (
                 <div key={dateKey} className="timeline-date-wrapper">
                   <div
-                    className={`timeline-date-circle ${isActive ? 'active' : ''} ${(!hasWorkout || isFutureBeyondTomorrow) ? 'no-workout' : ''}`}
+                    className={`timeline-date-circle ${isActive ? 'active' : ''} ${(isFutureBeyondTomorrow) ? 'no-workout' : ''}`}
                     onClick={() => handleDateSelect(dateKey)}
                     ref={(el) => (scrollRef.current[dateKey] = el)}
                   >
