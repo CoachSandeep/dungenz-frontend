@@ -15,6 +15,7 @@ const Workouts = () => {
   const scrollRef = useRef({});
   const scrollContainerRef = useRef(null);
   const user = JSON.parse(localStorage.getItem('user'));
+  const [isAtTop, setIsAtTop] = useState(true);
 
   const today = new Date();
   const todayKey = today.toLocaleDateString('en-CA', { timeZone: 'Asia/Kolkata' });
@@ -103,6 +104,8 @@ const Workouts = () => {
     }
     setDates(["__load_more__", ...baseDates]);
 
+
+
     const fetchInitial = async () => {
       const fromDate = new Date();
       fromDate.setDate(fromDate.getDate() - 5);
@@ -122,6 +125,13 @@ const Workouts = () => {
     };
 
     fetchInitial();
+
+    const handleScroll = () => {
+      setIsAtTop(window.scrollY < 10);
+    };
+  
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
   const toggleExpandAll = (version) => {
@@ -151,7 +161,7 @@ const Workouts = () => {
   };
 
   return (
-    <PullToRefresh onRefresh={handleRefresh} style={{ minHeight: '100vh' }}>
+    <PullToRefresh onRefresh={handleRefresh} disabled={!isAtTop} style={{ minHeight: '100vh' }}>
       <div className="horizontal-container">
         <div className="timeline-horizontal" ref={scrollContainerRef}>
           {dates.map((dateKey) => {

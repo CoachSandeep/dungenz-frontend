@@ -18,7 +18,7 @@ const CommentSection = ({ date, user }) => {
           setComments([
             {
               _id: 'coach-sandeep-local',
-              text: "Let’s crush it today, warriors! 💥 Drop your scores below 👇 – Coach Sandeep",
+              text: "Let’s crush it today, warriors! 💥 Drop your scores  – Coach Sandeep",
               user: {
                 _id: "coach_sandeep_001",
                 name: "Coach Sandeep",
@@ -107,7 +107,21 @@ const CommentSection = ({ date, user }) => {
 
   return (
     <div className="comment-zone-wrapper">
-      
+      <Form className="comment-zone" reply onSubmit={handleAddComment} style={{ display: 'flex', alignItems: 'center', width: '100%' }}>
+        <Form.Input
+          value={newComment}
+          onChange={(e) => setNewComment(e.target.value)}
+          placeholder="Log your workout result here"
+          style={{ flex: 1, marginRight: '0.5rem' }}
+        />
+        <Button
+          color="red"
+          icon="send"
+          onClick={handleAddComment}
+          type="submit"
+          style={{ margin: 0, marginBottom: '15px' }}
+        />
+      </Form>
 
       {comments.length > 0 && (
         <Comment.Group threaded className="no-min-height-comment">
@@ -141,21 +155,6 @@ const CommentSection = ({ date, user }) => {
           ))}
         </Comment.Group>
       )}
-      <Form className="comment-zone" reply onSubmit={handleAddComment} style={{ display: 'flex', alignItems: 'center', width: '100%' }}>
-        <Form.Input
-          value={newComment}
-          onChange={(e) => setNewComment(e.target.value)}
-          placeholder="Log your workout result here"
-          style={{ flex: 1, marginRight: '0.5rem' }}
-        />
-        <Button
-          color="red"
-          icon="send"
-          onClick={handleAddComment}
-          type="submit"
-          style={{ margin: 0, marginBottom: '15px' }}
-        />
-      </Form>
     </div>
   );
 };
