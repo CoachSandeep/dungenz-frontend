@@ -67,6 +67,22 @@ const Workouts = () => {
     }, 300);
   };
 
+  const handleDeleteComment = async (commentId) => {
+    try {
+      const token = localStorage.getItem('token');
+      const res = await fetch(`${process.env.REACT_APP_API_BASE_URL}/comments/${commentId}`, {
+        method: 'DELETE',
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (res.ok) {
+        alert("Comment deleted successfully.");
+        handleRefresh();
+      }
+    } catch (err) {
+      console.error("Failed to delete comment:", err);
+    }
+  };
+
   const fetchWorkoutsInRange = async (from, to) => {
     const token = localStorage.getItem('token');
     try {
