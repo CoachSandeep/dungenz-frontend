@@ -14,6 +14,7 @@ const Workouts = () => {
   const [isLoading, setIsLoading] = useState(true);
   const scrollRef = useRef({});
   const scrollContainerRef = useRef(null);
+  const scrollWrapperRef = useRef(null);
   const user = JSON.parse(localStorage.getItem('user'));
   const [isAtTop, setIsAtTop] = useState(true);
 
@@ -130,12 +131,19 @@ const Workouts = () => {
     fetchInitial();
   
     // ✅ Scroll listener for PullToRefresh
-    const wrapper = document.getElementById('scroll-wrapper');
+    const wrapper = scrollWrapperRef.current;
+    let timeout;
     if (!wrapper) return;
   
     const handleScroll = () => {
-      setIsAtTop(wrapper.scrollTop < 10);
+      if (timeout) clearTimeout(timeout);
+      timeout = setTimeout(() => {
+        if (wrapper) {
+          setIsAtTop(wrapper.scrollTop < 10);
+        }
+      }, 100);
     };
+  
   
     wrapper.addEventListener('scroll', handleScroll);
     return () => {
@@ -178,16 +186,18 @@ const Workouts = () => {
 
   return (
     <div
-      id="scroll-wrapper"
-      style={{
-        height: '100vh',
-        overflowY: 'auto',
-        WebkitOverflowScrolling: 'touch',
-      }}
-    >
-      <PullToRefresh
-        onRefresh={handleRefresh}
-        disabled={!isAtTop}
+  id="scroll-wrapper"
+  ref={scrollWrapperRef}
+  style={{
+    height: '100vh',
+    overflowY: 'auto',
+    WebkitOverflowScrolling: 'touch',
+  }}
+>
+<PullToRefresh
+  onRefresh={handleRefresh}
+  disabled={!isAtTop}
+  scrollableTarget="scroll-wrapper"
         style={{
           minHeight: '100%',
           display: 'flex',
