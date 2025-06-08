@@ -66,7 +66,7 @@ const Workouts = () => {
   const fetchWorkoutsInRange = async (from, to) => {
     const token = localStorage.getItem('token');
     try {
-      const res = await fetch(`${process.env.REACT_APP_API_BASE_URL}/workouts/range?from=${from}&to=${to}&t=${Date.now()}`, {
+      const res = await fetch(`${process.env.REACT_APP_API_BASE_URL}/workouts/range?from=${from}&to=${to}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       const data = await res.json();
@@ -142,8 +142,36 @@ const Workouts = () => {
   return (
     <PullToRefresh onRefresh={handleRefresh} disabled={!isAtTop} style={{ minHeight: '100vh' }}>
       <div className="horizontal-container">
-        {/* existing horizontal timeline here */}
-
+      <div className="timeline-horizontal" ref={scrollContainerRef}>
+          {dates.map((dateKey) => {
+            if (dateKey === "__load_more__") {
+              return (
+                <div key="__load_more__" className="timeline-date-wrapper">
+                  <div className="timeline-date-circle load-more-circle" onClick={handleLoadMore}>
+                    <div className="circle-date">⇤</div>
+                    <div className="circle-day">More</div>
+                  </div>
+                </div>
+              );
+            }
+            const dateObj = new Date(dateKey);
+            const isActive = selectedDate === dateKey;
+            const isFutureBeyondTomorrow = dateObj > new Date(tomorrowKey);
+            const hasWorkout = groupedWorkouts.hasOwnProperty(dateKey);
+            return (
+              <div key={dateKey} className="timeline-date-wrapper">
+                <div
+                  className={`timeline-date-circle ${isActive ? 'active' : ''} ${(!hasWorkout || isFutureBeyondTomorrow) ? 'no-workout' : ''}`}
+                  onClick={() => handleDateSelect(dateKey)}
+                  ref={el => scrollRef.current[dateKey] = el}
+                >
+                  <div className="circle-date">{groupedWorkouts[dateKey]?.displayDate?.split('/')[0] || dateKey.split('-')[2]}</div>
+                  <div className="circle-day">{groupedWorkouts[dateKey]?.day || dateObj.toLocaleDateString("en-US", { weekday: 'short' })}</div>
+                </div>
+              </div>
+            );
+          })}
+        </div>
         {selectedDate && groupedWorkouts[selectedDate] && (
           <>
             <div className="section-card-indvidual">
