@@ -132,6 +132,22 @@ const Workouts = () => {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
+  const handleLoadMore = async () => {
+    const currentDates = dates.filter(d => d !== "__load_more__");
+    const firstDate = new Date(currentDates[0]);
+    const newDates = [];
+    for (let i = 1; i <= 5; i++) {
+      const prevDate = new Date(firstDate);
+      prevDate.setDate(firstDate.getDate() - i);
+      newDates.unshift(prevDate.toLocaleDateString('en-CA', { timeZone: 'Asia/Kolkata' }));
+    }
+    const fromDate = newDates[0];
+    const toDate = newDates[newDates.length - 1];
+    await fetchWorkoutsInRange(fromDate, toDate);
+    setDates(["__load_more__", ...newDates, ...currentDates]);
+  };
+
+
   const selectedDateObj = new Date(selectedDate);
   const dayName = selectedDateObj.toLocaleDateString("en-US", { weekday: 'long', timeZone: 'Asia/Kolkata' });
   const hasWorkoutToday = versionOrder.some(
@@ -199,7 +215,53 @@ const Workouts = () => {
                 <div className="section-card-indvidual">
                   <SandboxedCommentSection date={selectedDate} user={user} />
                 </div>
-                {/* other workout rendering blocks go here */}
+                {!isRestDay && versionOrder.map(version => (
+              groupedWorkouts[selectedDate]?.versions[version] ? (
+                <div className="section-card-indvidual" key={version}> 
+<div key={version} className="version-container">
+                    <div className="version-header">
+                      <span className={`badge badge-${version.replace(/\s+/g, '').toLowerCase()}`}>{version}</span>
+                    </div>
+                    <div className="workout-list">
+                      {groupedWorkouts[selectedDate].versions[version].sort((a, b) => a.order - b.order).map(w => (
+                        <div key={w._id} className="workout-item" onClick={() => setModalWorkout(w)}>
+                          <div className="workout-line">
+                            {w.icon && (
+                              <img
+                                src={`/icons/${w.icon}.png`}
+                                alt={w.icon}
+                                className="workout-icon"
+                                style={{ width: '20px' }}
+                              />
+                            )}
+                            <div className="workout-text">
+                              <strong className="custom-name">
+                                {w.customName || w.title}
+                              </strong>
+                              {w.customName && (
+                                <div className="sub-title">
+                                  {w.title}
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                          {expandedVersions[version] && (
+                            <div className="inline-details">
+                              <div dangerouslySetInnerHTML={{ __html: w.description.replace(/\n/g, "<br/>") }} />
+                              <div>{w.capTime}</div>
+                              <div>{w.instructions}</div>
+                            </div>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                    <button className="expand-btn" onClick={() => toggleExpandAll(version)}>
+                      {expandedVersions[version] ? "Hide Workouts" : "Show Full Workout"}
+                    </button>
+                  </div>
+                  </div>
+              ) : null
+            ))}
               </>
             )}
           </>
