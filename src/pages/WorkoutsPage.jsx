@@ -49,18 +49,24 @@ const Workouts = () => {
   };
 
   const handleRefresh = async () => {
+    const prevSelectedDate = selectedDate || todayKey;
     setIsLoading(true);
+  
     const fromDate = new Date();
     fromDate.setDate(fromDate.getDate() - 5);
     const toDate = new Date();
     toDate.setDate(toDate.getDate() + 1);
+  
     await fetchWorkoutsInRange(
       fromDate.toISOString().split('T')[0],
       toDate.toISOString().split('T')[0]
     );
-    setSelectedDate(todayKey);
-    scrollToCenter(todayKey);
-    setIsLoading(false);
+  
+    setSelectedDate(prevSelectedDate);
+    setTimeout(() => {
+      scrollToCenter(prevSelectedDate);
+      setIsLoading(false);
+    }, 300);
   };
 
   const fetchWorkoutsInRange = async (from, to) => {
@@ -123,12 +129,12 @@ const Workouts = () => {
 
     fetchInitial();
 
+    const wrapper = document.getElementById('scroll-wrapper');
     const handleScroll = () => {
-      setIsAtTop(window.scrollY < 10);
+      setIsAtTop(wrapper.scrollTop < 10);
     };
-
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
+    wrapper.addEventListener('scroll', handleScroll);
+    return () => wrapper.removeEventListener('scroll', handleScroll);
   }, []);
 
   const toggleExpandAll = (version) => {
@@ -165,7 +171,8 @@ const Workouts = () => {
   const isRestDay = (dayName === "Thursday" || dayName === "Sunday") && !hasWorkoutToday;
 
   return (
-    <PullToRefresh onRefresh={handleRefresh} disabled={!isAtTop} style={{ minHeight: '100vh' }}>
+    <div style={{ height: '100vh', overflowY: 'auto' }} id="scroll-wrapper">
+     <PullToRefresh onRefresh={handleRefresh} disabled={!isAtTop}>
       <div className="horizontal-container">
       <div className="timeline-horizontal" ref={scrollContainerRef}>
           {dates.map((dateKey) => {
@@ -296,6 +303,7 @@ const Workouts = () => {
         )}
       </div>
     </PullToRefresh>
+    </div>
   );
 };
 
