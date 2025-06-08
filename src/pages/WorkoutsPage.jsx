@@ -204,10 +204,11 @@ const Workouts = () => {
               <SandboxedCommentSection date={selectedDate} user={user} />
             </div>
 
-            <div className="section-card-indvidual">
+            
               {versionOrder.map(version => (
                 groupedWorkouts[selectedDate]?.versions[version] ? (
-                  <div key={version} className="version-container">
+<div className="section-card-indvidual">
+<div key={version} className="version-container">
                     <div className="version-header">
                       <span className={`badge badge-${version.replace(/\s+/g, '').toLowerCase()}`}>{version}</span>
                     </div>
@@ -248,9 +249,10 @@ const Workouts = () => {
                       {expandedVersions[version] ? "Hide Workouts" : "Show Full Workout"}
                     </button>
                   </div>
+                  </div>
                 ) : null
               ))}
-            </div>
+            
           </>
         )}
 
