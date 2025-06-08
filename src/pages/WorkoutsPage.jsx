@@ -194,7 +194,7 @@ const Workouts = () => {
              
             
             </div>
-            <h3 style={{ color: "#ff2c2c", marginBottom: '20px' }}>
+            <h3 style={{ color: "#ff2c2c", marginBottom: '10px' }}>
                 Workout for {getDisplayDate(selectedDate)}
               </h3>
             </div>

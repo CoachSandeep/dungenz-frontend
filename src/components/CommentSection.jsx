@@ -10,9 +10,29 @@ const CommentSection = ({ date, user }) => {
   const fetchComments = async () => {
     try {
       const res = await fetch(`${process.env.REACT_APP_API_BASE_URL}/comments/${date}`);
+      
       if (res.status === 200) {
         const data = await res.json();
-        setComments(data);
+  
+        if (data.length === 0) {
+          setComments([
+            {
+              _id: 'coach-sandeep-local',
+              text: "Let’s crush it today, warriors! 💥 Drop your scores below 👇 – Coach Sandeep",
+              user: {
+                _id: "coach_sandeep_001",
+                name: "Coach Sandeep",
+                avatar: "/avatars/coach_sandeep.png"
+              },
+              createdAt: new Date().toISOString(),
+              likes: [],
+              replies: [],
+            },
+          ]);
+        } else {
+          setComments(data);
+        }
+  
       } else {
         setComments([]);
       }
@@ -20,8 +40,7 @@ const CommentSection = ({ date, user }) => {
       console.error("❌ Comment fetch error:", err);
       setComments([]);
     }
-  };
-
+  }
   const handleAddComment = async () => {
     if (!newComment.trim()) return;
     const fallbackUser = {

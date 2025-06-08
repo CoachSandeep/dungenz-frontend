@@ -65,7 +65,7 @@ const SandboxedCommentSection = ({ date, user }) => {
         </>
       }
     >
-      <div style={{ padding: '1rem' }}>
+      <div >
         <CommentSection date={date} user={user} />
       </div>
     </Frame>
