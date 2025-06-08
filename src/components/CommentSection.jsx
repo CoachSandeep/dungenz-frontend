@@ -67,6 +67,21 @@ const CommentSection = ({ date, user }) => {
     fetchComments();
   };
 
+  const handleDelete = async (commentId) => {
+    const token = localStorage.getItem('token');
+    try {
+      const res = await fetch(`${process.env.REACT_APP_API_BASE_URL}/comments/${commentId}`, {
+        method: 'DELETE',
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      if (res.ok) {
+        fetchComments(); // Refresh after deletion
+      }
+    } catch (err) {
+      console.error("❌ Delete comment failed:", err);
+    }
+  };
+
   const handleReply = async (commentId, text) => {
     if (!user?.name) return;
     const fallbackUser = {
@@ -129,7 +144,23 @@ const CommentSection = ({ date, user }) => {
             <Comment key={c._id}>
               <AvatarOrInitials user={c.user} />
               <Comment.Content>
-                <Comment.Author as='span'>{c.user?.name || 'Unknown'}</Comment.Author>
+              <Comment.Author as='span'>
+    {c.user?.name || 'Unknown'}
+    {c.user?._id === user?.id && (
+      <span
+        onClick={() => handleDelete(c._id)}
+        style={{
+          marginLeft: '10px',
+          cursor: 'pointer',
+          color: 'gray',
+          fontSize: '14px',
+        }}
+        title="Delete your comment"
+      >
+        🗑️
+      </span>
+    )}
+  </Comment.Author>
                 <Comment.Metadata>
                   <div>{new Date(c.createdAt).toLocaleTimeString()}</div>
                 </Comment.Metadata>
