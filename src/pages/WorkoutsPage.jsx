@@ -177,11 +177,7 @@ const Workouts = () => {
   const hasWorkoutToday = selectedDate && versionOrder.some(
     version => groupedWorkouts[selectedDate]?.versions?.[version]?.length > 0
   );
-  const isRestDay =
-  selectedDateObj &&
-  (dayName === "Thursday" || dayName === "Sunday") &&
-  groupedWorkouts[selectedDate] &&
-  versionOrder.every(version => !groupedWorkouts[selectedDate]?.versions?.[version]?.length);
+  const isRestDay = selectedDateObj && (dayName === "Thursday" || dayName === "Sunday") && !hasWorkoutToday;
 
   return (
 
