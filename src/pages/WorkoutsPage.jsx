@@ -220,7 +220,7 @@ const Workouts = () => {
                                 src={`/icons/${w.icon}.png`}
                                 alt={w.icon}
                                 className="workout-icon"
-                                style={{ width: '20px', marginRight: '10px' }}
+                                style={{ width: '20px' }}
                               />
                             )}
                             <div className="workout-text">
