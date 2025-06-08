@@ -109,7 +109,7 @@ const Workouts = () => {
       baseDates.push(d.toLocaleDateString('en-CA', { timeZone: 'Asia/Kolkata' }));
     }
     setDates(["__load_more__", ...baseDates]);
-
+  
     const fetchInitial = async () => {
       const fromDate = new Date();
       fromDate.setDate(fromDate.getDate() - 5);
@@ -126,17 +126,23 @@ const Workouts = () => {
         setIsLoading(false);
       }, 300);
     };
-
+  
     fetchInitial();
-
+  
+    // ✅ Scroll listener for PullToRefresh
     const wrapper = document.getElementById('scroll-wrapper');
+    if (!wrapper) return;
+  
     const handleScroll = () => {
       setIsAtTop(wrapper.scrollTop < 10);
     };
+  
     wrapper.addEventListener('scroll', handleScroll);
-    return () => wrapper.removeEventListener('scroll', handleScroll);
+    return () => {
+      wrapper.removeEventListener('scroll', handleScroll);
+    };
   }, []);
-
+  
   const toggleExpandAll = (version) => {
     setExpandedVersions(prev => ({ ...prev, [version]: !prev[version] }));
   };
@@ -171,8 +177,12 @@ const Workouts = () => {
   const isRestDay = (dayName === "Thursday" || dayName === "Sunday") && !hasWorkoutToday;
 
   return (
-    <div style={{ height: '100vh', overflowY: 'auto' }} id="scroll-wrapper">
-     <PullToRefresh onRefresh={handleRefresh} disabled={!isAtTop}>
+    <div id="scroll-wrapper" style={{ height: '100vh', overflow: 'auto', WebkitOverflowScrolling: 'touch' }}>
+    <PullToRefresh
+    onRefresh={handleRefresh}
+    disabled={!isAtTop}
+    style={{ height: '100%', overflow: 'auto' }}
+  >
       <div className="horizontal-container">
       <div className="timeline-horizontal" ref={scrollContainerRef}>
           {dates.map((dateKey) => {
