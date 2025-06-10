@@ -313,13 +313,13 @@ const Workouts = () => {
                 <h2>{modalWorkout.customName || modalWorkout.title}</h2>
                 <h3>{modalWorkout.title}</h3>
                 <div className="modal-inside-content">
-                  <div
+                  <div className="wod-desp"
                     dangerouslySetInnerHTML={{
                       __html: modalWorkout.description.replace(/\n/g, '<br/>'),
                     }}
                   />
                   <div className="wod-instructions">
-                    INSTRUCTIONS
+                    INSTRUCTIONS:
                   <div 
                     dangerouslySetInnerHTML={{
                       __html: modalWorkout.instructions.replace(/\n/g, '<br/>'),

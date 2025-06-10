@@ -256,6 +256,13 @@
   cursor: pointer;
   width:27%;
 }
+
+.wod-desp {
+  line-height:22px;
+  }
+
 .wod-instructions {
 margin-top:15px;
+font-size:14px;
+line-height:18px;
 }
