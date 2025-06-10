@@ -70,6 +70,15 @@ const AdminTimeline = () => {
       grouped[key].versions[w.version].push(w);
     });
 
+    // Sort by order field inside each version
+    Object.values(grouped).forEach(day => {
+      versionOrder.forEach(v => {
+        if (day.versions[v]) {
+          day.versions[v].sort((a, b) => (a.order || 0) - (b.order || 0));
+        }
+      });
+    });
+
     setGroupedWorkouts(grouped);
 
     const todayKey = new Date().toISOString().split('T')[0];
