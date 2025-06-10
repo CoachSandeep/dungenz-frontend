@@ -38,6 +38,11 @@ cluster-create-bo.cluster-create-box {
     border-radius: 6px;
     font-size: 15px;
   }
+
+  cluster-create-box textarea
+  {
+    height:250px;
+  }
   
   .datepicker {
     background: #2a2a2a !important;
@@ -72,14 +77,16 @@ cluster-create-bo.cluster-create-box {
   }
   
   .icon-options label {
-    padding: 8px 12px;
+    padding: 4px 7px;
     border-radius: 8px;
     background-color: #1a1a1a;
     color: white;
     font-size: 16px;
-    white-space: nowrap;
+    /* white-space: nowrap; */
     cursor: pointer;
     transition: 0.2s;
+    width:30%;
+    text-align: center;
   }
   
   .icon-options input {
