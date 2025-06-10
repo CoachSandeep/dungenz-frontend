@@ -41,6 +41,11 @@ const ClusterCopyPage = () => {
         if (!grouped[dateKey]) grouped[dateKey] = [];
         grouped[dateKey].push(w);
       });
+      
+       // 🔥 Sort workouts inside each date group by 'order'
+    Object.keys(grouped).forEach(dateKey => {
+      grouped[dateKey].sort((a, b) => (a.order || 0) - (b.order || 0));
+    });
 
       setGroupedWorkouts(grouped);
     } catch (err) {
