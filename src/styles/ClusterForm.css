@@ -39,7 +39,7 @@ cluster-create-bo.cluster-create-box {
     font-size: 15px;
   }
 
-  cluster-create-box textarea
+  .cluster-create-box textarea
   {
     height:250px;
   }
