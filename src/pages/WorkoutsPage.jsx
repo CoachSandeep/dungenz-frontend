@@ -318,11 +318,14 @@ const Workouts = () => {
                       __html: modalWorkout.description.replace(/\n/g, '<br/>'),
                     }}
                   />
-                  <div
+                  <div className="wod-instructions">
+                    INSTRUCTIONS
+                  <div 
                     dangerouslySetInnerHTML={{
                       __html: modalWorkout.instructions.replace(/\n/g, '<br/>'),
                     }}
                   />
+                  </div>
                   <p>{modalWorkout.capTime}</p>
                 </div>
                 <button onClick={() => setModalWorkout(null)}>Close</button>
