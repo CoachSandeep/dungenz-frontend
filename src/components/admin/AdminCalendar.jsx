@@ -5,6 +5,9 @@ import {
 import ClusterCreateForm from './ClusterCreateForm';
 import ClusterEditForm from './ClusterEditForm';
 import './../../styles/adminCalendar.css';
+import DatePicker from 'react-datepicker';
+import 'react-datepicker/dist/react-datepicker.css';
+import { subMonths, addMonths, format } from 'date-fns';
 
 const versionOrder = ['Ultra Train', 'Super Train', 'Minimal Equipment', 'Beginner'];
 
@@ -15,16 +18,15 @@ const AdminTimeline = () => {
   const [onlyStarred, setOnlyStarred] = useState(false);
   const [editingWorkoutId, setEditingWorkoutId] = useState(null);
   const [showAdd, setShowAdd] = useState(false);
+  const [selectedMonth, setSelectedMonth] = useState(new Date());
 
   const token = localStorage.getItem('token');
   const scrollRefs = useRef({});
 
-  // Fetch data
   useEffect(() => {
-    fetchWorkouts();
-  }, []);
+    fetchMonthWorkouts(selectedMonth);
+  }, [selectedMonth]);
 
-  // Scroll to center date
   useEffect(() => {
     if (selectedDate && scrollRefs.current[selectedDate]) {
       scrollRefs.current[selectedDate].scrollIntoView({
@@ -35,7 +37,6 @@ const AdminTimeline = () => {
     }
   }, [selectedDate]);
 
-  // Auto-correct selected date if starred filter active
   useEffect(() => {
     const starredDates = Object.keys(getFilteredGrouped()).sort((a, b) => new Date(a) - new Date(b));
     if (onlyStarred && !starredDates.includes(selectedDate)) {
@@ -43,25 +44,16 @@ const AdminTimeline = () => {
     }
   }, [onlyStarred, groupedWorkouts]);
 
-  const fetchWorkouts = async () => {
-    const res = await fetch(`${process.env.REACT_APP_API_BASE_URL}/admin/workouts`, {
+  const fetchMonthWorkouts = async (date) => {
+    const year = date.getFullYear();
+    const month = date.getMonth() + 1;
+
+    const res = await fetch(`${process.env.REACT_APP_API_BASE_URL}/admin/workouts/month?year=${year}&month=${month}`, {
       headers: { Authorization: `Bearer ${token}` },
     });
     const data = await res.json();
 
     const grouped = {};
-    const today = new Date();
-
-    for (let i = -7; i <= 7; i++) {
-      const d = new Date(today);
-      d.setDate(d.getDate() + i);
-      const dateKey = d.toISOString().split('T')[0];
-      const displayDate = d.toLocaleDateString('en-GB');
-      const day = d.toLocaleDateString('en-US', { weekday: 'short' });
-
-      grouped[dateKey] = { displayDate, day, versions: {} };
-    }
-
     data.forEach((w) => {
       const key = new Date(w.date).toISOString().split('T')[0];
       if (!grouped[key]) {
@@ -116,7 +108,7 @@ const AdminTimeline = () => {
       method: 'PATCH',
       headers: { Authorization: `Bearer ${token}` },
     });
-    fetchWorkouts();
+    fetchMonthWorkouts(selectedMonth);
   };
 
   const toggleLibrary = async (id) => {
@@ -124,7 +116,7 @@ const AdminTimeline = () => {
       method: 'PATCH',
       headers: { Authorization: `Bearer ${token}` },
     });
-    fetchWorkouts();
+    fetchMonthWorkouts(selectedMonth);
   };
 
   const handleDelete = async (id) => {
@@ -133,7 +125,7 @@ const AdminTimeline = () => {
         method: 'DELETE',
         headers: { Authorization: `Bearer ${token}` },
       });
-      fetchWorkouts();
+      fetchMonthWorkouts(selectedMonth);
     }
   };
 
@@ -142,7 +134,7 @@ const AdminTimeline = () => {
       method: 'POST',
       headers: { Authorization: `Bearer ${token}` },
     });
-    fetchWorkouts();
+    fetchMonthWorkouts(selectedMonth);
   };
 
   return (
@@ -151,7 +143,15 @@ const AdminTimeline = () => {
         <h2>DUNGENZ Admin Timeline</h2>
       </div>
 
-      {/* Filters */}
+      <div className="calendar-filter">
+        <DatePicker
+          selected={selectedMonth}
+          onChange={(date) => setSelectedMonth(date)}
+          dateFormat="MMMM yyyy"
+          showMonthYearPicker
+        />
+      </div>
+
       <div className="filter-bar">
         <select value={filterVersion} className="selectfilter" onChange={(e) => setFilterVersion(e.target.value)}>
           <option value="">All Versions</option>
@@ -159,20 +159,18 @@ const AdminTimeline = () => {
             <option key={v} value={v}>{v}</option>
           ))}
         </select>
-        </div>
-        <div className="filter-starred">
+      </div>
+      <div className="filter-starred">
         <label>
           <input
             type="checkbox"
             checked={onlyStarred}
             onChange={(e) => setOnlyStarred(e.target.checked)}
-          
           />
           ⭐ Show only Starred
         </label>
       </div>
 
-      {/* Timeline */}
       <div className="timeline-horizontal" style={{ display: 'flex', overflowX: 'auto', scrollSnapType: 'x mandatory' }}>
         {filteredDates.map((dateKey) => (
           <div
@@ -188,7 +186,6 @@ const AdminTimeline = () => {
         ))}
       </div>
 
-      {/* Timeline Details */}
       {selectedDate && filteredGrouped[selectedDate] && (
         <div className="timeline-details-box">
           <div className="admin-date-heading">
@@ -202,7 +199,7 @@ const AdminTimeline = () => {
             <ClusterCreateForm
               defaultDate={selectedDate}
               onSaved={() => {
-                fetchWorkouts();
+                fetchMonthWorkouts(selectedMonth);
                 setShowAdd(false);
               }}
             />
@@ -229,7 +226,7 @@ const AdminTimeline = () => {
                         workouts={filteredGrouped[selectedDate].versions[version]}
                         onSave={() => {
                           setEditingWorkoutId(null);
-                          fetchWorkouts();
+                          fetchMonthWorkouts(selectedMonth);
                         }}
                         onCancel={() => setEditingWorkoutId(null)}
                       />

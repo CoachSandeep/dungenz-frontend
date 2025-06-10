@@ -285,15 +285,17 @@ a {
 
 .cluster-edit-box {
   background: #1a1a1a;
-  padding: 20px;
+  padding: 5px;
   border-radius: 10px;
 }
 .cluster-item {
   background: #2a2a2a;
-  padding: 10px;
-  margin-bottom: 10px;
+  padding: 5px;
+  margin-bottom: 25px;
   border-radius: 6px;
 }
+
+
 .cluster-item input,
 .cluster-item textarea {
   width: 100%;
@@ -303,6 +305,10 @@ a {
   background: #333;
   color: white;
   border-radius: 4px;
+}
+
+cluster-item textarea{
+  min-height:250px;
 }
 
 .copy-cluster-btn {
