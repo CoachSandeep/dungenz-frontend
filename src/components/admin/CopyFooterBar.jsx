@@ -23,40 +23,44 @@ const CopyFooterBar = ({
 
   return (
     <div className="copy-footer-bar">
-      <div className="left">
-        <span className="selected-count">✅ {selectedCount} workout{selectedCount > 1 ? 's' : ''} selected</span>
-      </div>
-
-      <div className="middle">
-        <label className="footer-label">📅 Target Date:</label>
-        <DatePicker
-          selected={targetDate}
-          onChange={setTargetDate}
-          dateFormat="yyyy-MM-dd"
-          className="date-picker-input"
-        />
-      </div>
-
-      <div className="middle">
-        <label className="footer-label">🎯 Target Versions:</label>
-        <div className="version-checkboxes">
-          {versionOptions.map((v) => (
-            <label key={v} className="version-option">
-              <input
-                type="checkbox"
-                checked={selectedTargetVersions.includes(v)}
-                onChange={() => handleVersionToggle(v)}
-              />
-              <span>{v}</span>
-            </label>
-          ))}
-        </div>
-      </div>
-
-      <div className="right">
-        <button onClick={onCopy} className="copy-button">🔁 Copy Selected</button>
+    <div className="section">
+      ✅ {selectedCount} workouts selected
+    </div>
+  
+    <div className="section target-date">
+      📅 Target Date:
+      <input
+        type="date"
+        value={targetDate.toISOString().split('T')[0]}
+        onChange={(e) => setTargetDate(new Date(e.target.value))}
+      />
+    </div>
+  
+    <div className="section">
+      🎯 Target Versions:
+      <div className="target-versions">
+        {["Ultra Train", "Super Train", "Minimal Equipment", "Beginner"].map((version) => (
+          <label key={version}>
+            <input
+              type="checkbox"
+              checked={selectedTargetVersions.includes(version)}
+              onChange={(e) => {
+                const checked = e.target.checked;
+                setSelectedTargetVersions((prev) =>
+                  checked ? [...prev, version] : prev.filter((v) => v !== version)
+                );
+              }}
+            />
+            {version}
+          </label>
+        ))}
       </div>
     </div>
+  
+    <button className="copy-button" onClick={onCopy}>
+      🔁 Copy Selected
+    </button>
+  </div>
   );
 };
 
