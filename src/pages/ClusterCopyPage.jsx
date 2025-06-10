@@ -21,11 +21,14 @@ const ClusterCopyPage = () => {
 
   useEffect(() => {
     fetchWorkouts();
-  }, [selectedVersion]);
+  }, [selectedVersion, currentMonth]);
 
   const fetchWorkouts = async () => {
     try {
-      const res = await axios.get(`${process.env.REACT_APP_API_BASE_URL}/admin/workouts`, {
+      const year = currentMonth.getFullYear();
+      const month = currentMonth.getMonth() + 1;
+
+      const res = await axios.get(`${process.env.REACT_APP_API_BASE_URL}/admin/workouts/month?year=${year}&month=${month}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
 
@@ -59,10 +62,10 @@ const ClusterCopyPage = () => {
         for (let w of selected) {
           await axios.post(
             `${process.env.REACT_APP_API_BASE_URL}/admin/workouts/${w._id}/copy`,
-            { toVersion,
+            {
+              toVersion,
               targetDate: targetDate.toISOString().split('T')[0]
-             },
-            
+            },
             {
               headers: { Authorization: `Bearer ${token}` },
             }
@@ -123,6 +126,17 @@ const ClusterCopyPage = () => {
         versionOptions={versionOptions}
       />
 
+      {selectedWorkoutIds.length > 0 && (
+        <CopyFooterBar
+          selectedCount={selectedWorkoutIds.length}
+          selectedTargetVersions={targetVersions}
+          setSelectedTargetVersions={setTargetVersions}
+          onCopy={handleCopy}
+          targetDate={targetDate}
+          setTargetDate={setTargetDate}
+        />
+      )}
+
       <WorkoutBlockList
         groupedWorkouts={groupedWorkouts}
         selectedWorkouts={selectedWorkoutIds}
@@ -131,17 +145,6 @@ const ClusterCopyPage = () => {
       />
 
       <WorkoutModal workout={modalWorkout} onClose={() => setModalWorkout(null)} />
-
-      {selectedWorkoutIds.length > 0 && (
-       <CopyFooterBar
-       selectedCount={selectedWorkoutIds.length}
-       selectedTargetVersions={targetVersions}
-       setSelectedTargetVersions={setTargetVersions}
-       onCopy={handleCopy}
-       targetDate={targetDate}
-       setTargetDate={setTargetDate}
-     />
-      )}
     </div>
   );
 };
