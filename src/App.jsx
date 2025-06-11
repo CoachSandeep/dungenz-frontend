@@ -1,4 +1,4 @@
-import jwt_decode from 'jwt-decode'; // 👈 Add this on top
+import { jwtDecode } from 'jwt-decode';
 import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, useNavigate } from 'react-router-dom';
 import Navbar from './components/Navbar';
@@ -55,7 +55,7 @@ const App = () => {
     if (!token) return;
 
     try {
-      const { exp } = jwt_decode(token);
+      const { exp } = jwtDecode(token);
       const timeLeft = exp * 1000 - Date.now();
 
       if (timeLeft <= 0) {
