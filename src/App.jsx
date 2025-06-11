@@ -108,7 +108,14 @@ const App = () => {
       )}
       <Routes>
         <Route path="/" element={<Hero />} />
-        <Route path="/workouts" element={<Workouts />} /> 
+        <Route
+  path="/workouts"
+  element={
+    <PrivateRoute>
+      <Workouts /> {/* ✅ This must be a valid element */}
+    </PrivateRoute>
+  }
+/>
         <Route path="/login" element={<Login />} />
         <Route path="/caccount" element={<Caccount />} />
         <Route path="/upload" element={<UploadWorkout />} />
