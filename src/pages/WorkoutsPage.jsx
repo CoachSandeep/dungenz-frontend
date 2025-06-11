@@ -67,8 +67,6 @@ const Workouts = () => {
     }, 300);
   };
 
-
-
   const fetchWorkoutsInRange = async (from, to) => {
     const token = localStorage.getItem('token');
     try {
@@ -127,25 +125,27 @@ const Workouts = () => {
       }, 300);
     };
 
+    setTimeout(() => {
+      const wrapper = scrollWrapperRef.current;
+      if (!wrapper) return;
+
+      let timeout;
+      const handleScroll = () => {
+        if (timeout) clearTimeout(timeout);
+        timeout = setTimeout(() => {
+          if (wrapper) {
+            setIsAtTop(wrapper.scrollTop < 10);
+          }
+        }, 100);
+      };
+
+      wrapper.addEventListener('scroll', handleScroll);
+      return () => {
+        wrapper.removeEventListener('scroll', handleScroll);
+      };
+    }, 400);
+
     fetchInitial();
-
-    const wrapper = scrollWrapperRef.current;
-    let timeout;
-    if (!wrapper) return;
-
-    const handleScroll = () => {
-      if (timeout) clearTimeout(timeout);
-      timeout = setTimeout(() => {
-        if (wrapper) {
-          setIsAtTop(wrapper.scrollTop < 10);
-        }
-      }, 100);
-    };
-
-    wrapper.addEventListener('scroll', handleScroll);
-    return () => {
-      wrapper.removeEventListener('scroll', handleScroll);
-    };
   }, []);
 
   const toggleExpandAll = (version) => {
@@ -174,68 +174,20 @@ const Workouts = () => {
     setDates(["__load_more__", ...newDates, ...currentDates]);
   };
 
-  const selectedDateObj = selectedDate ? new Date(selectedDate) : null;
-  const dayName = selectedDateObj ? selectedDateObj.toLocaleDateString("en-US", { weekday: 'long', timeZone: 'Asia/Kolkata' }) : '';
-  const hasWorkoutToday = selectedDate && versionOrder.some(
-    version => groupedWorkouts[selectedDate]?.versions?.[version]?.length > 0
-  );
-  const isRestDay =
-  selectedDate &&
-  (dayName === "Sunday" || dayName === "Thursday") &&
-  (!groupedWorkouts[selectedDate] || versionOrder.every(
-    version => !groupedWorkouts[selectedDate]?.versions?.[version]?.length
-  ));
-  console.log("🧪 isRestDay:", isRestDay, "Day:", dayName, "Selected:", selectedDate, groupedWorkouts[selectedDate]);
   return (
-
-        <div className="horizontal-container" style={{ flex: 1 }}>
-          {/* Timeline section */}
-          <div className="timeline-horizontal" ref={scrollContainerRef}>
-            {dates.map((dateKey) => {
-              if (dateKey === "__load_more__") {
-                return (
-                  <div key="__load_more__" className="timeline-date-wrapper">
-                    <div className="timeline-date-circle load-more-circle" onClick={handleLoadMore}>
-                      <div className="circle-date">⇤</div>
-                      <div className="circle-day">More</div>
-                    </div>
-                  </div>
-                );
-              }
-  
-              const dateObj = new Date(dateKey);
-              const isActive = selectedDate === dateKey;
-              const isFutureBeyondTomorrow = dateObj > new Date(tomorrowKey);
-              const hasWorkout = groupedWorkouts.hasOwnProperty(dateKey);
-  
-              return (
-                <div key={dateKey} className="timeline-date-wrapper">
-                  <div
-                    className={`timeline-date-circle ${isActive ? 'active' : ''} ${(isFutureBeyondTomorrow) ? 'disabled' : ''}`}
-                    onClick={() => handleDateSelect(dateKey)}
-                    ref={(el) => (scrollRef.current[dateKey] = el)}
-                  >
-                    <div className="circle-date">
-                      {groupedWorkouts[dateKey]?.displayDate?.split('/')[0] || dateKey.split('-')[2]}
-                    </div>
-                    <div className="circle-day">
-                      {groupedWorkouts[dateKey]?.day || dateObj.toLocaleDateString("en-US", { weekday: 'short' })}
-                    </div>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-  
-          <PullToRefresh
-  onRefresh={handleRefresh}
-  resistance={2.5}
-  className="ptr-wrapper"
-  style={{ overflowY: 'auto', flex: 1 }}
-  ref={scrollWrapperRef}
->
-  <div style={{ padding: '2px' }}>
-          {selectedDate && (
+    <div style={{ height: '100vh', display: 'flex', flexDirection: 'column' }}>
+      <div className="timeline-horizontal" ref={scrollContainerRef}>
+        {/* Timeline dates rendering here */}
+      </div>
+      <PullToRefresh
+        onRefresh={handleRefresh}
+        resistance={2.5}
+        className="ptr-wrapper"
+        style={{ flex: 1, overflowY: 'auto' }}
+        ref={scrollWrapperRef}
+      >
+        <div style={{ padding: '2px' }}>
+        {selectedDate && (
   <>
     <div className="section-card-indvidual">
       <div className="section-header-row">
@@ -312,11 +264,10 @@ const Workouts = () => {
     )}
   </>
 )}
- </div>
- </PullToRefresh>
- 
-  
-          {modalWorkout && (
+        </div>
+      </PullToRefresh>
+
+      {modalWorkout && (
             <div className="modal-overlay" onClick={() => setModalWorkout(null)}>
               <div className="modal-box" onClick={(e) => e.stopPropagation()}>
                 <h2>{modalWorkout.customName || modalWorkout.title}</h2>
@@ -345,10 +296,8 @@ const Workouts = () => {
           {isLoading && (
             <div className="loading-overlay">Loading your workouts...</div>
           )}
-        </div>
-      
+    </div>
   );
-  
 };
 
 export default Workouts;
