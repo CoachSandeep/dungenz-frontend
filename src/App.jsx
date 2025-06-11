@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import jwt_decode from 'jwt-decode';
+import { jwtDecode } from 'jwt-decode';
 import Navbar from './components/Navbar';
 import Hero from './components/Hero';
 import Workouts from './pages/WorkoutsPage';
@@ -32,7 +32,7 @@ const App = () => {
 
       // ✅ Auto logout on token expiry
       try {
-        const { exp } = jwt_decode(token);
+        const { exp } = jwtDecode(token);
         const timeLeft = exp * 1000 - Date.now();
 
         if (timeLeft > 0) {
