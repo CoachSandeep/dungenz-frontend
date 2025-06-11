@@ -1,6 +1,6 @@
+import jwt_decode from 'jwt-decode'; // 👈 Add this on top
 import React, { useState, useEffect } from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-// import 'semantic-ui-css/semantic.min.css';
+import { BrowserRouter as Router, Routes, Route, useNavigate } from 'react-router-dom';
 import Navbar from './components/Navbar';
 import Hero from './components/Hero';
 import Workouts from './pages/WorkoutsPage';
@@ -15,14 +15,27 @@ import ClusterCopyPage from './pages/ClusterCopyPage';
 import AdminPushPage from './components/admin/AdminPushPage';
 import UserProfile from './pages/UserProfile';
 import { messaging, getToken, onMessage } from './firebase';
+import { isTokenValid } from './utils/auth'; // ✅ import added
+import PrivateRoute from './utils/PrivateRoute';
 
 const App = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [notificationStatus, setNotificationStatus] = useState('idle');
 
+  const navigate = useNavigate();
+
   useEffect(() => {
     const token = localStorage.getItem('token');
-    setIsLoggedIn(!!token);
+    const user = localStorage.getItem('user');
+
+    if (token && isTokenValid(token)) {
+      setIsLoggedIn(true);
+    } else {
+      localStorage.removeItem('token');
+      localStorage.removeItem('user');
+      setIsLoggedIn(false);
+      navigate('/login'); // ✅ force redirect if token invalid
+    }
 
     // 🔔 Check permission on load
     if (Notification.permission === 'granted') {
@@ -34,6 +47,38 @@ const App = () => {
       console.log('🔔 Foreground Message:', payload);
       alert(`🔔 New Notification: ${payload.notification?.title}`);
     });
+  }, [navigate]);
+
+  // ✅ Auto logout on token expiry
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    if (!token) return;
+
+    try {
+      const { exp } = jwt_decode(token);
+      const timeLeft = exp * 1000 - Date.now();
+
+      if (timeLeft <= 0) {
+        localStorage.removeItem('token');
+        localStorage.removeItem('user');
+        window.location.href = '/login';
+        return;
+      }
+
+      const logoutTimer = setTimeout(() => {
+        localStorage.removeItem('token');
+        localStorage.removeItem('user');
+        alert('Session expired. Please login again.');
+        window.location.href = '/login';
+      }, timeLeft);
+
+      return () => clearTimeout(logoutTimer);
+    } catch (err) {
+      console.error('Invalid token:', err);
+      localStorage.removeItem('token');
+      localStorage.removeItem('user');
+      window.location.href = '/login';
+    }
   }, []);
 
   const handleEnableNotifications = async () => {
@@ -110,7 +155,7 @@ const App = () => {
       )}
       <Routes>
         <Route path="/" element={<Hero />} />
-        <Route path="/workouts" element={<Workouts />} />
+        <Route path="/workouts" element={<PrivateRoute><Workouts /></PrivateRoute>} />
         <Route path="/login" element={<Login />} />
         <Route path="/caccount" element={<Caccount />} />
         <Route path="/upload" element={<UploadWorkout />} />
