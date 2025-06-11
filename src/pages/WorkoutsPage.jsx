@@ -187,7 +187,7 @@ const Workouts = () => {
   ));
   console.log("🧪 isRestDay:", isRestDay, "Day:", dayName, "Selected:", selectedDate, groupedWorkouts[selectedDate]);
   return (
-<PullToRefresh onRefresh={handleRefresh}>
+
         <div className="horizontal-container" style={{ flex: 1 }}>
           {/* Timeline section */}
           <div className="timeline-horizontal" ref={scrollContainerRef}>
@@ -227,7 +227,13 @@ const Workouts = () => {
             })}
           </div>
   
-         
+          <div ref={scrollWrapperRef} style={{ overflowY: 'auto', flex: 1 }}>
+    <PullToRefresh
+      onRefresh={handleRefresh}
+      resistance={2.5}
+      className="ptr-wrapper"
+      style={{ minHeight: '100vh' }}
+    >
           {selectedDate && (
   <>
     <div className="section-card-indvidual">
@@ -305,7 +311,8 @@ const Workouts = () => {
     )}
   </>
 )}
-
+ </PullToRefresh>
+  </div>
   
           {modalWorkout && (
             <div className="modal-overlay" onClick={() => setModalWorkout(null)}>
@@ -337,7 +344,7 @@ const Workouts = () => {
             <div className="loading-overlay">Loading your workouts...</div>
           )}
         </div>
-        </PullToRefresh>
+      
   );
   
 };
