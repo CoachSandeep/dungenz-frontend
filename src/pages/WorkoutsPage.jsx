@@ -227,13 +227,14 @@ const Workouts = () => {
             })}
           </div>
   
-          <div ref={scrollWrapperRef} style={{ overflowY: 'auto', flex: 1 }}>
-    <PullToRefresh
-      onRefresh={handleRefresh}
-      resistance={2.5}
-      className="ptr-wrapper"
-      style={{ minHeight: '100vh' }}
-    >
+          <PullToRefresh
+  onRefresh={handleRefresh}
+  resistance={2.5}
+  className="ptr-wrapper"
+  style={{ overflowY: 'auto', flex: 1 }}
+  ref={scrollWrapperRef}
+>
+  <div style={{ padding: '10px' }}>
           {selectedDate && (
   <>
     <div className="section-card-indvidual">
@@ -311,8 +312,9 @@ const Workouts = () => {
     )}
   </>
 )}
+ </div>
  </PullToRefresh>
-  </div>
+ 
   
           {modalWorkout && (
             <div className="modal-overlay" onClick={() => setModalWorkout(null)}>
