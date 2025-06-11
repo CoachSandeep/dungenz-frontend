@@ -187,7 +187,7 @@ const Workouts = () => {
   ));
   console.log("🧪 isRestDay:", isRestDay, "Day:", dayName, "Selected:", selectedDate, groupedWorkouts[selectedDate]);
   return (
-
+<PullToRefresh onRefresh={handleRefresh}>
         <div className="horizontal-container" style={{ flex: 1 }}>
           {/* Timeline section */}
           <div className="timeline-horizontal" ref={scrollContainerRef}>
@@ -337,7 +337,7 @@ const Workouts = () => {
             <div className="loading-overlay">Loading your workouts...</div>
           )}
         </div>
-     
+        </PullToRefresh>
   );
   
 };
