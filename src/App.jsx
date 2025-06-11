@@ -1,6 +1,5 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import { jwtDecode } from 'jwt-decode';
 import Navbar from './components/Navbar';
 import Hero from './components/Hero';
 import Workouts from './pages/WorkoutsPage';
@@ -15,56 +14,19 @@ import ClusterCopyPage from './pages/ClusterCopyPage';
 import AdminPushPage from './components/admin/AdminPushPage';
 import UserProfile from './pages/UserProfile';
 import { messaging, getToken, onMessage } from './firebase';
-import { isTokenValid } from './utils/auth';
 import PrivateRoute from './utils/PrivateRoute';
+import TokenWatcher from './components/TokenWatcher';
 
 const App = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [notificationStatus, setNotificationStatus] = useState('idle');
 
-  // ✅ Token check on load
-  useEffect(() => {
-    const token = localStorage.getItem('token');
-    const user = localStorage.getItem('user');
-
-    if (token && isTokenValid(token)) {
-      setIsLoggedIn(true);
-
-      // ✅ Auto logout on token expiry
-      try {
-        const { exp } = jwtDecode(token);
-        const timeLeft = exp * 1000 - Date.now();
-
-        if (timeLeft > 0) {
-          const logoutTimer = setTimeout(() => {
-            localStorage.removeItem('token');
-            localStorage.removeItem('user');
-            alert('Session expired. Please login again.');
-            window.location.href = '/login';
-          }, timeLeft);
-
-          return () => clearTimeout(logoutTimer);
-        }
-      } catch (e) {
-        console.error('Token decode failed:', e);
-      }
-
-    } else {
-      localStorage.removeItem('token');
-      localStorage.removeItem('user');
-      setIsLoggedIn(false);
-      // 👇 no navigate() to avoid crash
-      if (window.location.pathname !== '/login') {
-        window.location.href = '/login';
-      }
-    }
-
-    // ✅ Notification permission
+  // 🔔 Foreground notification listener
+  React.useEffect(() => {
     if (Notification.permission === 'granted') {
       setNotificationStatus('enabled');
     }
 
-    // ✅ Foreground notification listener
     onMessage(messaging, (payload) => {
       console.log('🔔 Foreground Message:', payload);
       alert(`🔔 New Notification: ${payload.notification?.title}`);
@@ -111,6 +73,7 @@ const App = () => {
   return (
     <Router>
       <Navbar />
+      <TokenWatcher setIsLoggedIn={setIsLoggedIn} />
       {isLoggedIn && notificationStatus !== 'enabled' && Notification.permission !== 'granted' && (
         <div style={{
           padding: '12px 20px',
