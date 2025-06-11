@@ -3,7 +3,15 @@
   background-color: #eceaea;
   min-height: 100vh;
   color: #fff;
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
 }
+.ptr-wrapper {
+  overflow-y: auto;
+  flex: 1;
+}
+
 
 .timeline-heading {
   text-align: center;
