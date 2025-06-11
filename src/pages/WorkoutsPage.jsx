@@ -234,7 +234,7 @@ const Workouts = () => {
   style={{ overflowY: 'auto', flex: 1 }}
   ref={scrollWrapperRef}
 >
-  <div style={{ padding: '10px' }}>
+  <div style={{ padding: '2px' }}>
           {selectedDate && (
   <>
     <div className="section-card-indvidual">
