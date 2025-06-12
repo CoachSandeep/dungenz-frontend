@@ -7,6 +7,7 @@ const NavbarAvatar = ({ user, onLogout }) => {
   const dropdownRef = useRef();
   const navigate = useNavigate();
   const baseURL = process.env.REACT_APP_API_BASE_URL.replace(/\/api$/, '');
+  console.log("user"+ user?.profileImage);
 
   const toggleDropdown = () => setOpen(!open);
 
