@@ -72,7 +72,6 @@
     background-color: #111;
     flex-direction: column;
     width: 100%;
-    display: none;
     padding: 1rem;
     gap: 10px;
     text-align: right;
