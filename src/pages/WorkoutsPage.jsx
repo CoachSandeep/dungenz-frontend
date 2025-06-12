@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import PullToRefresh from 'react-pull-to-refresh';
 import './../styles/workout.css';
+import './../styles/CommentSection.css';
 import SandboxedCommentSection from '../components/SandboxedCommentSection';
 import { FiRefreshCw } from 'react-icons/fi';
 
