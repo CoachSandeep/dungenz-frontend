@@ -21,7 +21,7 @@ const CommentSection = ({ date, user }) => {
               user: {
                 _id: "coach_sandeep_001",
                 name: "Coach Sandeep",
-                avatar: "/avatars/coach_sandeep.png"
+                avatar: "/uploads/1749730076261-09ktnt3wxjpgiwgi28eu.jpg"
               },
               createdAt: new Date().toISOString(),
               likes: [],
@@ -128,7 +128,13 @@ const CommentSection = ({ date, user }) => {
   }, []);
 
   const AvatarOrInitials = ({ user }) => {
-    if (user?.avatar) return <Comment.Avatar src={user.avatar} />;
+    if (user?.avatar) {
+      const baseURL = process.env.REACT_APP_API_BASE_URL?.replace(/\/api$/, '');
+      const fullURL = user.avatar.startsWith('http')
+        ? user.avatar
+        : `${baseURL}${user.avatar}`;
+      return <Comment.Avatar src={fullURL} />;
+    }
     const initials = (user?.name || 'U').slice(0, 2).toUpperCase();
     return <div className="avatar-initials-circle">{initials}</div>;
   };
