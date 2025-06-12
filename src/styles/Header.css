@@ -64,18 +64,6 @@
   border-radius: 2px;
 }
 
-@media (max-width: 768px) {
-  .navbar-right {
-    position: absolute;
-    top: 70px;
-    right: 0;
-    background-color: #111;
-    flex-direction: column;
-    width: 100%;
-    padding: 1rem;
-    gap: 10px;
-    text-align: right;
-  }
 
   .navbar-right.open {
     display: flex;
