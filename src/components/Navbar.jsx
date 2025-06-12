@@ -1,17 +1,16 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate, NavLink, useLocation, Link } from 'react-router-dom';
+import { useNavigate, useLocation, Link } from 'react-router-dom';
 import './../styles/Header.css';
 import logo from '../assets/logo.png';
 import dp from '../assets/dp.png';
 import adminShield from '../assets/admin-shield.png';
-import NavbarAvatar from './NavbarAvatar'; // ✅ Add this line
+import NavbarAvatar from './NavbarAvatar';
 
 const Navbar = () => {
-  // const [navOpen, setNavOpen] = useState(false);
   const [isSuperadmin, setIsSuperadmin] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [adminMenuOpen, setAdminMenuOpen] = useState(false);
-  const [user, setUser] = useState(null); // ✅ To pass into NavbarAvatar
+  const [user, setUser] = useState(null);
 
   const navigate = useNavigate();
   const location = useLocation();
@@ -19,7 +18,7 @@ const Navbar = () => {
   useEffect(() => {
     const token = localStorage.getItem('token');
     const storedUser = JSON.parse(localStorage.getItem('user'));
-    
+
     if (token && storedUser) {
       setIsLoggedIn(true);
       setUser(storedUser);
@@ -31,14 +30,8 @@ const Navbar = () => {
       setUser(null);
     }
 
-    setNavOpen(false);
     setAdminMenuOpen(false);
   }, [location.pathname]);
-
-  const toggleMenu = () => {
-    setNavOpen(!navOpen);
-    setAdminMenuOpen(false);
-  };
 
   const handleLogout = () => {
     localStorage.removeItem('token');
@@ -56,11 +49,9 @@ const Navbar = () => {
         <img src={dp} alt="DUNGENZ" className="navbar-logo" />
       </div>
 
-      <div className={`navbar-right ${navOpen ? 'open' : ''}`}>
+      <div className="navbar-right">
         {isLoggedIn ? (
-          <>
-            <NavbarAvatar user={user} onLogout={handleLogout} />
-          </>
+          <NavbarAvatar user={user} onLogout={handleLogout} />
         ) : (
           <>
             <button onClick={() => navigate('/login')}>Login</button>
@@ -88,12 +79,6 @@ const Navbar = () => {
           )}
         </div>
       )}
-{/* 
-      <div className="hamburger" onClick={toggleMenu}>
-        <span className="bar" />
-        <span className="bar" />
-        <span className="bar" />
-      </div> */}
     </header>
   );
 };
