@@ -65,14 +65,6 @@
 }
 
 
-  .navbar-right.open {
-    display: flex;
-  }
-
-  .hamburger {
-    display: flex;
-  }
-}
 
 .header-icons {
   display: flex;
