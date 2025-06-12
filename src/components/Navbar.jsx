@@ -7,7 +7,7 @@ import adminShield from '../assets/admin-shield.png';
 import NavbarAvatar from './NavbarAvatar'; // ✅ Add this line
 
 const Navbar = () => {
-  const [navOpen, setNavOpen] = useState(false);
+  // const [navOpen, setNavOpen] = useState(false);
   const [isSuperadmin, setIsSuperadmin] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [adminMenuOpen, setAdminMenuOpen] = useState(false);
@@ -88,8 +88,8 @@ const Navbar = () => {
           )}
         </div>
       )}
-
-      {/* <div className="hamburger" onClick={toggleMenu}>
+{/* 
+      <div className="hamburger" onClick={toggleMenu}>
         <span className="bar" />
         <span className="bar" />
         <span className="bar" />
