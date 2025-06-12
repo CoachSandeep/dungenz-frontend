@@ -43,6 +43,7 @@ const ProfilePage = () => {
       if (res.ok) {
         const updated = await res.json();
         setProfile(updated);
+        localStorage.setItem('user', JSON.stringify(updated)); // ✅ Add this
         setStatus('✅ Profile updated');
       } else {
         setStatus('❌ Failed to update profile');
