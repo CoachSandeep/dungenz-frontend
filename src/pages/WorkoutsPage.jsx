@@ -180,7 +180,7 @@ const Workouts = () => {
     ));
 
   return (
-    <div className="horizontal-container" style={{ flex: 1 }}>
+    <div className="horizontal-container" style={{ flex: 1, height: '100vh', display: 'flex', flexDirection: 'column' }}>
       <div className="timeline-horizontal" ref={scrollContainerRef}>
         {dates.map((dateKey) => {
           if (dateKey === "__load_more__") {
@@ -218,8 +218,13 @@ const Workouts = () => {
       </div>
 
       <div ref={scrollWrapperRef} style={{ overflowY: 'auto', flex: 1 }}>
-        <PullToRefresh onRefresh={handleRefresh} resistance={2.5} className="ptr-wrapper" style={{ minHeight: '100vh' }}>
-          <div style={{ padding: '2px' }}>
+      <PullToRefresh
+      onRefresh={handleRefresh}
+      resistance={2.5}
+      className="ptr-wrapper"
+      style={{ height: '100%' }}
+    >
+           <div style={{ minHeight: '100%' }}>
             {selectedDate && (
               <>
                 <div className="section-card-indvidual">

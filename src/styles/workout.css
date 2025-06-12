@@ -1,13 +1,22 @@
+html, body, #root {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  overflow: hidden; /* only if your scroll wrapper is managing scroll */
+}
+
 .horizontal-container {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
   padding: 0.5rem;
   background-color: #eceaea;
-  min-height: 100vh;
   color: #fff;
 }
 
 .ptr-wrapper {
+  height: 100%;
   overflow-y: auto;
-  flex: 1;
 }
 
 
