@@ -273,3 +273,9 @@ margin-top:15px;
 font-size:14px;
 line-height:18px;
 }
+
+.section-header-row svg:hover {
+  color: #ff2c2c;
+  transform: rotate(90deg);
+  transition: all 0.3s ease;
+}

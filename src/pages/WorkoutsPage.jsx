@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import PullToRefresh from 'react-pull-to-refresh';
 import './../styles/workout.css';
 import SandboxedCommentSection from '../components/SandboxedCommentSection';
+import { FiRefreshCw } from 'react-icons/fi';
 
 const versionOrder = ["Ultra Train", "Super Train", "Minimal Equipment", "Beginner"];
 
@@ -226,6 +227,12 @@ const Workouts = () => {
                   <div className="section-header-row">
                     <h1>Hi {user.name}</h1>
                     <button className="back-to-today-btns" onClick={() => handleDateSelect(todayKey)}>Back to Today</button>
+                    <FiRefreshCw
+      size={24}
+      style={{ cursor: 'pointer' }}
+      title="Reload Workouts"
+      onClick={handleRefresh}
+    />
                   </div>
                   <h3 style={{ color: "#ff2c2c", marginBottom: '10px' }}>Workout for {getDisplayDate(selectedDate)}</h3>
                 </div>
