@@ -89,11 +89,11 @@ const Navbar = () => {
         </div>
       )}
 
-      <div className="hamburger" onClick={toggleMenu}>
+      {/* <div className="hamburger" onClick={toggleMenu}>
         <span className="bar" />
         <span className="bar" />
         <span className="bar" />
-      </div>
+      </div> */}
     </header>
   );
 };
