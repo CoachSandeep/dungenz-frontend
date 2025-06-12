@@ -4,16 +4,15 @@ import { Comment, Form, Button } from 'semantic-ui-react';
 const CommentSection = ({ date, user }) => {
   const [comments, setComments] = useState([]);
   const [newComment, setNewComment] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   if (!date) return null;
 
   const fetchComments = async () => {
     try {
       const res = await fetch(`${process.env.REACT_APP_API_BASE_URL}/comments/${date}`);
-      
       if (res.status === 200) {
         const data = await res.json();
-  
         if (data.length === 0) {
           setComments([
             {
@@ -32,7 +31,6 @@ const CommentSection = ({ date, user }) => {
         } else {
           setComments(data);
         }
-  
       } else {
         setComments([]);
       }
@@ -40,22 +38,35 @@ const CommentSection = ({ date, user }) => {
       console.error("❌ Comment fetch error:", err);
       setComments([]);
     }
-  }
+  };
+
   const handleAddComment = async () => {
-    if (!newComment.trim()) return;
+    if (!newComment.trim() || isSubmitting) return;
+
+    setIsSubmitting(true);
     const fallbackUser = {
       _id: user?.id || 'anonymous',
       name: user?.name || 'Unknown',
       avatar: user?.avatar || '',
     };
-    const res = await fetch(`${process.env.REACT_APP_API_BASE_URL}/comments/${date}`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ text: newComment, user: fallbackUser })
-    });
-    const data = await res.json();
-    setComments(data);
-    setNewComment('');
+
+    try {
+      const res = await fetch(`${process.env.REACT_APP_API_BASE_URL}/comments/${date}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ text: newComment, user: fallbackUser })
+      });
+
+      if (res.ok) {
+        const data = await res.json();
+        setComments(data);
+        setNewComment('');
+      }
+    } catch (err) {
+      console.error("❌ Comment post failed:", err);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const handleLike = async (commentId) => {
@@ -68,27 +79,30 @@ const CommentSection = ({ date, user }) => {
   };
 
   const handleDelete = async (commentId) => {
+    if (commentId === 'coach-sandeep-local') return;
+
     const token = localStorage.getItem('token');
     try {
       const res = await fetch(`${process.env.REACT_APP_API_BASE_URL}/comments/${commentId}`, {
         method: 'DELETE',
         headers: { Authorization: `Bearer ${token}` }
       });
-      if (res.ok) {
-        fetchComments(); // Refresh after deletion
-      }
+      if (res.ok) fetchComments();
+      else console.error("Delete failed:", await res.text());
     } catch (err) {
       console.error("❌ Delete comment failed:", err);
     }
   };
 
   const handleReply = async (commentId, text) => {
-    if (!user?.name) return;
+    if (!user?.name || !text.trim()) return;
+
     const fallbackUser = {
       _id: user?.id || 'anonymous',
       name: user?.name || 'Unknown',
       avatar: user?.avatar || '',
     };
+
     await fetch(`${process.env.REACT_APP_API_BASE_URL}/comments/${date}/${commentId}/reply`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -101,7 +115,6 @@ const CommentSection = ({ date, user }) => {
     fetchComments();
   }, [date]);
 
-  // 💥 Remove injected min-height from any comment block or iframe
   useEffect(() => {
     const observer = new MutationObserver(() => {
       const els = document.querySelectorAll('.ui.comments, iframe');
@@ -122,7 +135,7 @@ const CommentSection = ({ date, user }) => {
 
   return (
     <div className="comment-zone-wrapper">
-      <Form className="comment-zone" reply onSubmit={handleAddComment} style={{ display: 'flex', alignItems: 'center', width: '100%' }}>
+      <Form className="comment-zone" reply onSubmit={(e) => { e.preventDefault(); handleAddComment(); }} style={{ display: 'flex', alignItems: 'center', width: '100%' }}>
         <Form.Input
           value={newComment}
           onChange={(e) => setNewComment(e.target.value)}
@@ -132,8 +145,8 @@ const CommentSection = ({ date, user }) => {
         <Button
           color="red"
           icon="send"
-          onClick={handleAddComment}
           type="submit"
+          loading={isSubmitting}
           style={{ margin: 0, marginBottom: '15px' }}
         />
       </Form>
@@ -144,33 +157,33 @@ const CommentSection = ({ date, user }) => {
             <Comment key={c._id}>
               <AvatarOrInitials user={c.user} />
               <Comment.Content>
-              <Comment.Author as='span'>
-    {c.user?.name || 'Unknown'}
-    {c.user?._id === user?.id && (
-      <span
-        onClick={() => handleDelete(c._id)}
-        style={{
-          marginLeft: '10px',
-          cursor: 'pointer',
-          color: 'gray',
-          fontSize: '14px',
-        }}
-        title="Delete your comment"
-      >
-        🗑️
-      </span>
-    )}
-  </Comment.Author>
+                <Comment.Author as='span'>
+                  {c.user?.name || 'Unknown'}
+                  {c.user?._id === user?.id && c._id !== 'coach-sandeep-local' && (
+                    <span
+                      onClick={() => handleDelete(c._id)}
+                      style={{
+                        marginLeft: '10px',
+                        cursor: 'pointer',
+                        color: 'gray',
+                        fontSize: '14px',
+                      }}
+                      title="Delete your comment"
+                    >
+                      🗑️
+                    </span>
+                  )}
+                </Comment.Author>
                 <Comment.Metadata>
                   <div>{new Date(c.createdAt).toLocaleTimeString()}</div>
                 </Comment.Metadata>
                 <Comment.Text>{c.text}</Comment.Text>
                 <Comment.Actions>
                   <Comment.Action onClick={() => handleLike(c._id)}>
-                    ❤️ {c.likes.length}
+                    ❤️ {c.likes?.length || 0}
                   </Comment.Action>
                 </Comment.Actions>
-                {c.replies.map((r, idx) => (
+                {c.replies?.map((r, idx) => (
                   <Comment.Group key={idx}>
                     <Comment>
                       <AvatarOrInitials user={r.user} />
