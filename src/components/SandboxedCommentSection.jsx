@@ -61,6 +61,21 @@ const SandboxedCommentSection = ({ date, user }) => {
                 display: none !important;
               }
 
+              .avatar-initials-circle {
+                width: 35px;
+                height: 35px;
+                background-color: #ff2c2c;
+                color: white;
+                border-radius: 50%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-weight: bold;
+                font-size: 14px;
+                text-transform: uppercase;
+                margin-right: 10px;
+              }
+
           `}</style>
         </>
       }
