@@ -170,7 +170,7 @@ const CommentSection = ({ date, user }) => {
                       }}
                       title="Delete your comment"
                     >
-                      🗑️
+                      🗑️ {c._id}
                     </span>
                   )}
                 </Comment.Author>
