@@ -32,7 +32,7 @@ const ProfilePage = () => {
       const formData = new FormData();
       formData.append('name', profile.name);
       formData.append('bio', profile.bio);
-      formData.append('profileImage', selectedFile); // ✅ THIS IS IMPORTANT
+      formData.append('profileImage', file); // ✅ THIS IS IMPORTANT
 
       const res = await fetch(`${process.env.REACT_APP_API_BASE_URL}/users/me`, {
         method: 'PUT',
@@ -65,7 +65,11 @@ const ProfilePage = () => {
 
         <label>Profile Picture</label>
         <input type="file" accept="image/*" onChange={handleFileChange} />
-        {profile.photo && <img src={profile.photo} alt="profile" className="preview-img" />}
+{profile.photo && (
+  <div style={{ textAlign: 'center' }}>
+    <img src={profile.photo} alt="profile" className="preview-img" />
+  </div>
+)}
 
         <button type="submit">💾 Save</button>
       </form>
