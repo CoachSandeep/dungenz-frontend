@@ -88,7 +88,7 @@ const ProfilePage = () => {
       <div className="photo-preview">
         <h4>🖼️ Profile Picture Preview:</h4>
         <img
-          src={`${baseURL}${user.profileImage}`}
+          src={`${baseURL}${profile.profileImage}`}
           alt="profile"
           className="zen-avatar"
         />
