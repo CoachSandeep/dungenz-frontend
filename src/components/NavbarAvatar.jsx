@@ -1,9 +1,11 @@
 import React, { useState, useRef, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import '../styles/NavbarAvatar.css';
 
-const NavbarAvatar = ({ user }) => {
+const NavbarAvatar = ({ user, onLogout }) => {
   const [open, setOpen] = useState(false);
   const dropdownRef = useRef();
+  const navigate = useNavigate();
 
   const toggleDropdown = () => setOpen(!open);
 
@@ -21,6 +23,13 @@ const NavbarAvatar = ({ user }) => {
   const initials = (user?.name || 'U').slice(0, 2).toUpperCase();
   const profileImage = user?.avatar;
 
+  const handleLogout = () => {
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+    if (onLogout) onLogout();
+    navigate('/login');
+  };
+
   return (
     <div className="navbar-avatar" ref={dropdownRef}>
       <div className="avatar-trigger" onClick={toggleDropdown}>
@@ -36,11 +45,8 @@ const NavbarAvatar = ({ user }) => {
           <p><strong>{user?.name}</strong></p>
           <p style={{ fontSize: '0.9rem', color: '#aaa' }}>{user?.email}</p>
           <hr />
-          <a href="/profile">🧍 View Profile</a>
-          <a href="#" onClick={() => {
-            localStorage.removeItem('token');
-            window.location.href = '/login';
-          }}>🚪 Logout</a>
+          <button onClick={() => navigate('/profile')} className="dropdown-btn">🧍 View Profile</button>
+          <button onClick={handleLogout} className="dropdown-btn">🚪 Logout</button>
         </div>
       )}
     </div>
