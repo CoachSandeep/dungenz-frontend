@@ -75,7 +75,7 @@ const ProfilePage = () => {
       </form>
       <p>{status}</p>
 
-      {(profile.bio || profile.photo) && (
+      {(profile.bio || profile.profileImage) && (
   <div className="profile-preview-box">
     {profile.bio && (
       <div className="bio-preview">
@@ -84,11 +84,11 @@ const ProfilePage = () => {
       </div>
     )}
 
-    {profile.photo && (
+    {profile.profileImage && (
       <div className="photo-preview">
         <h4>🖼️ Profile Picture Preview:</h4>
         <img
-          src={`${process.env.REACT_APP_API_BASE_URL}${profile.photo}`}
+          src={`${process.env.REACT_APP_API_BASE_URL}${profile.profileImage}`}
           alt="profile"
           className="zen-avatar"
         />
