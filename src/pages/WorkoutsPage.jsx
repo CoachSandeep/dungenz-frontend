@@ -218,12 +218,7 @@ const Workouts = () => {
       </div>
 
       <div ref={scrollWrapperRef} style={{ overflowY: 'auto', flex: 1 }}>
-      <PullToRefresh
-      onRefresh={handleRefresh}
-      resistance={2.5}
-      className="ptr-wrapper"
-      style={{ height: '100%' }}
-    >
+
            <div style={{ minHeight: '100%' }}>
             {selectedDate && (
               <>
@@ -297,7 +292,7 @@ const Workouts = () => {
               </>
             )}
           </div>
-        </PullToRefresh>
+       
       </div>
 
       {modalWorkout && (
