@@ -74,6 +74,29 @@ const ProfilePage = () => {
         <button type="submit">💾 Save</button>
       </form>
       <p>{status}</p>
+
+      {(profile.bio || profile.photo) && (
+  <div className="profile-preview-box">
+    {profile.bio && (
+      <div className="bio-preview">
+        <h4>📝 Bio Preview:</h4>
+        <p>{profile.bio}</p>
+      </div>
+    )}
+
+    {profile.photo && (
+      <div className="photo-preview">
+        <h4>🖼️ Profile Picture Preview:</h4>
+        <img
+          src={`${process.env.REACT_APP_API_BASE_URL}${profile.photo}`}
+          alt="profile"
+          className="zen-avatar"
+        />
+      </div>
+    )}
+  </div>
+)}
+
     </div>
   );
 };
