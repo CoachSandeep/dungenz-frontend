@@ -1,43 +1,51 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate, NavLink, useLocation, Link  } from 'react-router-dom';
+import { useNavigate, NavLink, useLocation, Link } from 'react-router-dom';
 import './../styles/Header.css';
 import logo from '../assets/logo.png';
 import dp from '../assets/dp.png';
-import adminShield from '../assets/admin-shield.png'; // Save this image in /assets
+import adminShield from '../assets/admin-shield.png';
+import NavbarAvatar from './NavbarAvatar'; // ✅ Add this line
 
 const Navbar = () => {
   const [navOpen, setNavOpen] = useState(false);
   const [isSuperadmin, setIsSuperadmin] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [adminMenuOpen, setAdminMenuOpen] = useState(false);
+  const [user, setUser] = useState(null); // ✅ To pass into NavbarAvatar
 
   const navigate = useNavigate();
   const location = useLocation();
+
   useEffect(() => {
     const token = localStorage.getItem('token');
-    const user = JSON.parse(localStorage.getItem('user'));
-   
-    if (token) {
+    const storedUser = JSON.parse(localStorage.getItem('user'));
+    
+    if (token && storedUser) {
       setIsLoggedIn(true);
-      if (user?.role === 'superadmin') {
+      setUser(storedUser);
+      if (storedUser.role === 'superadmin') {
         setIsSuperadmin(true);
       }
+    } else {
+      setIsLoggedIn(false);
+      setUser(null);
     }
+
     setNavOpen(false);
     setAdminMenuOpen(false);
-
   }, [location.pathname]);
 
- 
   const toggleMenu = () => {
     setNavOpen(!navOpen);
-    setAdminMenuOpen(false); // Close admin menu if nav toggled
+    setAdminMenuOpen(false);
   };
 
   const handleLogout = () => {
     localStorage.removeItem('token');
+    localStorage.removeItem('user');
     setIsLoggedIn(false);
     setIsSuperadmin(false);
+    setUser(null);
     navigate('/login');
   };
 
@@ -46,16 +54,12 @@ const Navbar = () => {
       <div className="navbar-left" onClick={() => navigate('/workouts')}>
         <img src={logo} alt="DUNGENZ" className="navbar-logo" />
         <img src={dp} alt="DUNGENZ" className="navbar-logo" />
-        
       </div>
 
       <div className={`navbar-right ${navOpen ? 'open' : ''}`}>
         {isLoggedIn ? (
           <>
-            {/* <button onClick={() => navigate('/upload')}>Upload Workout</button> */}
-            <button onClick={() => navigate('/profile')}>Profile</button>
-            {/* <a href="/profile">👤 Profile</a> */}
-            <button onClick={handleLogout}>Logout</button>
+            <NavbarAvatar user={user} onLogout={handleLogout} />
           </>
         ) : (
           <>

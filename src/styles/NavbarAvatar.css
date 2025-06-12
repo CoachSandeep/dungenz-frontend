@@ -1,0 +1,62 @@
+.navbar-avatar {
+    position: relative;
+    display: inline-block;
+    margin-right: 20px;
+  }
+  
+  .avatar-trigger {
+    width: 40px;
+    height: 40px;
+    cursor: pointer;
+    border-radius: 50%;
+    overflow: hidden;
+    background: #222;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .avatar-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 50%;
+  }
+  
+  .avatar-circle {
+    width: 100%;
+    height: 100%;
+    background-color: #444;
+    color: white;
+    font-weight: bold;
+    font-size: 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+  }
+  
+  .avatar-dropdown {
+    position: absolute;
+    top: 50px;
+    right: 0;
+    background: #1e1e1e;
+    color: white;
+    padding: 10px 15px;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+    z-index: 999;
+    width: 200px;
+  }
+  
+  .avatar-dropdown a {
+    display: block;
+    color: #f15b5b;
+    text-decoration: none;
+    margin-top: 10px;
+  }
+  
+  .avatar-dropdown a:hover {
+    text-decoration: underline;
+  }
+  
