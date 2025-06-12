@@ -225,14 +225,19 @@ const Workouts = () => {
               <>
                 <div className="section-card-indvidual">
                   <div className="section-header-row">
+                    <div>
                     <h1>Hi {user.name}</h1>
-                    <button className="back-to-today-btns" onClick={() => handleDateSelect(todayKey)}>Back to Today</button>
+                    </div>
+                    <div>
                     <FiRefreshCw
       size={24}
-      style={{ cursor: 'pointer' }}
+      style={{ cursor: 'pointer', color: '#ff2c2c' }}
       title="Reload Workouts"
       onClick={handleRefresh}
     />
+    </div> <div>
+                    <button className="back-to-today-btns" onClick={() => handleDateSelect(todayKey)}>Back to Today</button>
+                    </div>
                   </div>
                   <h3 style={{ color: "#ff2c2c", marginBottom: '10px' }}>Workout for {getDisplayDate(selectedDate)}</h3>
                 </div>
