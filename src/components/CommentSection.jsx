@@ -159,7 +159,8 @@ const CommentSection = ({ date, user }) => {
               <Comment.Content>
                 <Comment.Author as='span'>
                   {c.user?.name || 'Unknown'}
-                  {c.user?._id === user?.id && c._id !== 'coach-sandeep-local' && (
+                  {(c._id !== 'coach-sandeep-local') &&
+  (c.user?._id === user?.id || user?.role === 'superadmin') && (
                     <span
                       onClick={() => handleDelete(c._id)}
                       style={{
@@ -170,7 +171,7 @@ const CommentSection = ({ date, user }) => {
                       }}
                       title="Delete your comment"
                     >
-                      🗑️ {c._id}
+                      🗑️
                     </span>
                   )}
                 </Comment.Author>
