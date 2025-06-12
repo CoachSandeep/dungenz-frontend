@@ -6,6 +6,7 @@ const NavbarAvatar = ({ user, onLogout }) => {
   const [open, setOpen] = useState(false);
   const dropdownRef = useRef();
   const navigate = useNavigate();
+  const baseURL = process.env.REACT_APP_API_BASE_URL.replace(/\/api$/, '');
 
   const toggleDropdown = () => setOpen(!open);
 
@@ -21,7 +22,7 @@ const NavbarAvatar = ({ user, onLogout }) => {
   }, []);
 
   const initials = (user?.name || 'U').slice(0, 2).toUpperCase();
-  const profileImage = user?.avatar;
+  const profileImage = user?.profileImage;
 
   const handleLogout = () => {
     localStorage.removeItem('token');
@@ -34,7 +35,7 @@ const NavbarAvatar = ({ user, onLogout }) => {
     <div className="navbar-avatar" ref={dropdownRef}>
       <div className="avatar-trigger" onClick={toggleDropdown}>
         {profileImage ? (
-          <img src={profileImage} alt="avatar" className="avatar-img" />
+         <img src={`${process.env.REACT_APP_API_BASE_URL.replace('/api', '')}${profileImage}`} alt="avatar" className="avatar-img" />
         ) : (
           <div className="avatar-circle">{initials}</div>
         )}
