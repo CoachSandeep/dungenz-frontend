@@ -5,7 +5,7 @@ const ProfilePage = () => {
   const [profile, setProfile] = useState({ name: '', email: '', photo: '', bio: '' });
   const [file, setFile] = useState(null);
   const [status, setStatus] = useState('');
-
+  const baseURL = process.env.REACT_APP_API_BASE_URL.replace(/\/api$/, '');
   const token = localStorage.getItem('token');
 
   useEffect(() => {
@@ -88,7 +88,7 @@ const ProfilePage = () => {
       <div className="photo-preview">
         <h4>🖼️ Profile Picture Preview:</h4>
         <img
-          src={`${process.env.REACT_APP_API_BASE_URL}${profile.profileImage}`}
+          src={`${baseURL}${user.profileImage}`}
           alt="profile"
           className="zen-avatar"
         />
