@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import DatePicker from 'react-datepicker';
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 import 'react-datepicker/dist/react-datepicker.css';
@@ -8,7 +8,6 @@ const iconOptions = [
   { label: '🔥 Warm-up', value: 'warmup' },
   { label: '💪 Main Workout', value: 'main' },
   { label: '🧊 Cool Down', value: 'cooldown' },
-
 ];
 
 const ClusterCreateForm = ({ defaultDate, onSaved }) => {
@@ -17,8 +16,27 @@ const ClusterCreateForm = ({ defaultDate, onSaved }) => {
   const [workouts, setWorkouts] = useState([
     { title: '', description: '', capTime: '', instructions: '', customName: '', icon: '' }
   ]);
+  const [targetUserId, setTargetUserId] = useState('');
+  const [userList, setUserList] = useState([]);
 
   const token = localStorage.getItem('token');
+
+  useEffect(() => {
+    const fetchUsers = async () => {
+      try {
+        const res = await fetch(`${process.env.REACT_APP_API_BASE_URL}/users`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        if (res.ok) {
+          const data = await res.json();
+          setUserList(data);
+        }
+      } catch (err) {
+        console.error("❌ Failed to fetch user list", err);
+      }
+    };
+    fetchUsers();
+  }, [token]);
 
   const handleAddWorkout = () => {
     setWorkouts([...workouts, { title: '', description: '', capTime: '', instructions: '', customName: '', icon: '' }]);
@@ -37,7 +55,7 @@ const ClusterCreateForm = ({ defaultDate, onSaved }) => {
 
   const handleSave = async () => {
     const formattedDate = selectedDate.toISOString();
-    const payloads = workouts.map(w => ({ ...w, version, date: formattedDate }));
+    const payloads = workouts.map(w => ({ ...w, version, date: formattedDate, targetUser: targetUserId || null }));
 
     try {
       const responses = await Promise.all(
@@ -76,6 +94,14 @@ const ClusterCreateForm = ({ defaultDate, onSaved }) => {
   return (
     <div className="cluster-create-box">
       <h2 className="form-title">📋 Create Workout Cluster</h2>
+
+      <label>Assign to Specific User (optional)</label>
+      <select value={targetUserId} onChange={(e) => setTargetUserId(e.target.value)}>
+        <option value="">-- Daily Program (default) --</option>
+        {userList.map(u => (
+          <option key={u._id} value={u._id}>{u.name} ({u.email})</option>
+        ))}
+      </select>
 
       <div className="form-row">
         <label>Date:</label>
