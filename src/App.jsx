@@ -16,6 +16,7 @@ import UserProfile from './pages/UserProfile';
 import { messaging, getToken, onMessage } from './firebase';
 import PrivateRoute from './utils/PrivateRoute';
 import TokenWatcher from './components/TokenWatcher';
+import PublicOnlyRoute from './utils/PublicOnlyRoute';
 
 const App = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -116,8 +117,23 @@ const App = () => {
     </PrivateRoute>
   }
 />
-        <Route path="/login" element={<Login />} />
-        <Route path="/caccount" element={<Caccount />} />
+<Route
+    path="/login"
+    element={
+      <PublicOnlyRoute>
+        <Login />
+      </PublicOnlyRoute>
+    }
+  />
+
+  <Route
+    path="/caccount"
+    element={
+      <PublicOnlyRoute>
+        <Caccount />
+      </PublicOnlyRoute>
+    }
+  />
         <Route path="/upload" element={<UploadWorkout />} />
         <Route path="/admin" element={<AdminCalendar />} />
         <Route path="/admin/cluster-copy" element={<ClusterCopyPage />} />
