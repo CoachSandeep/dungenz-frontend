@@ -24,7 +24,7 @@ const ClusterCreateForm = ({ defaultDate, onSaved }) => {
   useEffect(() => {
     const fetchUsers = async () => {
       try {
-        const res = await fetch(`${process.env.REACT_APP_API_BASE_URL}/users`, {
+        const res = await fetch(`${process.env.REACT_APP_API_BASE_URL}/users/me`, {
           headers: { Authorization: `Bearer ${token}` },
         });
         if (res.ok) {
