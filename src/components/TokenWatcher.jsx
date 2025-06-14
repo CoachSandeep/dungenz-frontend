@@ -1,14 +1,17 @@
 import { useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { isTokenValid } from '../utils/auth';
 import { jwtDecode } from 'jwt-decode';
 
 const TokenWatcher = ({ setIsLoggedIn }) => {
   const navigate = useNavigate();
+  const location = useLocation();
 
   useEffect(() => {
     const token = localStorage.getItem('token');
     const user = localStorage.getItem('user');
+
+    const isAuthPage = location.pathname === '/login' || location.pathname === '/caccount';
 
     if (token && isTokenValid(token)) {
       setIsLoggedIn(true);
@@ -32,9 +35,12 @@ const TokenWatcher = ({ setIsLoggedIn }) => {
       localStorage.removeItem('token');
       localStorage.removeItem('user');
       setIsLoggedIn(false);
-      navigate('/login');
+      // 👇 Prevent infinite redirect loop
+      if (!isAuthPage) {
+        navigate('/login');
+      }
     }
-  }, [navigate, setIsLoggedIn]);
+  }, [navigate, setIsLoggedIn, location]);
 
   return null;
 };
