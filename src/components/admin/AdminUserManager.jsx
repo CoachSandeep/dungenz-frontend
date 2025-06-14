@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { PiTrashSimpleBold } from "react-icons/pi";
 import { MdAdminPanelSettings } from "react-icons/md";
 import { FaUserAlt, FaUserCheck, FaUserTimes } from "react-icons/fa";
-import './../../styles/UserManagement.css';
+import './../../styles/AdminUsers.css';
 
 const AdminUsers = () => {
   const [users, setUsers] = useState([]);
