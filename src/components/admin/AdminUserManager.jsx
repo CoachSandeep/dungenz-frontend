@@ -1,4 +1,7 @@
 import React, { useEffect, useState } from 'react';
+import { PiTrashSimpleBold } from "react-icons/pi";
+import { MdAdminPanelSettings } from "react-icons/md";
+import { FaUserAlt, FaUserCheck, FaUserTimes } from "react-icons/fa";
 import './../../styles/UserManagement.css';
 
 const AdminUsers = () => {
@@ -73,24 +76,18 @@ const AdminUsers = () => {
   if (loading) return <div className="admin-section">Loading users...</div>;
 
   return (
-    <div className="admin-section">
-      <h2>User Management</h2>
-      <table className="user-table">
-        <thead>
-          <tr>
-            <th>Name</th>
-            <th>Email</th>
-            <th>Role</th>
-            <th>Status</th>
-            <th>Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          {users.map(user => (
-            <tr key={user._id}>
-              <td>{user.name}</td>
-              <td>{user.email}</td>
-              <td>
+    <div className="user-management-container">
+      <h2>👥 Manage Users</h2>
+      <div className="user-card-grid">
+        {users.map(user => (
+          <div key={user._id} className="user-card">
+            <div className="user-info">
+              <h3>{user.name}</h3>
+              <p>{user.email}</p>
+            </div>
+            <div className="user-controls">
+              <div className="user-role">
+                <label>Role</label>
                 <select
                   value={user.role}
                   onChange={(e) => updateRole(user._id, e.target.value)}
@@ -99,22 +96,24 @@ const AdminUsers = () => {
                   <option value="coach">Coach</option>
                   <option value="superadmin">Superadmin</option>
                 </select>
-              </td>
-              <td>
-                <span
-                  className={user.isActive ? 'badge-active' : 'badge-inactive'}
-                  onClick={() => toggleActive(user._id)}
-                >
-                  {user.isActive ? 'Active' : 'Inactive'}
-                </span>
-              </td>
-              <td>
-                <button className="delete-btn" onClick={() => deleteUser(user._id)}>🗑️ Delete</button>
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+              </div>
+              <div
+                className={`user-status ${user.isActive ? 'active' : 'inactive'}`}
+                onClick={() => toggleActive(user._id)}
+              >
+                {user.isActive ? <FaUserCheck /> : <FaUserTimes />}
+                {user.isActive ? ' Active' : ' Inactive'}
+              </div>
+              <button
+                className="delete-user-btn"
+                onClick={() => deleteUser(user._id)}
+              >
+                <PiTrashSimpleBold size={18} />
+              </button>
+            </div>
+          </div>
+        ))}
+      </div>
     </div>
   );
 };
