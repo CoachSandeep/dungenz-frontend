@@ -249,6 +249,7 @@ const Workouts = () => {
             ))}
           </select>
         </div>
+        </div>
 
       <div ref={scrollWrapperRef} style={{ overflowY: 'auto', flex: 1 }}>
 
