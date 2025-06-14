@@ -1,0 +1,56 @@
+.user-management-container {
+    padding: 20px;
+    max-width: 1000px;
+    margin: 0 auto;
+    background-color: #1a1a1a;
+    border-radius: 10px;
+    box-shadow: 0 0 8px rgba(255, 44, 44, 0.3);
+  }
+  
+  .user-management-container h2 {
+    color: #ff2c2c;
+    margin-bottom: 20px;
+    font-size: 28px;
+  }
+  
+  .user-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 14px;
+    margin-bottom: 12px;
+    background-color: #2a2a2a;
+    border-radius: 6px;
+  }
+  
+  .user-row span {
+    flex: 1;
+    color: #fff;
+    font-size: 16px;
+  }
+  
+  .user-row select,
+  .user-row button {
+    margin-left: 10px;
+    padding: 6px 10px;
+    font-size: 14px;
+    border: none;
+    border-radius: 4px;
+  }
+  
+  .user-row select {
+    background-color: #1f1f1f;
+    color: #fff;
+    border: 1px solid #555;
+  }
+  
+  .user-row button {
+    cursor: pointer;
+    background-color: #ff2c2c;
+    color: white;
+  }
+  
+  .user-row button:hover {
+    background-color: #e62828;
+  }
+  

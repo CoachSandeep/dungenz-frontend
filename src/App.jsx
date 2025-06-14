@@ -12,6 +12,7 @@ import LibraryPage from './pages/LibraryPage';
 import Settings from './components/admin/settings';
 import ClusterCopyPage from './pages/ClusterCopyPage';
 import AdminPushPage from './components/admin/AdminPushPage';
+import AdminUserManager from './components/admin/AdminUserManager';
 import UserProfile from './pages/UserProfile';
 import { messaging, getToken, onMessage } from './firebase';
 import PrivateRoute from './utils/PrivateRoute';
@@ -141,6 +142,7 @@ const App = () => {
         <Route path="/settings" element={<Settings />} />
         <Route path="/admin/push" element={<AdminPushPage />} />
         <Route path="/profile" element={<UserProfile />} />
+        <Route path="/admin/users" element={<AdminUserManager />} />
         <Route path="*" element={<Workouts />} />
       </Routes>
     </Router>

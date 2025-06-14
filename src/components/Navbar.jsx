@@ -73,8 +73,9 @@ const Navbar = () => {
               <button onClick={() => navigate('/admin')}>🛠 Manage Workouts</button>
               <button onClick={() => navigate('/admin/cluster-copy')}>🔁 Cluster Copy</button>
               <button onClick={() => navigate('/library')}>📚 Library</button>
-              <button onClick={() => navigate('/settings')}>Setting</button>
-              <Link to="/admin/push">🔔 Push Panel</Link>
+              <button onClick={() => navigate('/settings')}>⚙️ Settings</button>
+              <button onClick={() => navigate('/admin/push')}>🔔 Push Panel</button>
+              <button onClick={() => navigate('/admin/users')}>👥 Manage Users</button>
             </div>
           )}
         </div>
