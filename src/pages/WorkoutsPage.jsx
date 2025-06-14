@@ -18,6 +18,8 @@ const Workouts = () => {
   const scrollWrapperRef = useRef(null);
   const user = JSON.parse(localStorage.getItem('user'));
   const [isAtTop, setIsAtTop] = useState(true);
+  const [selectedUserId, setSelectedUserId] = useState('');
+  const [users, setUsers] = useState([]);
 
   const today = new Date();
   const todayKey = today.toLocaleDateString('en-CA', { timeZone: 'Asia/Kolkata' });
@@ -50,6 +52,19 @@ const Workouts = () => {
     }
   };
 
+  const fetchUsers = async () => {
+    const token = localStorage.getItem('token');
+    try {
+      const res = await fetch(`${process.env.REACT_APP_API_BASE_URL}/users`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      const data = await res.json();
+      if (Array.isArray(data)) setUsers(data);
+    } catch (err) {
+      console.error('Error fetching users:', err);
+    }
+  };
+
   const handleRefresh = async () => {
     const prevSelectedDate = selectedDate || todayKey;
     setIsLoading(true);
@@ -71,7 +86,8 @@ const Workouts = () => {
   const fetchWorkoutsInRange = async (from, to) => {
     const token = localStorage.getItem('token');
     try {
-      const res = await fetch(`${process.env.REACT_APP_API_BASE_URL}/workouts/range?from=${from}&to=${to}`, {
+      const userParam = selectedUserId ? `&user=${selectedUserId}` : '';
+      const res = await fetch(`${process.env.REACT_APP_API_BASE_URL}/workouts/range?from=${from}&to=${to}${userParam}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       const data = await res.json();
@@ -110,6 +126,7 @@ const Workouts = () => {
     setDates(["__load_more__", ...baseDates]);
 
     const fetchInitial = async () => {
+      await fetchUsers();
       const fromDate = new Date();
       fromDate.setDate(fromDate.getDate() - 5);
       const toDate = new Date();
@@ -143,7 +160,7 @@ const Workouts = () => {
       wrapper.addEventListener('scroll', handleScroll);
       return () => wrapper.removeEventListener('scroll', handleScroll);
     }, 400);
-  }, []);
+  }, [selectedUserId]);
 
   const toggleExpandAll = (version) => {
     setExpandedVersions(prev => ({ ...prev, [version]: !prev[version] }));
@@ -217,6 +234,21 @@ const Workouts = () => {
           );
         })}
       </div>
+
+      <div ref={scrollWrapperRef} style={{ overflowY: 'auto', flex: 1 }}>
+        <div className="section-card-indvidual">
+          <label style={{ fontWeight: 'bold', color: 'white' }}>Target User:</label>
+          <select
+            value={selectedUserId}
+            onChange={(e) => setSelectedUserId(e.target.value)}
+            style={{ padding: '5px 10px', marginTop: '5px' }}
+          >
+            <option value="">All (Daily Programming)</option>
+            {users.map((u) => (
+              <option key={u._id} value={u._id}>{u.name}</option>
+            ))}
+          </select>
+        </div>
 
       <div ref={scrollWrapperRef} style={{ overflowY: 'auto', flex: 1 }}>
 
