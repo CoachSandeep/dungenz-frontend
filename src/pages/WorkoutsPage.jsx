@@ -199,44 +199,48 @@ const Workouts = () => {
 
   return (
     <div className="horizontal-container" style={{ flex: 1, height: '100vh', display: 'flex', flexDirection: 'column' }}>
-      <div className="timeline-horizontal" ref={scrollContainerRef}>
-        {dates.map((dateKey) => {
-          if (dateKey === "__load_more__") {
-            return (
-              <div key="__load_more__" className="timeline-date-wrapper">
-                <div className="timeline-date-circle load-more-circle" onClick={handleLoadMore}>
-                  <div className="circle-date">⇤</div>
-                  <div className="circle-day">More</div>
-                </div>
-              </div>
-            );
-          }
-
-          const dateObj = new Date(dateKey);
-          const isActive = selectedDate === dateKey;
-          const isFutureBeyondTomorrow = dateObj > new Date(tomorrowKey);
-
+    <div className="timeline-horizontal" ref={scrollContainerRef}>
+      {dates.map((dateKey) => {
+        if (dateKey === "__load_more__") {
           return (
-            <div key={dateKey} className="timeline-date-wrapper">
-              <div
-                className={`timeline-date-circle ${isActive ? 'active' : ''} ${isFutureBeyondTomorrow ? 'disabled' : ''}`}
-                onClick={() => handleDateSelect(dateKey)}
-                ref={(el) => (scrollRef.current[dateKey] = el)}
-              >
-                <div className="circle-date">
-                  {groupedWorkouts[dateKey]?.displayDate?.split('/')[0] || dateKey.split('-')[2]}
-                </div>
-                <div className="circle-day">
-                  {groupedWorkouts[dateKey]?.day || dateObj.toLocaleDateString("en-US", { weekday: 'short' })}
-                </div>
+            <div key="__load_more__" className="timeline-date-wrapper">
+              <div className="timeline-date-circle load-more-circle" onClick={handleLoadMore}>
+                <div className="circle-date">⇤</div>
+                <div className="circle-day">More</div>
               </div>
             </div>
           );
-        })}
-      </div>
+        }
+
+        const dateObj = new Date(dateKey);
+        const isActive = selectedDate === dateKey;
+        const isFutureBeyondTomorrow = dateObj > new Date(tomorrowKey);
+
+        return (
+          <div key={dateKey} className="timeline-date-wrapper">
+            <div
+              className={`timeline-date-circle ${isActive ? 'active' : ''} ${isFutureBeyondTomorrow ? 'disabled' : ''}`}
+              onClick={() => handleDateSelect(dateKey)}
+              ref={(el) => (scrollRef.current[dateKey] = el)}
+            >
+              <div className="circle-date">
+                {groupedWorkouts[dateKey]?.displayDate?.split('/')[0] || dateKey.split('-')[2]}
+              </div>
+              <div className="circle-day">
+                {groupedWorkouts[dateKey]?.day || dateObj.toLocaleDateString("en-US", { weekday: 'short' })}
+              </div>
+            </div>
+          </div>
+        );
+      })}
+    </div>
+
+      
+   
+       
 
       <div ref={scrollWrapperRef} style={{ overflowY: 'auto', flex: 1 }}>
-        <div className="section-card-indvidual">
+      <div className="section-card-indvidual">
           <label style={{ fontWeight: 'bold', color: 'white' }}>Target User:</label>
           <select
             value={selectedUserId}
@@ -249,9 +253,7 @@ const Workouts = () => {
             ))}
           </select>
         </div>
-        </div>
 
-      <div ref={scrollWrapperRef} style={{ overflowY: 'auto', flex: 1 }}>
 
            <div style={{ minHeight: '100%' }}>
             {selectedDate && (
