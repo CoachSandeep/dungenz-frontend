@@ -211,6 +211,17 @@ const AdminTimeline = () => {
             />
           )}
 
+{showCopyModal && (
+        <CopyClusterModal
+          selectedWorkoutIds={selectedWorkouts}
+          onClose={() => {
+            setShowCopyModal(false);
+            setSelectedWorkouts([]);
+            fetchMonthWorkouts(selectedMonth);
+          }}
+        />
+      )}
+
           {versionOrder.map((version) => {
             if (filterVersion && version !== filterVersion) return null;
             const workouts = filteredGrouped[selectedDate].versions[version];
@@ -248,16 +259,7 @@ const AdminTimeline = () => {
         </div>
       )}
 
-      {showCopyModal && (
-        <CopyClusterModal
-          selectedWorkoutIds={selectedWorkouts}
-          onClose={() => {
-            setShowCopyModal(false);
-            setSelectedWorkouts([]);
-            fetchMonthWorkouts(selectedMonth);
-          }}
-        />
-      )}
+   
     </div>
   );
 };
