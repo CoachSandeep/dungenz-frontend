@@ -4,7 +4,6 @@ import {
 } from 'react-icons/fa';
 import ClusterCreateForm from './ClusterCreateForm';
 import ClusterEditForm from './ClusterEditForm';
-import CopyClusterModal from './CopyClusterModal';
 import './../../styles/adminCalendar.css';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
@@ -20,8 +19,6 @@ const AdminTimeline = () => {
   const [editingWorkoutId, setEditingWorkoutId] = useState(null);
   const [showAdd, setShowAdd] = useState(false);
   const [selectedMonth, setSelectedMonth] = useState(new Date());
-  const [selectedWorkouts, setSelectedWorkouts] = useState([]);
-  const [showCopyModal, setShowCopyModal] = useState(false);
 
   const token = localStorage.getItem('token');
   const scrollRefs = useRef({});
@@ -73,6 +70,7 @@ const AdminTimeline = () => {
       grouped[key].versions[w.version].push(w);
     });
 
+    // Sort by order field inside each version
     Object.values(grouped).forEach(day => {
       versionOrder.forEach(v => {
         if (day.versions[v]) {
@@ -86,38 +84,6 @@ const AdminTimeline = () => {
     const todayKey = new Date().toISOString().split('T')[0];
     setSelectedDate(grouped[todayKey] ? todayKey : Object.keys(grouped)[0]);
   };
-
-  const handleClusterCopy = async ({ date, version, user }) => {
-    try {
-      const res = await fetch(`${process.env.REACT_APP_API_BASE_URL}/admin/workouts/copy-day`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({
-          date: selectedDate,      // 👈 source date
-          fromVersion: version,    // 👈 version we're copying from
-          toVersion: version,      // 👈 version we're copying to (same unless changed in modal)
-          targetDate: date,        // 👈 new target date
-          user: user || "all"                       // 👈 either "all" or specific userId
-        })
-      });
-  
-      if (res.ok) {
-        alert('✅ Workouts copied successfully!');
-        fetchMonthWorkouts(selectedMonth);
-      } else {
-        const err = await res.json();
-        alert(`❌ Copy failed: ${err.message}`);
-      }
-    } catch (err) {
-      console.error('❌ Error copying workouts:', err);
-      alert('❌ Something went wrong while copying workouts');
-    }
-  };
-  
-  
 
   const getFilteredGrouped = () => {
     if (!onlyStarred) return groupedWorkouts;
@@ -143,30 +109,41 @@ const AdminTimeline = () => {
     return filtered;
   };
 
-  const toggleWorkoutSelection = (workout, date, version) => {
-    const key = `${date}-${version}`;
-    const versionWorkouts = groupedWorkouts[date]?.versions[version] || [];
-    const allSelected = versionWorkouts.every(w => selectedWorkouts.includes(w._id));
-    const newSelection = [...selectedWorkouts];
-
-    versionWorkouts.forEach(w => {
-      const idx = newSelection.indexOf(w._id);
-      if (!allSelected && idx === -1) {
-        newSelection.push(w._id);
-      } else if (allSelected && idx !== -1) {
-        newSelection.splice(idx, 1);
-      }
-    });
-
-    setSelectedWorkouts(newSelection);
-  };
-
   const filteredGrouped = getFilteredGrouped();
   const filteredDates = Object.keys(filteredGrouped).sort((a, b) => new Date(a) - new Date(b));
 
-  const isChecked = (date, version) => {
-    const versionWorkouts = groupedWorkouts[date]?.versions[version] || [];
-    return versionWorkouts.every(w => selectedWorkouts.includes(w._id));
+  const toggleStar = async (id) => {
+    await fetch(`${process.env.REACT_APP_API_BASE_URL}/admin/workouts/${id}/star`, {
+      method: 'PATCH',
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    fetchMonthWorkouts(selectedMonth);
+  };
+
+  const toggleLibrary = async (id) => {
+    await fetch(`${process.env.REACT_APP_API_BASE_URL}/admin/workouts/${id}/library`, {
+      method: 'PATCH',
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    fetchMonthWorkouts(selectedMonth);
+  };
+
+  const handleDelete = async (id) => {
+    if (window.confirm('Delete workout?')) {
+      await fetch(`${process.env.REACT_APP_API_BASE_URL}/admin/workouts/${id}/delete`, {
+        method: 'DELETE',
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      fetchMonthWorkouts(selectedMonth);
+    }
+  };
+
+  const handleCopy = async (id) => {
+    await fetch(`${process.env.REACT_APP_API_BASE_URL}/admin/workouts/${id}/copy`, {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    fetchMonthWorkouts(selectedMonth);
   };
 
   return (
@@ -203,12 +180,6 @@ const AdminTimeline = () => {
         </label>
       </div>
 
-      {selectedWorkouts.length > 0 && (
-        <div className="copy-selected-btn">
-          <button onClick={() => setShowCopyModal(true)}>📋 Copy Selected ({selectedWorkouts.length})</button>
-        </div>
-      )}
-
       <div className="timeline-horizontal" style={{ display: 'flex', overflowX: 'auto', scrollSnapType: 'x mandatory' }}>
         {filteredDates.map((dateKey) => (
           <div
@@ -243,19 +214,6 @@ const AdminTimeline = () => {
             />
           )}
 
-{showCopyModal && (
-        <CopyClusterModal
-          selectedWorkoutIds={selectedWorkouts}
-          onCopy={(payload) => handleClusterCopy(payload)} // ✅ yeh function define karna hoga
-          onClose={() => {
-            setShowCopyModal(false);
-            setSelectedWorkouts([]);
-            fetchMonthWorkouts(selectedMonth);
-            
-          }}
-        />
-      )}
-
           {versionOrder.map((version) => {
             if (filterVersion && version !== filterVersion) return null;
             const workouts = filteredGrouped[selectedDate].versions[version];
@@ -264,27 +222,37 @@ const AdminTimeline = () => {
             return (
               <div key={version} className="version-group">
                 <div className="badge-title-line">
-                  <label>
-                    <input
-                      type="checkbox"
-                      checked={isChecked(selectedDate, version)}
-                      onChange={() => toggleWorkoutSelection(null, selectedDate, version)}
-                    />
-                    <span className={`badge badge-${version.replace(/\s+/g, '').toLowerCase()}`}>{version}</span>
-                  </label>
+                  <span className={`badge badge-${version.replace(/\s+/g, '').toLowerCase()}`}>
+                    {version}
+                  </span>
                 </div>
 
                 {workouts.map((w) => (
                   <div key={w._id} className="admin-workout-item">
-                    <div className="workout-title-row">
-                      <h4>{w.title}</h4>
-                      <div className="icon-actions">
-                        <FaEdit onClick={() => setEditingWorkoutId(w._id)} />
-                        <FaTrash onClick={() => handleDelete(w._id)} />
-                        <FaStar onClick={() => toggleStar(w._id)} />
-                        <FaBookOpen onClick={() => toggleLibrary(w._id)} />
+                    {editingWorkoutId === w._id ? (
+                      <ClusterEditForm
+                        version={version}
+                        workouts={filteredGrouped[selectedDate].versions[version]}
+                        onSave={() => {
+                          setEditingWorkoutId(null);
+                          fetchMonthWorkouts(selectedMonth);
+                        }}
+                        onCancel={() => setEditingWorkoutId(null)}
+                      />
+                    ) : (
+                      <div className="workout-title-row">
+                        <h4>{w.title}</h4>
+                        <div className="icon-actions">
+                          <FaEdit onClick={() => setEditingWorkoutId(w._id)} />
+                          <FaTrash onClick={() => handleDelete(w._id)} />
+                          <FaCopy onClick={() => handleCopy(w._id)} />
+                          {w.isStarred
+                            ? <FaStar onClick={() => toggleStar(w._id)} />
+                            : <FaRegStar onClick={() => toggleStar(w._id)} />}
+                          <FaBookOpen onClick={() => toggleLibrary(w._id)} />
+                        </div>
                       </div>
-                    </div>
+                    )}
                   </div>
                 ))}
               </div>
@@ -292,8 +260,6 @@ const AdminTimeline = () => {
           })}
         </div>
       )}
-
-   
     </div>
   );
 };
