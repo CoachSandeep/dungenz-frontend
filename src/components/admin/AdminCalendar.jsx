@@ -87,6 +87,38 @@ const AdminTimeline = () => {
     setSelectedDate(grouped[todayKey] ? todayKey : Object.keys(grouped)[0]);
   };
 
+  const handleClusterCopy = async ({ date, version, user }) => {
+    try {
+      const res = await fetch(`${process.env.REACT_APP_API_BASE_URL}/admin/workouts/copy-day`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          date: selectedDate,      // 👈 source date
+          fromVersion: version,    // 👈 version we're copying from
+          toVersion: version,      // 👈 version we're copying to (same unless changed in modal)
+          targetDate: date,        // 👈 new target date
+          user                     // 👈 either "all" or specific userId
+        })
+      });
+  
+      if (res.ok) {
+        alert('✅ Workouts copied successfully!');
+        fetchMonthWorkouts(selectedMonth);
+      } else {
+        const err = await res.json();
+        alert(`❌ Copy failed: ${err.message}`);
+      }
+    } catch (err) {
+      console.error('❌ Error copying workouts:', err);
+      alert('❌ Something went wrong while copying workouts');
+    }
+  };
+  
+  
+
   const getFilteredGrouped = () => {
     if (!onlyStarred) return groupedWorkouts;
     const filtered = {};
@@ -214,10 +246,12 @@ const AdminTimeline = () => {
 {showCopyModal && (
         <CopyClusterModal
           selectedWorkoutIds={selectedWorkouts}
+          onCopy={(payload) => handleClusterCopy(payload)} // ✅ yeh function define karna hoga
           onClose={() => {
             setShowCopyModal(false);
             setSelectedWorkouts([]);
             fetchMonthWorkouts(selectedMonth);
+            
           }}
         />
       )}
