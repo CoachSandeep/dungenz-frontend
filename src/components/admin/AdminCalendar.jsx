@@ -100,7 +100,7 @@ const AdminTimeline = () => {
           fromVersion: version,    // 👈 version we're copying from
           toVersion: version,      // 👈 version we're copying to (same unless changed in modal)
           targetDate: date,        // 👈 new target date
-          user                     // 👈 either "all" or specific userId
+          user: user || "all"                       // 👈 either "all" or specific userId
         })
       });
   
