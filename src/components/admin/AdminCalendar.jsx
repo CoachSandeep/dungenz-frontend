@@ -4,6 +4,7 @@ import {
 } from 'react-icons/fa';
 import ClusterCreateForm from './ClusterCreateForm';
 import ClusterEditForm from './ClusterEditForm';
+import CopyClusterModal from './CopyClusterModal';
 import './../../styles/adminCalendar.css';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
@@ -19,6 +20,8 @@ const AdminTimeline = () => {
   const [editingWorkoutId, setEditingWorkoutId] = useState(null);
   const [showAdd, setShowAdd] = useState(false);
   const [selectedMonth, setSelectedMonth] = useState(new Date());
+  const [copyModalOpen, setCopyModalOpen] = useState(false);
+  const [copyDate, setCopyDate] = useState(null);
 
   const token = localStorage.getItem('token');
   const scrollRefs = useRef({});
@@ -70,7 +73,6 @@ const AdminTimeline = () => {
       grouped[key].versions[w.version].push(w);
     });
 
-    // Sort by order field inside each version
     Object.values(grouped).forEach(day => {
       versionOrder.forEach(v => {
         if (day.versions[v]) {
@@ -80,7 +82,6 @@ const AdminTimeline = () => {
     });
 
     setGroupedWorkouts(grouped);
-
     const todayKey = new Date().toISOString().split('T')[0];
     setSelectedDate(grouped[todayKey] ? todayKey : Object.keys(grouped)[0]);
   };
@@ -138,12 +139,9 @@ const AdminTimeline = () => {
     }
   };
 
-  const handleCopy = async (id) => {
-    await fetch(`${process.env.REACT_APP_API_BASE_URL}/admin/workouts/${id}/copy`, {
-      method: 'POST',
-      headers: { Authorization: `Bearer ${token}` },
-    });
-    fetchMonthWorkouts(selectedMonth);
+  const handleOpenCopyModal = (date) => {
+    setCopyDate(date);
+    setCopyModalOpen(true);
   };
 
   return (
@@ -169,6 +167,7 @@ const AdminTimeline = () => {
           ))}
         </select>
       </div>
+
       <div className="filter-starred">
         <label>
           <input
@@ -199,9 +198,17 @@ const AdminTimeline = () => {
         <div className="timeline-details-box">
           <div className="admin-date-heading">
             <h3>Workouts for {filteredGrouped[selectedDate].displayDate}</h3>
-            <button className="add-btn" onClick={() => setShowAdd(!showAdd)}>
-              <FaPlus /> Add
-            </button>
+            <div>
+              <button className="copy-btn" onClick={() => handleOpenCopyModal(selectedDate)}>📋 Copy All</button>
+              <button className="add-btn" onClick={() => setShowAdd(!showAdd)}>
+                <FaPlus /> Add
+              </button>
+
+                {/* 👉 Add this button to open Copy Modal */}
+    <button className="copy-btn" onClick={() => setShowCopyModal(true)}>
+      <FaCopy /> Copy All
+    </button>
+            </div>
           </div>
 
           {showAdd && (
@@ -245,7 +252,7 @@ const AdminTimeline = () => {
                         <div className="icon-actions">
                           <FaEdit onClick={() => setEditingWorkoutId(w._id)} />
                           <FaTrash onClick={() => handleDelete(w._id)} />
-                          <FaCopy onClick={() => handleCopy(w._id)} />
+                          <FaCopy onClick={() => handleOpenCopyModal(selectedDate)} />
                           {w.isStarred
                             ? <FaStar onClick={() => toggleStar(w._id)} />
                             : <FaRegStar onClick={() => toggleStar(w._id)} />}
@@ -259,6 +266,17 @@ const AdminTimeline = () => {
             );
           })}
         </div>
+      )}
+
+      {copyModalOpen && (
+        <CopyClusterModal
+          date={copyDate}
+          onClose={() => setCopyModalOpen(false)}
+          onCopied={() => {
+            fetchMonthWorkouts(selectedMonth);
+            setCopyModalOpen(false);
+          }}
+        />
       )}
     </div>
   );
