@@ -350,14 +350,14 @@ const Workouts = () => {
             <div className="modal-inside-content">
               <div className="wod-desp" dangerouslySetInnerHTML={{ __html: modalWorkout.description.replace(/\n/g, '<br/>') }} />
               {modalWorkout.instructions && (
-  <div className="wod-elements">
+  <div className="wod-instructions">
     INSTRUCTIONS:
     <div dangerouslySetInnerHTML={{ __html: modalWorkout.instructions.replace(/\n/g, '<br/>') }} />
   </div>
 )}
 
 {modalWorkout.capTime && (
-  <div className="wod-elements">
+  <div className="wod-instructions">
     TIME CAP:
     <div>{modalWorkout.capTime}</div>
   </div>
