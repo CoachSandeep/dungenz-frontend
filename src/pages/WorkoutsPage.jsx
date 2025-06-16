@@ -359,7 +359,7 @@ const Workouts = () => {
 {modalWorkout.capTime && (
   <div className="wod-elements">
     TIME CAP:
-    <p>{modalWorkout.capTime}</p>
+    <div>{modalWorkout.capTime}</div>
   </div>
 )}
             </div>
