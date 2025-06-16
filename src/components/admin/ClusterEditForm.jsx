@@ -38,13 +38,12 @@ const ClusterEditForm = ({ version, workouts, onSave, onCancel }) => {
           })
         )
       );
-      alert('Workouts updated!');
+      alert('✅ Workouts updated!');
       onSave(); // callback
     } catch (err) {
       console.error(err);
-      alert('Failed to update workouts.');
+      alert('❌ Failed to update workouts.');
     }
-  
   };
 
   return (
@@ -64,17 +63,33 @@ const ClusterEditForm = ({ version, workouts, onSave, onCancel }) => {
                       {...provided.dragHandleProps}
                     >
                       <input
+                        value={w.customName || ''}
+                        placeholder="Custom Name"
+                        onChange={(e) => handleChange(index, 'customName', e.target.value)}
+                      />
+                      <input
                         value={w.title}
+                        placeholder="Title"
                         onChange={(e) => handleChange(index, 'title', e.target.value)}
                       />
                       <textarea
+                        rows={4}
                         value={w.description}
+                        placeholder="Description"
                         onChange={(e) => handleChange(index, 'description', e.target.value)}
+                        style={{ minHeight: '250px' }}
+                      />
+                      <textarea
+                        rows={3}
+                        value={w.instructions || ''}
+                        placeholder="Instructions"
+                        onChange={(e) => handleChange(index, 'instructions', e.target.value)}
+                        style={{ minHeight: '150px' }}
                       />
                       <input
                         value={w.capTime || ''}
                         onChange={(e) => handleChange(index, 'capTime', e.target.value)}
-                        placeholder="Cap Time"
+                        placeholder="Cap Time (in mins)"
                       />
                     </div>
                   )}
@@ -86,8 +101,8 @@ const ClusterEditForm = ({ version, workouts, onSave, onCancel }) => {
         </Droppable>
       </DragDropContext>
       <div style={{ marginTop: '10px' }}>
-        <button onClick={handleSave} className="save-btn">Save All</button>
-        <button onClick={onCancel} className="cancel-btn">Cancel</button>
+        <button onClick={handleSave} className="save-btn">💾 Save All</button>
+        <button onClick={onCancel} className="cancel-btn">❌ Cancel</button>
       </div>
     </div>
   );
