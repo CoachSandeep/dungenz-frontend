@@ -96,11 +96,11 @@ const AdminTimeline = () => {
           Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({
-          date: selectedDate,      // 👈 source date
-          fromVersion: version,    // 👈 version we're copying from
-          toVersion: version,      // 👈 version we're copying to (same unless changed in modal)
-          targetDate: date,        // 👈 new target date
-          user: user || "all"                       // 👈 either "all" or specific userId
+          fromDate: selectedDate,      // ✅ corrected
+          fromVersion: version,        // ✅ already correct
+          toDate: date,                // ✅ corrected
+          toVersion: version,          // ✅ already correct
+          user: user || "all"          // ✅ already correct
         })
       });
   
