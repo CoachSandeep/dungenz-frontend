@@ -349,11 +349,19 @@ const Workouts = () => {
             <h3>{modalWorkout.title}</h3>
             <div className="modal-inside-content">
               <div className="wod-desp" dangerouslySetInnerHTML={{ __html: modalWorkout.description.replace(/\n/g, '<br/>') }} />
-              <div className="wod-instructions">
-                {/* INSTRUCTIONS: */}
-                <div dangerouslySetInnerHTML={{ __html: modalWorkout.instructions.replace(/\n/g, '<br/>') }} />
-              </div>
-              <p>{modalWorkout.capTime}</p>
+              {modalWorkout.instructions && (
+  <div className="wod-elements">
+    INSTRUCTIONS:
+    <div dangerouslySetInnerHTML={{ __html: modalWorkout.instructions.replace(/\n/g, '<br/>') }} />
+  </div>
+)}
+
+{modalWorkout.capTime && (
+  <div className="wod-elements">
+    TIME CAP:
+    <p>{modalWorkout.capTime}</p>
+  </div>
+)}
             </div>
             <button onClick={() => setModalWorkout(null)}>Close</button>
           </div>
