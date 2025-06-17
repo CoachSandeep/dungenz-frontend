@@ -146,7 +146,7 @@ const Workouts = () => {
   };
 
   useEffect(() => {
-    const now = new Date(w.date).toLocaleDateString('en-CA', { timeZone: 'Asia/Kolkata' });
+    const now = new Date().toLocaleDateString('en-CA', { timeZone: 'Asia/Kolkata' });
     const baseDates = [];
     for (let i = -5; i <= 4; i++) {
       const d = new Date();
