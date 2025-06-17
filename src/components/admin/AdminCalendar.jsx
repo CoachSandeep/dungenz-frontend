@@ -9,6 +9,7 @@ import './../../styles/adminCalendar.css';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import { subMonths, addMonths, format } from 'date-fns';
+import { toast } from 'react-toastify';
 
 const versionOrder = ['Ultra Train', 'Super Train', 'Minimal Equipment', 'Beginner'];
 
@@ -22,6 +23,7 @@ const AdminTimeline = () => {
   const [selectedMonth, setSelectedMonth] = useState(new Date());
   const [selectedWorkouts, setSelectedWorkouts] = useState([]);
   const [showCopyModal, setShowCopyModal] = useState(false);
+  const [calorieValue, setCalorieValue] = useState('');
 
   const token = localStorage.getItem('token');
   const scrollRefs = useRef({});
@@ -51,10 +53,23 @@ const AdminTimeline = () => {
     const year = date.getFullYear();
     const month = date.getMonth() + 1;
 
-    const res = await fetch(`${process.env.REACT_APP_API_BASE_URL}/admin/workouts/month?year=${year}&month=${month}`, {
-      headers: { Authorization: `Bearer ${token}` },
+    const [workoutRes, metaRes] = await Promise.all([
+      fetch(`${process.env.REACT_APP_API_BASE_URL}/admin/workouts/month?year=${year}&month=${month}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      }),
+      fetch(`${process.env.REACT_APP_API_BASE_URL}/admin/workouts/daily-meta/month?year=${year}&month=${month}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      })
+    ]);
+
+    const data = await workoutRes.json();
+    const meta = await metaRes.json();
+
+    const calorieMap = {};
+    meta.forEach((entry) => {
+      const key = new Date(entry.date).toISOString().split('T')[0];
+      calorieMap[key] = entry.calories;
     });
-    const data = await res.json();
 
     const grouped = {};
     data.forEach((w) => {
@@ -63,7 +78,8 @@ const AdminTimeline = () => {
         grouped[key] = {
           displayDate: new Date(w.date).toLocaleDateString('en-GB'),
           day: new Date(w.date).toLocaleDateString('en-US', { weekday: 'short' }),
-          versions: {}
+          versions: {},
+          calories: calorieMap[key] || ''
         };
       }
 
@@ -87,6 +103,29 @@ const AdminTimeline = () => {
     setSelectedDate(grouped[todayKey] ? todayKey : Object.keys(grouped)[0]);
   };
 
+  const handleSaveCalories = async () => {
+    if (!selectedDate) return toast.error("Select a date first");
+    try {
+      const res = await fetch(`${process.env.REACT_APP_API_BASE_URL}/admin/workouts/daily-meta`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`
+        },
+        body: JSON.stringify({ date: selectedDate, calories: Number(calorieValue) })
+      });
+      const data = await res.json();
+      if (res.ok) {
+        toast.success("Calories saved ✅");
+        fetchMonthWorkouts(selectedMonth);
+      } else {
+        toast.error(data.message || "Failed to save calories");
+      }
+    } catch (err) {
+      toast.error("Something went wrong");
+    }
+  };
+
   const handleClusterCopy = async ({ date, version, user }) => {
     try {
       const res = await fetch(`${process.env.REACT_APP_API_BASE_URL}/admin/workouts/copy-day`, {
@@ -96,14 +135,13 @@ const AdminTimeline = () => {
           Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({
-          fromDate: selectedDate,      // ✅ corrected
-          fromVersion: version,        // ✅ already correct
-          toDate: date,                // ✅ corrected
-          toVersion: version,          // ✅ already correct
-          user: user || "all"          // ✅ already correct
+          fromDate: selectedDate,
+          fromVersion: version,
+          toDate: date,
+          toVersion: version,
+          user: user || "all"
         })
       });
-  
       if (res.ok) {
         alert('✅ Workouts copied successfully!');
         fetchMonthWorkouts(selectedMonth);
@@ -112,34 +150,23 @@ const AdminTimeline = () => {
         alert(`❌ Copy failed: ${err.message}`);
       }
     } catch (err) {
-      console.error('❌ Error copying workouts:', err);
       alert('❌ Something went wrong while copying workouts');
     }
   };
-  
-  
 
   const getFilteredGrouped = () => {
     if (!onlyStarred) return groupedWorkouts;
     const filtered = {};
-
     Object.keys(groupedWorkouts).forEach((date) => {
       const versions = {};
       versionOrder.forEach((v) => {
         const workouts = groupedWorkouts[date].versions[v]?.filter(w => w.isStarred);
-        if (workouts?.length) {
-          versions[v] = workouts;
-        }
+        if (workouts?.length) versions[v] = workouts;
       });
-
       if (Object.keys(versions).length) {
-        filtered[date] = {
-          ...groupedWorkouts[date],
-          versions
-        };
+        filtered[date] = { ...groupedWorkouts[date], versions };
       }
     });
-
     return filtered;
   };
 
@@ -148,16 +175,11 @@ const AdminTimeline = () => {
     const versionWorkouts = groupedWorkouts[date]?.versions[version] || [];
     const allSelected = versionWorkouts.every(w => selectedWorkouts.includes(w._id));
     const newSelection = [...selectedWorkouts];
-
     versionWorkouts.forEach(w => {
       const idx = newSelection.indexOf(w._id);
-      if (!allSelected && idx === -1) {
-        newSelection.push(w._id);
-      } else if (allSelected && idx !== -1) {
-        newSelection.splice(idx, 1);
-      }
+      if (!allSelected && idx === -1) newSelection.push(w._id);
+      else if (allSelected && idx !== -1) newSelection.splice(idx, 1);
     });
-
     setSelectedWorkouts(newSelection);
   };
 
@@ -168,7 +190,6 @@ const AdminTimeline = () => {
     const versionWorkouts = groupedWorkouts[date]?.versions[version] || [];
     return versionWorkouts.every(w => selectedWorkouts.includes(w._id));
   };
-
   return (
     <div className="admin-timeline-container">
       <div className="timeline-header">
@@ -201,6 +222,18 @@ const AdminTimeline = () => {
           />
           ⭐ Show only Starred
         </label>
+      </div>
+
+      <div style={{ margin: '10px 0', display: 'flex', gap: '10px', alignItems: 'center' }}>
+        <label style={{ color: 'white' }}>🔥 Set Calories for Date:</label>
+        <input
+          type="number"
+          value={calorieValue}
+          onChange={(e) => setCalorieValue(e.target.value)}
+          placeholder="e.g. 400"
+          style={{ padding: '5px', width: '100px' }}
+        />
+        <button className="save-btn" onClick={handleSaveCalories}>Save</button>
       </div>
 
       {selectedWorkouts.length > 0 && (
