@@ -193,6 +193,7 @@ const AdminTimeline = () => {
   };
   return (
     <div className="admin-timeline-container">
+      <ToastContainer position="top-right" autoClose={3000} />
       <div className="timeline-header">
         <h2>DUNGENZ Admin Timeline</h2>
       </div>
