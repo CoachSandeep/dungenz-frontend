@@ -30,28 +30,7 @@ const Workouts = () => {
   tomorrow.setDate(tomorrow.getDate() + 1);
   const tomorrowKey = tomorrow.toLocaleDateString('en-CA', { timeZone: 'Asia/Kolkata' });
 
-  const fetchMonthWorkouts = async (date) => {
-    const year = date.getFullYear();
-    const month = date.getMonth() + 1;
-  
-    const [workoutRes, metaRes] = await Promise.all([
-      fetch(`${process.env.REACT_APP_API_BASE_URL}/admin/workouts/month?year=${year}&month=${month}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      }),
-      fetch(`${process.env.REACT_APP_API_BASE_URL}/admin/workouts/daily-meta/month?year=${year}&month=${month}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      })
-    ]);
-  
-    const workoutData = await workoutRes.json();
-    const metaData = await metaRes.json();
-  
-    const metaMap = {};
-    metaData.forEach((entry) => {
-      const key = new Date(entry.date).toISOString().split('T')[0];
-      metaMap[key] = entry.calories;
-    });
-    setDailyMeta(metaMap);
+
   
 
 
