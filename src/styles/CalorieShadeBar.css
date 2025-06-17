@@ -7,7 +7,7 @@
   .shade-bar {
     width: 100%;
     height: 20px;
-    background: linear-gradient(to right, #ffff00, #ffae00, #ff0000);
+    background: linear-gradient(to right, #ffff00, #ff6600, #ff0000, #a50505);
     border-radius: 10px;
     position: relative;
   }
