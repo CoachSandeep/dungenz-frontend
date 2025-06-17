@@ -128,6 +128,27 @@ const AdminTimeline = () => {
     }
   };
 
+  const handleDeleteCalories = async () => {
+    if (!selectedDate) return toast.error("Select a date first");
+    try {
+      const res = await fetch(`${process.env.REACT_APP_API_BASE_URL}/admin/workouts/daily-meta?date=${selectedDate}`, {
+        method: 'DELETE',
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      });
+      if (res.ok) {
+        toast.success("Calories deleted ❌");
+        setCalorieValue('');
+        fetchMonthWorkouts(selectedMonth);
+      } else {
+        toast.error("Failed to delete calories");
+      }
+    } catch (err) {
+      toast.error("Something went wrong");
+    }
+  };
+
   const handleClusterCopy = async ({ date, version, user }) => {
     try {
       const res = await fetch(`${process.env.REACT_APP_API_BASE_URL}/admin/workouts/copy-day`, {
@@ -230,7 +251,7 @@ const AdminTimeline = () => {
       </div>
 
       <div style={{ margin: '10px 0', display: 'flex', gap: '10px', alignItems: 'center' }}>
-        <label style={{ color: 'white' }}>🔥 Set Calories for Date:</label>
+        <label style={{ color: 'white' }}>🔥 Set Cals</label>
         <input
           type="number"
           value={calorieValue}
@@ -239,6 +260,13 @@ const AdminTimeline = () => {
           style={{ padding: '5px', width: '100px' }}
         />
         <button className="save-btn" onClick={handleSaveCalories}>Save</button>
+        <button
+    className="delete-btn"
+    style={{ background: '#ff2c2c', color: 'white', padding: '5px 10px' }}
+    onClick={handleDeleteCalories}
+  >
+    Delete
+  </button>
       </div>
 
       {selectedWorkouts.length > 0 && (
