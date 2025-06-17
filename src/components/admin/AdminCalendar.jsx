@@ -34,6 +34,7 @@ const AdminTimeline = () => {
     fetchMonthWorkouts(selectedMonth);
   }, [selectedMonth]);
 
+
   useEffect(() => {
     if (selectedDate && scrollRefs.current[selectedDate]) {
       scrollRefs.current[selectedDate].scrollIntoView({
@@ -51,6 +52,12 @@ const AdminTimeline = () => {
     }
   }, [onlyStarred, groupedWorkouts]);
 
+
+  useEffect(() => {
+    if (selectedDate && groupedWorkouts[selectedDate]) {
+      setCalorieValue(groupedWorkouts[selectedDate].calories || '');
+    }
+  }, [selectedDate, groupedWorkouts]);
   const fetchMonthWorkouts = async (date) => {
     const year = date.getFullYear();
     const month = date.getMonth() + 1;
@@ -133,9 +140,8 @@ const AdminTimeline = () => {
     try {
       const res = await fetch(`${process.env.REACT_APP_API_BASE_URL}/admin/workouts/daily-meta?date=${selectedDate}`, {
         method: 'DELETE',
-        headers: {
-          Authorization: `Bearer ${token}`
-        }
+        headers: { Authorization: `Bearer ${token}` }
+        
       });
       if (res.ok) {
         toast.success("Calories deleted ❌");
