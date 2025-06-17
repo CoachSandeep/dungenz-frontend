@@ -271,7 +271,7 @@ const Workouts = () => {
 
       <div ref={scrollWrapperRef} style={{ overflowY: 'auto', flex: 1 }}>
      
-     
+      {user?.role === 'superadmin' && (
       <div className="section-card-indvidual">
           <label style={{ fontWeight: 'bold', color: 'white' }}>Target User:</label>
           <select
@@ -285,7 +285,7 @@ const Workouts = () => {
             ))}
           </select>
         </div>
-
+      )}
 
            <div style={{ minHeight: '100%' }}>
             {selectedDate && (
