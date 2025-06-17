@@ -3,6 +3,7 @@ import {
   FaEdit, FaTrash, FaCopy, FaStar, FaRegStar, FaBookOpen, FaPlus
 } from 'react-icons/fa';
 import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 import ClusterCreateForm from './ClusterCreateForm';
 import ClusterEditForm from './ClusterEditForm';
 import CopyClusterModal from './CopyClusterModal';

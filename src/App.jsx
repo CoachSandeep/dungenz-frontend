@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import 'react-toastify/dist/ReactToastify.css';
+import { ToastContainer, toast } from 'react-toastify'; // ✅ Add this
 import Navbar from './components/Navbar';
 import Hero from './components/Hero';
 import Workouts from './pages/WorkoutsPage';
@@ -21,7 +21,7 @@ import TokenWatcher from './components/TokenWatcher';
 import PublicOnlyRoute from './utils/PublicOnlyRoute';
 
 const App = () => {
-  <ToastContainer />
+
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [notificationStatus, setNotificationStatus] = useState('idle');
 
@@ -78,6 +78,7 @@ const App = () => {
     <Router>
       <Navbar />
       <TokenWatcher setIsLoggedIn={setIsLoggedIn} />
+      <ToastContainer />
       {isLoggedIn && notificationStatus !== 'enabled' && Notification.permission !== 'granted' && (
         <div style={{
           padding: '12px 20px',
