@@ -52,7 +52,7 @@ const Workouts = () => {
       metaMap[key] = entry.calories;
     });
     setDailyMeta(metaMap);
-
+  
 
 
   const getDisplayDate = (selectedDate) => {
@@ -303,9 +303,9 @@ const Workouts = () => {
                   </div>
                   <h3 style={{ color: "#ff2c2c", marginBottom: '10px' }}>Workout for {getDisplayDate(selectedDate)}</h3>
                 </div>
-                {dailyMeta[selectedDate] && (
+                {/* {dailyMeta[selectedDate] && (
   <CalorieShadeBar calorie={dailyMeta[selectedDate]} />
-)}
+)} */}
                 {isRestDay ? (
                   <div className="section-card-indvidual">
                     <div style={{ textAlign: 'center', fontStyle: 'italic', padding: '10px', color: '#ff2c2c' }}>
