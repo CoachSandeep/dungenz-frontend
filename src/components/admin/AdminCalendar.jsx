@@ -144,17 +144,19 @@ const AdminTimeline = () => {
           user: user || "all"
         })
       });
+  
       if (res.ok) {
-        alert('✅ Workouts copied successfully!');
+        toast.success('✅ Workouts copied successfully!');
         fetchMonthWorkouts(selectedMonth);
       } else {
         const err = await res.json();
-        alert(`❌ Copy failed: ${err.message}`);
+        toast.error(`❌ Copy failed: ${err.message}`);
       }
     } catch (err) {
-      alert('❌ Something went wrong while copying workouts');
+      toast.error('❌ Something went wrong while copying workouts');
     }
   };
+  
 
   const getFilteredGrouped = () => {
     if (!onlyStarred) return groupedWorkouts;

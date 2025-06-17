@@ -146,6 +146,7 @@ const Workouts = () => {
   };
 
   useEffect(() => {
+    const now = new Date(w.date).toLocaleDateString('en-CA', { timeZone: 'Asia/Kolkata' });
     const baseDates = [];
     for (let i = -5; i <= 4; i++) {
       const d = new Date();
@@ -171,7 +172,7 @@ const Workouts = () => {
         setIsLoading(false);
       }, 300);
     };
-
+    fetchMonthWorkouts(now);
     fetchInitial();
 
     setTimeout(() => {
@@ -269,6 +270,8 @@ const Workouts = () => {
        
 
       <div ref={scrollWrapperRef} style={{ overflowY: 'auto', flex: 1 }}>
+     
+     
       <div className="section-card-indvidual">
           <label style={{ fontWeight: 'bold', color: 'white' }}>Target User:</label>
           <select
