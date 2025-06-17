@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import 'react-toastify/dist/ReactToastify.css';
 import Navbar from './components/Navbar';
 import Hero from './components/Hero';
 import Workouts from './pages/WorkoutsPage';
@@ -20,6 +21,7 @@ import TokenWatcher from './components/TokenWatcher';
 import PublicOnlyRoute from './utils/PublicOnlyRoute';
 
 const App = () => {
+  <ToastContainer />
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [notificationStatus, setNotificationStatus] = useState('idle');
 

@@ -2,6 +2,7 @@ import React, { useEffect, useState, useRef } from 'react';
 import {
   FaEdit, FaTrash, FaCopy, FaStar, FaRegStar, FaBookOpen, FaPlus
 } from 'react-icons/fa';
+import { ToastContainer, toast } from 'react-toastify';
 import ClusterCreateForm from './ClusterCreateForm';
 import ClusterEditForm from './ClusterEditForm';
 import CopyClusterModal from './CopyClusterModal';
@@ -9,7 +10,7 @@ import './../../styles/adminCalendar.css';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import { subMonths, addMonths, format } from 'date-fns';
-import { toast } from 'react-toastify';
+
 
 const versionOrder = ['Ultra Train', 'Super Train', 'Minimal Equipment', 'Beginner'];
 
