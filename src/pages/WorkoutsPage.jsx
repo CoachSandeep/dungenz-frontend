@@ -31,7 +31,30 @@ const Workouts = () => {
   const tomorrowKey = tomorrow.toLocaleDateString('en-CA', { timeZone: 'Asia/Kolkata' });
 
 
-  
+  const fetchMonthWorkouts = async (date) => {
+    const token = localStorage.getItem('token');
+    const year = date.getFullYear();
+    const month = date.getMonth() + 1;
+
+    const [workoutRes, metaRes] = await Promise.all([
+      fetch(`${process.env.REACT_APP_API_BASE_URL}/admin/workouts/month?year=${year}&month=${month}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      }),
+      fetch(`${process.env.REACT_APP_API_BASE_URL}/admin/workouts/daily-meta/month?year=${year}&month=${month}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      })
+    ]);
+
+    const workoutData = await workoutRes.json();
+    const metaData = await metaRes.json();
+
+    const metaMap = {};
+    metaData.forEach((entry) => {
+      const key = new Date(entry.date).toISOString().split('T')[0];
+      metaMap[key] = entry.calories;
+    });
+    setDailyMeta(prev => ({ ...prev, ...metaMap }));
+  };
 
 
   const getDisplayDate = (selectedDate) => {
@@ -282,9 +305,9 @@ const Workouts = () => {
                   </div>
                   <h3 style={{ color: "#ff2c2c", marginBottom: '10px' }}>Workout for {getDisplayDate(selectedDate)}</h3>
                 </div>
-                {/* {dailyMeta[selectedDate] && (
-  <CalorieShadeBar calorie={dailyMeta[selectedDate]} />
-)} */}
+                {dailyMeta[selectedDate] && (
+                <CalorieShadeBar calorie={dailyMeta[selectedDate]} />
+              )}
                 {isRestDay ? (
                   <div className="section-card-indvidual">
                     <div style={{ textAlign: 'center', fontStyle: 'italic', padding: '10px', color: '#ff2c2c' }}>
