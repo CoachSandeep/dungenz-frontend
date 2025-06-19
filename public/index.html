@@ -9,12 +9,57 @@
   <meta name="theme-color" content="#000000" />
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Roboto+Flex:opsz,wght@8..144,100..1000&display=swap');
+    <style>
+  body {
+    margin: 0;
+    background: #000;
+  }
+
+  #splash-screen {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: #000;
+    color: #fff;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+    font-family: sans-serif;
+  }
+
+  .splash-logo {
+    width: 100px;
+    margin-bottom: 20px;
+  }
+</style>
+    
     </style>
 
 
   <title>DUNGENZ</title>
 </head>
-<body style="background-color: #fff; color: white;">
+<body style="background-color: #000; color: white;">
+  <div id="splash-screen">
+    <img src="/logo512.png" alt="DUNGENZ Logo" class="splash-logo" />
+    <h2>Loading DUNGENZ...</h2>
+  </div>
   <div id="root"></div>
+
+  <script>
+    window.addEventListener('DOMContentLoaded', () => {
+      const splash = document.getElementById('splash-screen');
+      const root = document.getElementById('root');
+      if (root) {
+        const observer = new MutationObserver(() => {
+          splash.style.display = 'none';
+        });
+        observer.observe(root, { childList: true });
+      }
+    });
+  </script>
 </body>
 </html>
