@@ -259,10 +259,10 @@ const AdminTimeline = () => {
       <div style={{ margin: '10px 0', display: 'flex', gap: '10px', alignItems: 'center' }}>
         <label style={{ color: 'white' }}>🔥 Set Cals</label>
         <input
-          type="number"
+          type="text"
           value={calorieValue}
           onChange={(e) => setCalorieValue(e.target.value)}
-          placeholder="e.g. 400"
+          placeholder="e.g. 400-500"
           style={{ padding: '5px', width: '100px' }}
         />
         <button className="save-btn" onClick={handleSaveCalories}>Save</button>
