@@ -1,4 +1,4 @@
-export const getCroppedImg = (imageSrc, croppedAreaPixels) => {
+ const getCroppedImg = (imageSrc, croppedAreaPixels) => {
     return new Promise((resolve, reject) => {
       const image = new Image();
       image.src = imageSrc;
@@ -38,3 +38,4 @@ export const getCroppedImg = (imageSrc, croppedAreaPixels) => {
     });
   };
   
+export default getCroppedImg;
