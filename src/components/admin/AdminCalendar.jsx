@@ -121,7 +121,7 @@ const AdminTimeline = () => {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${token}`
         },
-        body: JSON.stringify({ date: selectedDate, calories: Number(calorieValue) })
+        body: JSON.stringify({ date: selectedDate, calories: calorieValue })
       });
       const data = await res.json();
       if (res.ok) {
