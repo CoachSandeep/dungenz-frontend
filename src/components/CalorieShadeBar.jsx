@@ -2,33 +2,41 @@ import React from 'react';
 import './../styles/CalorieShadeBar.css';
 
 const CalorieShadeBar = ({ calorie }) => {
-  const minCal = 200;
-  const maxCal = 800;
+  const minCalBound = 200;
+  const maxCalBound = 800;
 
-  // ✅ Check if it's a range like "400-450"
-  let label = calorie;
-  let average = parseInt(calorie);
+  let min = null;
+  let max = null;
 
   if (typeof calorie === 'string' && calorie.includes('-')) {
-    const parts = calorie.split('-').map(p => parseInt(p.trim()));
-    if (parts.length === 2 && !isNaN(parts[0]) && !isNaN(parts[1])) {
-      average = (parts[0] + parts[1]) / 2;
-      label = `${parts[0]}-${parts[1]} cal`;
-    }
-  } else if (!isNaN(parseInt(calorie))) {
-    average = parseInt(calorie);
-    label = `${average} cal`;
+    const parts = calorie.split('-');
+    min = parseInt(parts[0], 10);
+    max = parseInt(parts[1], 10);
+  } else {
+    const val = parseInt(calorie, 10);
+    min = val;
+    max = val;
   }
 
-  const percentage = Math.min(100, Math.max(0, ((average - minCal) / (maxCal - minCal)) * 100));
+  const minPercent = Math.min(100, Math.max(0, ((min - minCalBound) / (maxCalBound - minCalBound)) * 100));
+  const maxPercent = Math.min(100, Math.max(0, ((max - minCalBound) / (maxCalBound - minCalBound)) * 100));
 
   return (
     <div className="shade-wrapper">
       <div className="shade-bar">
-        <div className="calorie-marker" style={{ left: `${percentage}%` }}>
+        {/* Min Marker */}
+        <div className="calorie-marker" style={{ left: `${minPercent}%` }}>
           <div className="marker-line"></div>
-          <div className="marker-label">{label}</div>
+          <div className="marker-label">{min} cal</div>
         </div>
+
+        {/* Show second marker only if range */}
+        {min !== max && (
+          <div className="calorie-marker" style={{ left: `${maxPercent}%` }}>
+            <div className="marker-line"></div>
+            <div className="marker-label">{max} cal</div>
+          </div>
+        )}
       </div>
     </div>
   );
