@@ -1,5 +1,3 @@
-// utils/cropImageHelper.js
-
 export const getCroppedImg = (imageSrc, croppedAreaPixels) => {
     return new Promise((resolve, reject) => {
       const image = new Image();
