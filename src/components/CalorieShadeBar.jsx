@@ -27,7 +27,7 @@ const CalorieShadeBar = ({ calorie }) => {
         {/* Min Marker */}
         <div className="calorie-marker" style={{ left: `${minPercent}%` }}>
           <div className="marker-line"></div>
-          <div className="marker-label">{min} cal</div>
+          <div className="marker-label">{min} </div>
         </div>
 
         {/* Show second marker only if range */}
