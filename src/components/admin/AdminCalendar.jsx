@@ -217,6 +217,32 @@ const AdminTimeline = () => {
   const filteredGrouped = getFilteredGrouped();
   const filteredDates = Object.keys(filteredGrouped).sort((a, b) => new Date(a) - new Date(b));
 
+  const toggleStar = async (id) => {
+    await fetch(`${process.env.REACT_APP_API_BASE_URL}/admin/workouts/${id}/star`, {
+      method: 'PATCH',
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    fetchWorkouts();
+  };
+
+  const toggleLibrary = async (id) => {
+    await fetch(`${process.env.REACT_APP_API_BASE_URL}/admin/workouts/${id}/library`, {
+      method: 'PATCH',
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    fetchWorkouts();
+  };
+
+  const handleDelete = async (id) => {
+    if (window.confirm('Delete workout?')) {
+      await fetch(`${process.env.REACT_APP_API_BASE_URL}/admin/workouts/${id}/delete`, {
+        method: 'DELETE',
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      fetchWorkouts();
+    }
+  };
+
   const isChecked = (date, version) => {
     const versionWorkouts = groupedWorkouts[date]?.versions[version] || [];
     return versionWorkouts.every(w => selectedWorkouts.includes(w._id));
