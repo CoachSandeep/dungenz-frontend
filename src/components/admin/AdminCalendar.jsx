@@ -233,15 +233,34 @@ const AdminTimeline = () => {
     fetchWorkouts();
   };
 
-  const handleDelete = async (id) => {
+  const handleDelete = async (id, date, version) => {
     if (window.confirm('Delete workout?')) {
-      await fetch(`${process.env.REACT_APP_API_BASE_URL}/admin/workouts/${id}/delete`, {
-        method: 'DELETE',
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      fetchWorkouts();
+      try {
+        const res = await fetch(`${process.env.REACT_APP_API_BASE_URL}/admin/workouts/${id}/delete`, {
+          method: 'DELETE',
+          headers: { Authorization: `Bearer ${token}` },
+        });
+  
+        if (res.ok) {
+          setGroupedWorkouts(prev => {
+            const updated = { ...prev };
+            if (!updated[date]) return prev;
+  
+            const versionList = updated[date].versions[version];
+            if (!versionList) return prev;
+  
+            updated[date].versions[version] = versionList.filter(w => w._id !== id);
+            return updated;
+          });
+        } else {
+          alert('❌ Failed to delete workout');
+        }
+      } catch (err) {
+        console.error('❌ Error deleting:', err);
+      }
     }
   };
+  
 
   const isChecked = (date, version) => {
     const versionWorkouts = groupedWorkouts[date]?.versions[version] || [];
