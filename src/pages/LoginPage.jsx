@@ -60,15 +60,37 @@ const Login = () => {
           onChange={(e) => setPassword(e.target.value)}
           required
         />
-       <button
-  type="submit"
-  className="login-button"
-  disabled={isLoggingIn}
->
-  {isLoggingIn ? 'Logging in...' : 'Login'}
-</button>
 
-        <p>New here? <button onClick={() => navigate('/caccount')}>Create Account</button></p>
+        <button
+          type="submit"
+          className="login-button"
+          disabled={isLoggingIn}
+        >
+          {isLoggingIn ? 'Logging in...' : 'Login'}
+        </button>
+
+        <div style={{ marginTop: '10px' }}>
+          <button
+            type="button"
+            onClick={() => navigate('/forgot-password')}
+            style={{
+              background: 'none',
+              border: 'none',
+              color: '#007bff',
+              textDecoration: 'underline',
+              cursor: 'pointer',
+              fontSize: '14px',
+              padding: 0,
+              marginBottom: '10px'
+            }}
+          >
+            Forgot Password?
+          </button>
+        </div>
+
+        <p>
+          New here? <button onClick={() => navigate('/caccount')}>Create Account</button>
+        </p>
       </form>
     </div>
   );

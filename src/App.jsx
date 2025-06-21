@@ -4,6 +4,8 @@ import { ToastContainer, toast } from 'react-toastify'; // ✅ Add this
 import Navbar from './components/Navbar';
 import Hero from './components/Hero';
 import Workouts from './pages/WorkoutsPage';
+import ForgotPassword from './pages/ForgotPassword';
+import ResetPassword from './pages/ResetPassword';
 import Login from './pages/LoginPage';
 import Caccount from './pages/RegisterPage';
 import './styles/App.css';
@@ -140,6 +142,8 @@ const App = () => {
   />
         <Route path="/upload" element={<UploadWorkout />} />
         <Route path="/admin" element={<AdminCalendar />} />
+        <Route path="/forgot-password" element={<ForgotPassword />} />
+        <Route path="/reset-password/:token" element={<ResetPassword />} />
         <Route path="/admin/cluster-copy" element={<ClusterCopyPage />} />
         <Route path="/library" element={<LibraryPage />} />
         <Route path="/settings" element={<Settings />} />
