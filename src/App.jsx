@@ -141,7 +141,7 @@ const App = () => {
     }
   />
 
-{/* <Route
+<Route
     path="/forgot-password"
     element={
       <PublicOnlyRoute>
@@ -156,11 +156,11 @@ const App = () => {
         <ResetPassword />
       </PublicOnlyRoute>
     }
-  /> */}
+  />
         <Route path="/upload" element={<UploadWorkout />} />
         <Route path="/admin" element={<AdminCalendar />} />
-        <Route path="/forgot-password" element={<ForgotPassword />} />
-        <Route path="/reset-password/:token" element={<ResetPassword />} />
+        {/* <Route path="/forgot-password" element={<ForgotPassword />} />
+        <Route path="/reset-password/:token" element={<ResetPassword />} /> */}
         <Route path="/admin/cluster-copy" element={<ClusterCopyPage />} />
         <Route path="/library" element={<LibraryPage />} />
         <Route path="/settings" element={<Settings />} />
