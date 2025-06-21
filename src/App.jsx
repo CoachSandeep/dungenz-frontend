@@ -140,10 +140,27 @@ const App = () => {
       </PublicOnlyRoute>
     }
   />
+
+<Route
+    path="/forgot-password"
+    element={
+      <PublicOnlyRoute>
+        <ForgotPassword />
+      </PublicOnlyRoute>
+    }
+  />
+  <Route
+    path="/reset-password/:token"
+    element={
+      <PublicOnlyRoute>
+        <ResetPassword />
+      </PublicOnlyRoute>
+    }
+  />
         <Route path="/upload" element={<UploadWorkout />} />
         <Route path="/admin" element={<AdminCalendar />} />
-        <Route path="/forgot-password" element={<ForgotPassword />} />
-        <Route path="/reset-password/:token" element={<ResetPassword />} />
+        {/* <Route path="/forgot-password" element={<ForgotPassword />} />
+        <Route path="/reset-password/:token" element={<ResetPassword />} /> */}
         <Route path="/admin/cluster-copy" element={<ClusterCopyPage />} />
         <Route path="/library" element={<LibraryPage />} />
         <Route path="/settings" element={<Settings />} />
