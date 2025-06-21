@@ -217,22 +217,6 @@ const AdminTimeline = () => {
   const filteredGrouped = getFilteredGrouped();
   const filteredDates = Object.keys(filteredGrouped).sort((a, b) => new Date(a) - new Date(b));
 
-  const toggleStar = async (id) => {
-    await fetch(`${process.env.REACT_APP_API_BASE_URL}/admin/workouts/${id}/star`, {
-      method: 'PATCH',
-      headers: { Authorization: `Bearer ${token}` },
-    });
-    fetchWorkouts();
-  };
-
-  const toggleLibrary = async (id) => {
-    await fetch(`${process.env.REACT_APP_API_BASE_URL}/admin/workouts/${id}/library`, {
-      method: 'PATCH',
-      headers: { Authorization: `Bearer ${token}` },
-    });
-    fetchWorkouts();
-  };
-
   const handleDelete = async (id, date, version) => {
     if (window.confirm('Delete workout?')) {
       try {
@@ -240,24 +224,61 @@ const AdminTimeline = () => {
           method: 'DELETE',
           headers: { Authorization: `Bearer ${token}` },
         });
-  
+
         if (res.ok) {
+          toast.success('🗑️ Workout deleted');
           setGroupedWorkouts(prev => {
             const updated = { ...prev };
             if (!updated[date]) return prev;
-  
+
             const versionList = updated[date].versions[version];
             if (!versionList) return prev;
-  
+
             updated[date].versions[version] = versionList.filter(w => w._id !== id);
             return updated;
           });
         } else {
-          alert('❌ Failed to delete workout');
+          toast.error('❌ Failed to delete workout');
         }
       } catch (err) {
-        console.error('❌ Error deleting:', err);
+        toast.error('❌ Error deleting workout');
       }
+    }
+  };
+
+  const toggleStar = async (id) => {
+    try {
+      const res = await fetch(`${process.env.REACT_APP_API_BASE_URL}/admin/workouts/${id}/star`, {
+        method: 'PATCH',
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      if (res.ok) {
+        toast.success('⭐ Workout starred/unstarred');
+        fetchMonthWorkouts(selectedMonth);
+      } else {
+        toast.error('❌ Failed to update star');
+      }
+    } catch (err) {
+      toast.error('❌ Error toggling star');
+    }
+  };
+
+  const toggleLibrary = async (id) => {
+    try {
+      const res = await fetch(`${process.env.REACT_APP_API_BASE_URL}/admin/workouts/${id}/library`, {
+        method: 'PATCH',
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      if (res.ok) {
+        toast.success('📚 Workout added/removed from Library');
+        fetchMonthWorkouts(selectedMonth);
+      } else {
+        toast.error('❌ Failed to update library status');
+      }
+    } catch (err) {
+      toast.error('❌ Error toggling library');
     }
   };
   
@@ -408,7 +429,7 @@ const AdminTimeline = () => {
         <h4>{w.title}</h4>
         <div className="icon-actions">
           <FaEdit onClick={() => setEditingWorkoutId(w._id)} />
-          <FaTrash onClick={() => handleDelete(w._id)} />
+          <FaTrash  onClick={() => handleDelete(w._id, w.date.split('T')[0], w.version)} />
           <FaStar onClick={() => toggleStar(w._id)} />
           <FaBookOpen onClick={() => toggleLibrary(w._id)} />
         </div>
