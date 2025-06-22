@@ -11,7 +11,7 @@ const TokenWatcher = ({ setIsLoggedIn }) => {
     const token = localStorage.getItem('token');
     const user = localStorage.getItem('user');
 
-    const isAuthPage = location.pathname === '/login' || location.pathname === '/caccount' || location.pathname === '/forgot-password' || location.pathname === '/reset-password' ;
+    const isAuthPage = location.pathname === '/login' || location.pathname === '/caccount' || location.pathname === '/forgot-password' || location.pathname.startsWith('/reset-password') ;
 
     if (token && isTokenValid(token)) {
       setIsLoggedIn(true);

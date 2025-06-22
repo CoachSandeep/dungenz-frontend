@@ -157,6 +157,7 @@ const App = () => {
       </PublicOnlyRoute>
     }
   />
+
         <Route path="/upload" element={<UploadWorkout />} />
         <Route path="/admin" element={<AdminCalendar />} />
         {/* <Route path="/forgot-password" element={<ForgotPassword />} />
