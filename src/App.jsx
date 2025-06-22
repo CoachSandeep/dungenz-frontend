@@ -124,39 +124,37 @@ const App = () => {
   }
 />
 <Route
-    path="/login"
-    element={
-      <PublicOnlyRoute>
-        <Login />
-      </PublicOnlyRoute>
-    }
-  />
-
-  <Route
-    path="/caccount"
-    element={
-      <PublicOnlyRoute>
-        <Caccount />
-      </PublicOnlyRoute>
-    }
-  />
-
+  path="/forgot-password"
+  element={
+    <PublicOnlyRoute isLoggedIn={isLoggedIn}>
+      <ForgotPassword />
+    </PublicOnlyRoute>
+  }
+/>
 <Route
-    path="/forgot-password"
-    element={
-      <PublicOnlyRoute>
-        <ForgotPassword />
-      </PublicOnlyRoute>
-    }
-  />
-  <Route
-    path="/reset-password/:token"
-    element={
-      <PublicOnlyRoute>
-        <ResetPassword />
-      </PublicOnlyRoute>
-    }
-  />
+  path="/login"
+  element={
+    <PublicOnlyRoute isLoggedIn={isLoggedIn}>
+      <Login />
+    </PublicOnlyRoute>
+  }
+/>
+<Route
+  path="/caccount"
+  element={
+    <PublicOnlyRoute isLoggedIn={isLoggedIn}>
+      <Caccount />
+    </PublicOnlyRoute>
+  }
+/>
+<Route
+  path="/reset-password/:token"
+  element={
+    <PublicOnlyRoute isLoggedIn={isLoggedIn}>
+      <ResetPassword />
+    </PublicOnlyRoute>
+  }
+/>
 
         <Route path="/upload" element={<UploadWorkout />} />
         <Route path="/admin" element={<AdminCalendar />} />
