@@ -73,10 +73,10 @@ const ProfilePage = () => {
 
         <label>Bio</label>
         <textarea name="bio" rows={3} value={profile.bio || ''} onChange={handleChange} />
-
+        <p>Check: {profile.profileImage}</p>
         <label>Profile Picture</label>
         <input type="file" accept="image/*" onChange={handleFileChange} />
-
+       
         {(preview || profile.photo) && (
           <div style={{ textAlign: 'center', marginTop: '10px' }}>
             <img
@@ -90,6 +90,7 @@ const ProfilePage = () => {
         <button type="submit">💾 Save</button>
       </form>
       <p>{status}</p>
+     
 
       {(profile.bio || profile.profileImage) && (
         <div className="profile-preview-box">
