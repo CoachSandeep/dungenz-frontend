@@ -23,6 +23,12 @@ import TokenWatcher from './components/TokenWatcher';
 import PublicOnlyRoute from './utils/PublicOnlyRoute';
 
 const App = () => {
+  // useEffect(() => {
+  //   const stored = JSON.parse(localStorage.getItem('user'));
+  //   if (stored?.user) {
+  //     localStorage.setItem('user', JSON.stringify(stored.user));
+  //   }
+  // }, []);
 
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [notificationStatus, setNotificationStatus] = useState('idle');
