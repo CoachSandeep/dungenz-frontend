@@ -29,33 +29,38 @@ const App = () => {
 
   // 🔔 Foreground notification listener
   React.useEffect(() => {
-    if (Notification.permission === 'granted') {
+    if (typeof Notification !== 'undefined' && Notification.permission === 'granted') {
       setNotificationStatus('enabled');
     }
-
+  
     onMessage(messaging, (payload) => {
       console.log('🔔 Foreground Message:', payload);
       alert(`🔔 New Notification: ${payload.notification?.title}`);
     });
   }, []);
-
+  
   const handleEnableNotifications = async () => {
+    if (typeof Notification === 'undefined') {
+      alert("❌ Notifications are not supported on this device or browser.");
+      return;
+    }
+  
     try {
       const permission = await Notification.requestPermission();
       if (permission !== 'granted') {
         alert("❌ Notification permission denied.");
         return;
       }
-
+  
       setNotificationStatus('requesting');
-
+  
       const currentToken = await getToken(messaging, {
         vapidKey: "BCHlImXNmJE5fjxK6Dnc9g74itDxN8KKBtkuQpPHn4HzgPd0AVt7zOFYSw_gvI6oOz9IolQY0AxuUwiIcA2LkBc"
       });
-
+  
       if (currentToken) {
         console.log('📬 FCM Token:', currentToken);
-
+  
         await fetch(`${process.env.REACT_APP_API_BASE_URL}/push/register-token`, {
           method: 'POST',
           headers: {
@@ -64,7 +69,7 @@ const App = () => {
           },
           body: JSON.stringify({ token: currentToken }),
         });
-
+  
         setNotificationStatus('enabled');
         alert("✅ Notifications enabled!");
       } else {
@@ -81,7 +86,7 @@ const App = () => {
       <Navbar />
       <TokenWatcher setIsLoggedIn={setIsLoggedIn} />
       <ToastContainer />
-      {isLoggedIn && notificationStatus !== 'enabled' && Notification.permission !== 'granted' && (
+      {isLoggedIn && notificationStatus !== 'enabled' && typeof Notification !== 'undefined' && Notification.permission !== 'granted' && (
         <div style={{
           padding: '12px 20px',
           backgroundColor: '#1f1f1f',
