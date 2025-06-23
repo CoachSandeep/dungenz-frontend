@@ -142,12 +142,15 @@ const ClusterCopyPage = () => {
         />
       )}
 
-      <WorkoutBlockList
-        groupedWorkouts={groupedWorkouts}
-        selectedWorkouts={selectedWorkoutIds}
-        onWorkoutToggle={handleWorkoutToggle}
-        onViewWorkout={(w) => setModalWorkout(w)}
-      />
+<WorkoutBlockList
+  groupedWorkouts={Object.fromEntries(
+    Object.entries(groupedWorkouts)
+      .sort(([a], [b]) => new Date(b) - new Date(a)) // 🔽 descending by date
+  )}
+  selectedWorkouts={selectedWorkoutIds}
+  onWorkoutToggle={handleWorkoutToggle}
+  onViewWorkout={(w) => setModalWorkout(w)}
+/>
 
       <WorkoutModal workout={modalWorkout} onClose={() => setModalWorkout(null)} />
     </div>
