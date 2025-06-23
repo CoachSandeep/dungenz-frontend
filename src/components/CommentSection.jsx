@@ -21,7 +21,7 @@ const CommentSection = ({ date, user }) => {
               user: {
                 _id: "coach_sandeep_001",
                 name: "Coach Sandeep",
-                avatar: "/uploads/1749748907056-09ktnt3wxjpgiwgi28eu.jpg"
+                avatar: "https://res.cloudinary.com/dzfo713ey/image/upload/v1750674793/dungenz_profiles/gksyszwbkqrj427n4lji.png"
               },
               createdAt: new Date().toISOString(),
               likes: [],
