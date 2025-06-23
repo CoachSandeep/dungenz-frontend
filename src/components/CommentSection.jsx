@@ -5,6 +5,8 @@ const CommentSection = ({ date, user }) => {
   const [comments, setComments] = useState([]);
   const [newComment, setNewComment] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [likeModalOpen, setLikeModalOpen] = useState(false);
+  const [likeList, setLikeList] = useState([]);
 
   if (!date) return null;
 
@@ -17,7 +19,7 @@ const CommentSection = ({ date, user }) => {
           setComments([
             {
               _id: 'coach-sandeep-local',
-              text: "Let’s crush it today, warriors! 💥 Drop your scores  – Coach Sandeep",
+              text: "Let’s crush it today, warriors! 💥 Drop your scores – Coach Sandeep",
               user: {
                 _id: "coach_sandeep_001",
                 name: "Coach Sandeep",
@@ -115,18 +117,6 @@ const CommentSection = ({ date, user }) => {
     fetchComments();
   }, [date]);
 
-  useEffect(() => {
-    const observer = new MutationObserver(() => {
-      const els = document.querySelectorAll('.ui.comments, iframe');
-      els.forEach(el => {
-        el.style.minHeight = '0px';
-        el.style.border = 'none';
-      });
-    });
-    observer.observe(document.body, { childList: true, subtree: true });
-    return () => observer.disconnect();
-  }, []);
-
   const AvatarOrInitials = ({ user }) => {
     if (user?.avatar) {
       const baseURL = process.env.REACT_APP_API_BASE_URL?.replace(/\/api$/, '');
@@ -166,29 +156,36 @@ const CommentSection = ({ date, user }) => {
                 <Comment.Author as='span'>
                   {c.user?.name || 'Unknown'}
                   {(c._id !== 'coach-sandeep-local') &&
-  (c.user?._id === user?.id || user?.role === 'superadmin') && (
-                    <span
-                      onClick={() => handleDelete(c._id)}
-                      style={{
-                        marginLeft: '10px',
-                        cursor: 'pointer',
-                        color: 'gray',
-                        fontSize: '14px',
-                      }}
-                      title="Delete your comment"
-                    >
-                      🗑️
-                    </span>
-                  )}
+                    (c.user?._id === user?.id || user?.role === 'superadmin') && (
+                      <span
+                        onClick={() => handleDelete(c._id)}
+                        style={{
+                          marginLeft: '10px',
+                          cursor: 'pointer',
+                          color: 'gray',
+                          fontSize: '14px',
+                        }}
+                        title="Delete your comment"
+                      >
+                        🗑️
+                      </span>
+                    )}
                 </Comment.Author>
                 <Comment.Metadata>
                   <div>{new Date(c.createdAt).toLocaleTimeString()}</div>
                 </Comment.Metadata>
                 <Comment.Text>{c.text}</Comment.Text>
                 <Comment.Actions>
-                  <Comment.Action onClick={() => handleLike(c._id)}>
-                    ❤️ {c.likes?.length || 0}
-                  </Comment.Action>
+                  <Comment.Action onClick={() => handleLike(c._id)}>❤️</Comment.Action>
+                  <span
+                    style={{ marginLeft: '8px', color: '#aaa', cursor: 'pointer' }}
+                    onClick={() => {
+                      setLikeList(c.likes || []);
+                      setLikeModalOpen(true);
+                    }}
+                  >
+                    {c.likes?.length || 0}
+                  </span>
                 </Comment.Actions>
                 {c.replies?.map((r, idx) => (
                   <Comment.Group key={idx}>
@@ -205,6 +202,41 @@ const CommentSection = ({ date, user }) => {
             </Comment>
           ))}
         </Comment.Group>
+      )}
+
+      {/* ❤️ Like Modal */}
+      {likeModalOpen && (
+        <div
+          style={{
+            position: 'fixed',
+            bottom: '20px',
+            left: '50%',
+            transform: 'translateX(-50%)',
+            background: '#1a1a1a',
+            color: '#fff',
+            borderRadius: '10px',
+            padding: '15px',
+            zIndex: 1000,
+            width: '90%',
+            maxWidth: '300px',
+            boxShadow: '0 0 10px rgba(0,0,0,0.4)'
+          }}
+          onClick={() => setLikeModalOpen(false)}
+        >
+          <div style={{ fontWeight: 'bold', marginBottom: '8px' }}>❤️ Liked by</div>
+          {likeList.length === 0 ? (
+            <div>No likes yet.</div>
+          ) : (
+            likeList.map((u, idx) => (
+              <div key={idx} style={{ borderBottom: '1px solid #333', padding: '4px 0' }}>
+                {u?.name || 'Unknown User'}
+              </div>
+            ))
+          )}
+          <div style={{ marginTop: '10px', fontSize: '12px', color: '#aaa', textAlign: 'center' }}>
+            Tap to close
+          </div>
+        </div>
       )}
     </div>
   );
