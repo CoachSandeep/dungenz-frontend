@@ -50,8 +50,12 @@ const ProfilePage = () => {
 
       if (res.ok) {
         const updated = await res.json();
-        setProfile(updated);
-        localStorage.setItem('user', JSON.stringify(updated));
+      
+        // ✅ Extract user only
+        const user = updated.user;
+      
+        setProfile(user);
+        localStorage.setItem('user', JSON.stringify(user)); // ✅ only user goes in localStorage
         setStatus('✅ Profile updated');
         setPreview(null);
         setFile(null);

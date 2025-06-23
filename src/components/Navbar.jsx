@@ -10,7 +10,7 @@ const Navbar = () => {
   const [isSuperadmin, setIsSuperadmin] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [adminMenuOpen, setAdminMenuOpen] = useState(false);
-  const [user, setUser, storedUser] = useState(null);
+  const [user, setUser] = useState(null);
 
   const navigate = useNavigate();
   const location = useLocation();
@@ -51,7 +51,7 @@ const Navbar = () => {
 
       <div className="navbar-right">
         {isLoggedIn ? (
-          <NavbarAvatar user={storedUser} onLogout={handleLogout} />
+          <NavbarAvatar user={user} onLogout={handleLogout} />
         ) : (
           <>
             <button onClick={() => navigate('/login')}>Login</button>
