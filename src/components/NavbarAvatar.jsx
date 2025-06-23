@@ -36,7 +36,7 @@ const NavbarAvatar = ({ user, onLogout }) => {
     <div className="navbar-avatar" ref={dropdownRef}>
       <div className="avatar-trigger" onClick={toggleDropdown}>
         {profileImage ? (
-         <img src={`${process.env.REACT_APP_API_BASE_URL.replace('/api', '')}${profileImage}`} alt="avatar" className="avatar-img" />
+         <img src={`${profileImage}`} alt="avatar" className="avatar-img" />
         ) : (
           <div className="avatar-circle">{initials}</div>
         )}

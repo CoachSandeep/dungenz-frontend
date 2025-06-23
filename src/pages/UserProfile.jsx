@@ -73,7 +73,7 @@ const ProfilePage = () => {
 
         <label>Bio</label>
         <textarea name="bio" rows={3} value={profile.bio || ''} onChange={handleChange} />
-        <p>Check: {profile.profileImage}</p>
+        
         <label>Profile Picture</label>
         <input type="file" accept="image/*" onChange={handleFileChange} />
        
@@ -105,7 +105,7 @@ const ProfilePage = () => {
             <div className="photo-preview">
               <h4>🖼️ Profile Picture Preview:</h4>
               <img
-                src={`${baseURL}${profile.profileImage}`}
+                src={`${profile.profileImage}`}
                 alt="profile"
                 className="zen-avatar"
               />
