@@ -10,7 +10,7 @@ const Navbar = () => {
   const [isSuperadmin, setIsSuperadmin] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [adminMenuOpen, setAdminMenuOpen] = useState(false);
-  const [user, setUser] = useState(null);
+  const [user, setUser, storedUser] = useState(null);
 
   const navigate = useNavigate();
   const location = useLocation();
