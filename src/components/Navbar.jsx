@@ -51,7 +51,7 @@ const Navbar = () => {
 
       <div className="navbar-right">
         {isLoggedIn ? (
-          <NavbarAvatar user={user} onLogout={handleLogout} />
+          <NavbarAvatar user={storedUser} onLogout={handleLogout} />
         ) : (
           <>
             <button onClick={() => navigate('/login')}>Login</button>
