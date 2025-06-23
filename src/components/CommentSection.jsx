@@ -75,7 +75,10 @@ const CommentSection = ({ date, user }) => {
     await fetch(`${process.env.REACT_APP_API_BASE_URL}/comments/${date}/${commentId}/like`, {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ userId: user.id })
+      body: JSON.stringify({ 
+        userId: user.id,
+        name: user.name
+      })
     });
     fetchComments();
   };
