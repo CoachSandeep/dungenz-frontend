@@ -51,17 +51,56 @@
       window.addEventListener('DOMContentLoaded', () => {
         const splash = document.getElementById('splash-screen');
         const root = document.getElementById('root');
-
         const isResetRoute = window.location.pathname.startsWith('/reset-password');
-
+    
+        const hideSplash = () => {
+          if (splash) splash.style.display = 'none';
+        };
+    
         if (isResetRoute) {
-          splash.style.display = 'none';
-        } else if (root && splash) {
-          new MutationObserver(() => {
-            splash.style.display = 'none';
+          hideSplash();
+        } else {
+          let observerTimeout = setTimeout(hideSplash, 5000); // fallback
+    
+          new MutationObserver((mutations, observer) => {
+            if (root && root.childNodes.length > 0) {
+              hideSplash();
+              clearTimeout(observerTimeout);
+              observer.disconnect();
+            }
           }).observe(root, { childList: true });
         }
       });
+    </script>
+
+    <!-- 🧪 JS Error Logger for Mobile -->
+    <script>
+      window.onerror = function (message, source, lineno, colno, error) {
+        const errorBox = document.createElement('pre');
+        errorBox.style.color = 'red';
+        errorBox.style.background = 'black';
+        errorBox.style.padding = '20px';
+        errorBox.style.fontSize = '14px';
+        errorBox.innerText =
+          '⚠️ JS Error on iPhone:\n' +
+          message + '\n' +
+          'File: ' + source + '\n' +
+          'Line: ' + lineno + ', Col: ' + colno;
+
+        document.body.innerHTML = '';
+        document.body.appendChild(errorBox);
+      };
+    </script>
+
+    <!-- ⏱ Fallback if root is empty -->
+    <script>
+      setTimeout(() => {
+        const root = document.getElementById('root');
+        if (root && root.children.length === 0) {
+          document.body.innerHTML =
+            '<h2 style="color:white;padding:20px;background:black">⚠️ App failed to load.<br>Please refresh or update your browser.</h2>';
+        }
+      }, 5000);
     </script>
   </body>
 </html>
