@@ -73,7 +73,7 @@ const ProfilePage = () => {
 
         <label>Bio</label>
         <textarea name="bio" rows={3} value={profile.bio || ''} onChange={handleChange} />
-        <p>Check: {profile.profileImage}</p>
+        <p>Check: {profile.photo}</p>
         <label>Profile Picture</label>
         <input type="file" accept="image/*" onChange={handleFileChange} />
        
