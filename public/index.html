@@ -2,8 +2,8 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
-    <link rel="manifest" href="/manifest.json" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+  <link rel="manifest" href="/manifest.json" />
     <link rel="apple-touch-icon" href="/icons/icon-192-helmet.png" />
     <meta name="theme-color" content="#000000" />
     <title>DUNGENZ</title>
@@ -75,6 +75,7 @@
 
     <!-- 🧪 JS Error Logger for Mobile -->
     <script>
+      if (!window.location.pathname.startsWith('/reset-password')) {
       window.onerror = function (message, source, lineno, colno, error) {
         const errorBox = document.createElement('pre');
         errorBox.style.color = 'red';
@@ -90,6 +91,7 @@
         document.body.innerHTML = '';
         document.body.appendChild(errorBox);
       };
+    }
     </script>
 
     <!-- ⏱ Fallback if root is empty -->
