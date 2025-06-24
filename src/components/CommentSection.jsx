@@ -231,7 +231,7 @@ const CommentSection = ({ date, user }) => {
           {likeList.length === 0 ? (
             <div>No likes yet.</div>
           ) : (
-            {likeList.map((u, idx) => {
+            likeList.map((u, idx) => {
               const userName = typeof u === 'string' ? 'Unknown User' : (u?.name || 'Unknown User');
               const avatar = typeof u === 'string' ? '' : u?.avatar;
             
@@ -241,7 +241,7 @@ const CommentSection = ({ date, user }) => {
                   <span>{userName}</span>
                 </div>
               );
-            })}
+            })
           )}
           <div style={{ marginTop: '10px', fontSize: '12px', color: '#aaa', textAlign: 'center' }}>
             Tap to close
