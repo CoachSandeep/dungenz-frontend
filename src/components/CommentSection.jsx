@@ -81,7 +81,7 @@ const CommentSection = ({ date, user }) => {
         avatar: user.avatar
       })
     });
-    fetchComments(); // Refresh after like/unlike
+    fetchComments(); // Refresh comments
   };
 
   const handleDelete = async (commentId) => {
@@ -229,17 +229,14 @@ const CommentSection = ({ date, user }) => {
   >
     <div style={{ fontWeight: 'bold', marginBottom: '8px' }}>❤️ Liked by</div>
     {likeList.length === 0 ? (
-      <div>No likes yet.</div>
-    ) : (
-      likeList.map((u, idx) => {
-        const userName = typeof u === 'string' ? 'Unknown User' : (u?.name || 'Unknown User');
-        return (
-          <div key={idx} style={{ padding: '4px 0', borderBottom: '1px solid #333' }}>
-            {userName}
-          </div>
-        );
-      })
-    )}
+  <div>No likes yet.</div>
+) : (
+  likeList.map((u, idx) => (
+    <div key={idx} style={{ padding: '4px 0', borderBottom: '1px solid #333' }}>
+      {u?.name || 'Unknown User'}
+    </div>
+  ))
+)}
     <div style={{ marginTop: '10px', fontSize: '12px', color: '#aaa', textAlign: 'center' }}>
       Tap to close
     </div>
