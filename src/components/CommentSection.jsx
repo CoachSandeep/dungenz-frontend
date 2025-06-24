@@ -75,13 +75,13 @@ const CommentSection = ({ date, user }) => {
     await fetch(`${process.env.REACT_APP_API_BASE_URL}/comments/${date}/${commentId}/like`, {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ 
+      body: JSON.stringify({
         userId: user.id,
         name: user.name,
         avatar: user.avatar
       })
     });
-    fetchComments(); // Refresh UI
+    fetchComments(); // Refresh after like/unlike
   };
 
   const handleDelete = async (commentId) => {
@@ -210,44 +210,64 @@ const CommentSection = ({ date, user }) => {
 
       {/* ❤️ Like Modal */}
       {likeModalOpen && (
-        <div
-          style={{
-            position: 'fixed',
-            bottom: '20px',
-            left: '50%',
-            transform: 'translateX(-50%)',
-            background: '#1a1a1a',
-            color: '#fff',
-            borderRadius: '10px',
-            padding: '15px',
-            zIndex: 1000,
-            width: '90%',
-            maxWidth: '300px',
-            boxShadow: '0 0 10px rgba(0,0,0,0.4)'
-          }}
-          onClick={() => setLikeModalOpen(false)}
-        >
-          <div style={{ fontWeight: 'bold', marginBottom: '8px' }}>❤️ Liked by</div>
-          {likeList.length === 0 ? (
-            <div>No likes yet.</div>
-          ) : (
-            likeList.map((u, idx) => {
-              const userName = typeof u === 'string' ? 'Unknown User' : (u?.name || 'Unknown User');
-              const avatar = typeof u === 'string' ? '' : u?.avatar;
-            
-              return (
-                <div key={idx} style={{ borderBottom: '1px solid #333', padding: '4px 0', display: 'flex', alignItems: 'center' }}>
-                
-                  <span>{userName}</span>
-                </div>
-              );
-            })
-          )}
-          <div style={{ marginTop: '10px', fontSize: '12px', color: '#aaa', textAlign: 'center' }}>
-            Tap to close
+  <div
+    style={{
+      position: 'fixed',
+      bottom: '20px',
+      left: '50%',
+      transform: 'translateX(-50%)',
+      background: '#1a1a1a',
+      color: '#fff',
+      borderRadius: '10px',
+      padding: '15px',
+      zIndex: 1000,
+      width: '90%',
+      maxWidth: '300px',
+      boxShadow: '0 0 10px rgba(0,0,0,0.4)'
+    }}
+    onClick={() => setLikeModalOpen(false)}
+  >
+    <div style={{ fontWeight: 'bold', marginBottom: '8px' }}>❤️ Liked by</div>
+    {likeList.length === 0 ? (
+      <div>No likes yet.</div>
+    ) : (
+      likeList.map((u, idx) => {
+        const userName = u?.name || u?.userId || 'Unknown User';
+        const avatar = u?.avatar;
+
+        return (
+          <div
+            key={idx}
+            style={{
+              borderBottom: '1px solid #333',
+              padding: '4px 0',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px'
+            }}
+          >
+            {avatar && (
+              <img
+                src={avatar}
+                alt="avatar"
+                style={{
+                  width: 24,
+                  height: 24,
+                  borderRadius: '50%',
+                  objectFit: 'cover'
+                }}
+              />
+            )}
+            <span>{userName}</span>
           </div>
-        </div>
-      )}
+        );
+      })
+    )}
+    <div style={{ marginTop: '10px', fontSize: '12px', color: '#aaa', textAlign: 'center' }}>
+      Tap to close
+    </div>
+  </div>
+)}
     </div>
   );
 };
