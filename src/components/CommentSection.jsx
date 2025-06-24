@@ -232,33 +232,10 @@ const CommentSection = ({ date, user }) => {
       <div>No likes yet.</div>
     ) : (
       likeList.map((u, idx) => {
-        const userName = u?.name || u?.userId || 'Unknown User';
-        const avatar = u?.avatar;
-
+        const userName = typeof u === 'string' ? 'Unknown User' : (u?.name || 'Unknown User');
         return (
-          <div
-            key={idx}
-            style={{
-              borderBottom: '1px solid #333',
-              padding: '4px 0',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '8px'
-            }}
-          >
-            {avatar && (
-              <img
-                src={avatar}
-                alt="avatar"
-                style={{
-                  width: 24,
-                  height: 24,
-                  borderRadius: '50%',
-                  objectFit: 'cover'
-                }}
-              />
-            )}
-            <span>{userName}</span>
+          <div key={idx} style={{ padding: '4px 0', borderBottom: '1px solid #333' }}>
+            {userName}
           </div>
         );
       })
