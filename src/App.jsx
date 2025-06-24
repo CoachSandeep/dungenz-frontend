@@ -22,13 +22,7 @@ import PrivateRoute from './utils/PrivateRoute';
 import TokenWatcher from './components/TokenWatcher';
 import PublicOnlyRoute from './utils/PublicOnlyRoute';
 
-// ✅ Disable all console logs in production
-if (process.env.NODE_ENV === 'production') {
-  console.log = () => {};
-  console.warn = () => {};
-  // console.error = () => {};
-  // console.info = () => {};
-}
+
 
 const App = () => {
   // useEffect(() => {

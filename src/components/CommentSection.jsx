@@ -77,10 +77,11 @@ const CommentSection = ({ date, user }) => {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ 
         userId: user.id,
-        name: user.name
+        name: user.name,
+        avatar: user.avatar
       })
     });
-    fetchComments();
+    fetchComments(); // Refresh UI
   };
 
   const handleDelete = async (commentId) => {
@@ -230,11 +231,17 @@ const CommentSection = ({ date, user }) => {
           {likeList.length === 0 ? (
             <div>No likes yet.</div>
           ) : (
-            likeList.map((u, idx) => (
-              <div key={idx} style={{ borderBottom: '1px solid #333', padding: '4px 0' }}>
-                {u?.name || 'Unknown User'}
-              </div>
-            ))
+            {likeList.map((u, idx) => {
+              const userName = typeof u === 'string' ? 'Unknown User' : (u?.name || 'Unknown User');
+              const avatar = typeof u === 'string' ? '' : u?.avatar;
+            
+              return (
+                <div key={idx} style={{ borderBottom: '1px solid #333', padding: '4px 0', display: 'flex', alignItems: 'center' }}>
+                
+                  <span>{userName}</span>
+                </div>
+              );
+            })}
           )}
           <div style={{ marginTop: '10px', fontSize: '12px', color: '#aaa', textAlign: 'center' }}>
             Tap to close
