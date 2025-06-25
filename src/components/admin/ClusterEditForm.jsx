@@ -1,8 +1,29 @@
-import React, { useState } from 'react';
+""import React, { useEffect, useState } from 'react';
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
+import './../../styles/MovementInput.css';
 
 const ClusterEditForm = ({ version, workouts, onSave, onCancel }) => {
   const [items, setItems] = useState(workouts);
+  const [library, setLibrary] = useState([]);
+  const [showModal, setShowModal] = useState(false);
+  const [newMovement, setNewMovement] = useState('');
+  const [newLink, setNewLink] = useState('');
+  const token = localStorage.getItem('token');
+
+  useEffect(() => {
+    const fetchLibrary = async () => {
+      try {
+        const res = await fetch(`${process.env.REACT_APP_API_BASE_URL}/movements`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        const data = await res.json();
+        setLibrary(data);
+      } catch (err) {
+        console.error('Error loading library:', err);
+      }
+    };
+    fetchLibrary();
+  }, [token]);
 
   const handleDragEnd = (result) => {
     if (!result.destination) return;
@@ -39,10 +60,32 @@ const ClusterEditForm = ({ version, workouts, onSave, onCancel }) => {
         )
       );
       alert('✅ Workouts updated!');
-      onSave(); // callback
+      onSave();
     } catch (err) {
       console.error(err);
       alert('❌ Failed to update workouts.');
+    }
+  };
+
+  const handleAddMovement = async () => {
+    try {
+      const res = await fetch(`${process.env.REACT_APP_API_BASE_URL}/movements`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ name: newMovement, youtubeUrl: newLink }),
+      });
+      if (res.ok) {
+        const updatedLibrary = [...library, { name: newMovement, youtubeUrl: newLink }];
+        setLibrary(updatedLibrary);
+        setShowModal(false);
+        setNewMovement('');
+        setNewLink('');
+      }
+    } catch (err) {
+      console.error('Failed to add new movement:', err);
     }
   };
 
@@ -91,6 +134,27 @@ const ClusterEditForm = ({ version, workouts, onSave, onCancel }) => {
                         onChange={(e) => handleChange(index, 'capTime', e.target.value)}
                         placeholder="Cap Time (in mins)"
                       />
+                      
+                      <input
+                        placeholder="Movements (comma separated)"
+                        value={w.movements?.join(', ') || ''}
+                        onChange={(e) => handleChange(index, 'movements', e.target.value.split(',').map(m => m.trim()))}
+                      />
+                      <div className="movement-tags">
+                        {(w.movements || []).map((m, i) => {
+                          const exists = library.some(l => l.name.toLowerCase() === m.toLowerCase());
+                          return (
+                            <span key={i} className="tag">
+                              {m} {!exists && (
+                                <span className="add-icon" onClick={() => {
+                                  setNewMovement(m);
+                                  setShowModal(true);
+                                }}>➕</span>
+                              )}
+                            </span>
+                          );
+                        })}
+                      </div>
                     </div>
                   )}
                 </Draggable>
@@ -104,6 +168,23 @@ const ClusterEditForm = ({ version, workouts, onSave, onCancel }) => {
         <button onClick={handleSave} className="save-btn">💾 Save All</button>
         <button onClick={onCancel} className="cancel-btn">❌ Cancel</button>
       </div>
+
+      {showModal && (
+        <div className="modal-backdrop">
+          <div className="modal-box">
+            <h4>Add Movement</h4>
+            <p><strong>{newMovement}</strong></p>
+            <input
+              type="text"
+              placeholder="YouTube Link"
+              value={newLink}
+              onChange={(e) => setNewLink(e.target.value)}
+            />
+            <button onClick={handleAddMovement}>Save</button>
+            <button onClick={() => setShowModal(false)} className="cancel-btn">Cancel</button>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
