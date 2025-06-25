@@ -3,6 +3,7 @@ import DatePicker from 'react-datepicker';
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 import 'react-datepicker/dist/react-datepicker.css';
 import './../../styles/ClusterForm.css';
+import MovementInput from './MovementInput';
 
 const iconOptions = [
   { label: '🔥 Warm-up', value: 'warmup' },
@@ -14,10 +15,13 @@ const ClusterCreateForm = ({ defaultDate, onSaved }) => {
   const [version, setVersion] = useState('Ultra Train');
   const [selectedDate, setSelectedDate] = useState(new Date(defaultDate));
   const [workouts, setWorkouts] = useState([
-    { title: '', description: '', capTime: '', instructions: '', customName: '', icon: '' }
+    { title: '', description: '', capTime: '', instructions: '', customName: '', icon: '', movements: [] }
   ]);
   const [targetUserId, setTargetUserId] = useState('');
   const [userList, setUserList] = useState([]);
+  const [showLibraryModal, setShowLibraryModal] = useState(false);
+  const [movementNameToAdd, setMovementNameToAdd] = useState('');
+  const [activeWorkoutIndex, setActiveWorkoutIndex] = useState(null);
 
   const token = localStorage.getItem('token');
 
@@ -39,7 +43,7 @@ const ClusterCreateForm = ({ defaultDate, onSaved }) => {
   }, [token]);
 
   const handleAddWorkout = () => {
-    setWorkouts([...workouts, { title: '', description: '', capTime: '', instructions: '', customName: '', icon: '' }]);
+    setWorkouts([...workouts, { title: '', description: '', capTime: '', instructions: '', customName: '', icon: '', movements: [] }]);
   };
 
   const handleChange = (index, field, value) => {
@@ -51,6 +55,21 @@ const ClusterCreateForm = ({ defaultDate, onSaved }) => {
   const handleRemove = (index) => {
     const updated = workouts.filter((_, i) => i !== index);
     setWorkouts(updated);
+  };
+
+  const handleAddMovement = (index, movementName) => {
+    setMovementNameToAdd(movementName);
+    setActiveWorkoutIndex(index);
+    setShowLibraryModal(true);
+  };
+
+  const handleMovementSaved = (youtubeLink) => {
+    const updated = [...workouts];
+    if (!updated[activeWorkoutIndex].movements.includes(movementNameToAdd)) {
+      updated[activeWorkoutIndex].movements.push(movementNameToAdd);
+    }
+    setWorkouts(updated);
+    setShowLibraryModal(false);
   };
 
   const handleSave = async () => {
@@ -179,6 +198,14 @@ const ClusterCreateForm = ({ defaultDate, onSaved }) => {
                         value={w.instructions}
                         onChange={(e) => handleChange(index, 'instructions', e.target.value)}
                       />
+                       <textarea
+    placeholder="💬 Admin Note (e.g. killer wod)"
+    value={w.adminNote || ''}
+    onChange={(e) => handleChange(index, 'adminNote', e.target.value)}
+  />
+
+<MovementInput value={w.movements?.join(', ')} onChange={(val) => handleChange(index, 'movements', val.split(',').map(m => m.trim()))} />
+
                       {index > 0 && (
                         <button className="remove-btn" onClick={() => handleRemove(index)}>🗑️ Remove</button>
                       )}
@@ -197,6 +224,14 @@ const ClusterCreateForm = ({ defaultDate, onSaved }) => {
         <button onClick={handleAddWorkout}>➕ Add Another Workout</button>
         <button className="save-btn" onClick={handleSave}>💾 Save All</button>
       </div>
+
+      {showLibraryModal && (
+        <MovementLibraryModal
+          movementName={movementNameToAdd}
+          onClose={() => setShowLibraryModal(false)}
+          onSaved={handleMovementSaved}
+        />
+      )}
     </div>
   );
 };

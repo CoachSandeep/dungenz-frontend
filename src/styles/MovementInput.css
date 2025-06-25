@@ -1,0 +1,86 @@
+.movement-input-container {
+    margin-top: 10px;
+  }
+  
+  .movement-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: 6px;
+  }
+  
+  .movement-tag {
+    background-color: #1f1f1f;
+    border: 1px solid #444;
+    padding: 4px 8px;
+    border-radius: 16px;
+    font-size: 14px;
+    color: white;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    position: relative;
+  }
+  
+  .movement-tag .plus-icon {
+    cursor: pointer;
+    font-size: 14px;
+    margin-left: 4px;
+    color: #f44336;
+    font-weight: bold;
+  }
+  
+  .movement-tag .plus-icon:hover {
+    color: #ff7961;
+  }
+  
+  .modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100vh;
+    width: 100vw;
+    background-color: rgba(0, 0, 0, 0.6);
+    z-index: 999;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  
+  .modal-box {
+    background: #fff;
+    padding: 20px 25px;
+    border-radius: 8px;
+    width: 300px;
+    max-width: 90%;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  }
+  
+  .modal-box h3 {
+    margin-top: 0;
+  }
+  
+  .modal-box input {
+    width: 100%;
+    margin-bottom: 12px;
+    padding: 8px;
+    font-size: 14px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+  }
+  
+  .modal-box button {
+    background-color: #e53935;
+    border: none;
+    color: white;
+    padding: 8px 16px;
+    font-size: 14px;
+    border-radius: 4px;
+    cursor: pointer;
+    margin-right: 10px;
+  }
+  
+  .modal-box button:hover {
+    background-color: #c62828;
+  }
+  
