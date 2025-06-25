@@ -14,13 +14,13 @@ const MovementInput = ({ value, onChange }) => {
   useEffect(() => {
     const fetchLibrary = async () => {
       try {
-        const res = await fetch(`${process.env.REACT_APP_API_BASE_URL}/movement-videos`);
-        if (res.ok) {
-          const data = await res.json();
-          setMovementLibrary(data); // store the movement library for auto-matching
-        }
+        const res = await fetch(`${process.env.REACT_APP_API_BASE_URL}/movements`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        const data = await res.json();
+        setLibrary(data);
       } catch (err) {
-        console.error("❌ Failed to fetch movement library", err);
+        console.error('Error loading library:', err);
       }
     };
     fetchLibrary();
