@@ -49,12 +49,11 @@ const MovementInput = ({ value, onChange }) => {
           .split(',')
           .map(m => m.trim().toLowerCase())
           .filter(m => m !== '');
-  
-        // ❌ Filter out already selected movements
+
         const filtered = data
           .map(item => item.name)
           .filter(name => !currentList.includes(name.toLowerCase()));
-  
+
         setSuggestions(filtered);
       }
     } catch (err) {
@@ -64,37 +63,36 @@ const MovementInput = ({ value, onChange }) => {
 
   const handleInputChange = (e) => {
     const raw = e.target.value;
+    setRawInput(raw);
     onChange(raw);
-  
+
     const parts = raw.split(',').map(p => p.trim()).filter(Boolean);
-    const last = parts[parts.length - 1]; // last part being typed
-  
-    // If last is already in list, no need to suggest again
-    const alreadySelected = parts.slice(0, -1); // all except the one being typed
+    const last = parts[parts.length - 1];
+
+    const alreadySelected = parts.slice(0, -1);
     const isDuplicate = alreadySelected.some(p => p.toLowerCase() === last.toLowerCase());
-  
+
     if (!isDuplicate && last.length >= 2) {
       fetchSuggestions(last);
     } else {
       setSuggestions([]);
     }
-  
+
     setActiveInput(last);
   };
 
   const selectSuggestion = (sugg) => {
-    const parts = value.split(',').map(p => p.trim());
-    parts[parts.length - 1] = sugg; // replace last part with selected suggestion
-  
-    const deduped = [...new Set(parts.filter(Boolean))]; // remove accidental duplicates
+    const parts = rawInput.split(',').map(p => p.trim());
+    parts[parts.length - 1] = sugg;
+
+    const deduped = [...new Set(parts.filter(Boolean))];
     const updated = deduped.join(', ') + ', ';
-    
+
+    setRawInput(updated);
     onChange(updated);
     setSuggestions([]);
     setActiveInput('');
   };
-
-
 
   const handleAddMovement = async () => {
     try {
