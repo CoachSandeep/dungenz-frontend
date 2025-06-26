@@ -85,7 +85,7 @@
   }
   
   .suggestion-list {
-    background: #111;
+    background: #fff;
     border: 1px solid #444;
     border-radius: 5px;
     max-height: 150px;
@@ -95,7 +95,7 @@
     list-style: none;
     position: absolute;
     z-index: 100;
-    width: 100%;
+    width: 80%;
   }
   
   .suggestion-list li {
@@ -104,5 +104,5 @@
   }
   
   .suggestion-list li:hover {
-    background-color: #222;
+    background-color: #ece5e5;
   }

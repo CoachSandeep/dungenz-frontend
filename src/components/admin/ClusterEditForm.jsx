@@ -21,11 +21,16 @@ const ClusterEditForm = ({ version, workouts, onSave, onCancel }) => {
 
   const handleSave = async () => {
     const token = localStorage.getItem('token');
-    const updatedItems = items.map((item, index) => ({
-      ...item,
-      order: index,
-    }));
-
+  
+    const updatedItems = items.map((item, index) => {
+      const movementIds = (item.movements || []).map((m) => m._id); // ✅ extract movement IDs
+      return {
+        ...item,
+        order: index,
+        movements: movementIds,
+      };
+    });
+  
     try {
       await Promise.all(
         updatedItems.map((w) =>
@@ -92,10 +97,10 @@ const ClusterEditForm = ({ version, workouts, onSave, onCancel }) => {
                         onChange={(e) => handleChange(index, 'capTime', e.target.value)}
                         placeholder="Cap Time (in mins)"
                       />
-                      <MovementInput
-                        value={(w.movements || []).join(', ')}
-                        onChange={(val) => handleChange(index, 'movements', val.split(',').map(m => m.trim()))}
-                      />
+                     <MovementInput
+  value={w.movements || []}
+  onChange={(val) => handleChange(index, 'movements', val)}
+/>
                     </div>
                   )}
                 </Draggable>
