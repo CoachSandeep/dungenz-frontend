@@ -13,8 +13,16 @@ const MovementInput = ({ value = [], onChange }) => {
 
   const token = localStorage.getItem('token');
 
+  // Normalize incoming value
   useEffect(() => {
-    setMovements(value);
+    if (Array.isArray(value)) {
+      const normalized = value.map(item =>
+        typeof item === 'string' ? { name: item, url: '' } : item
+      );
+      setMovements(normalized);
+    } else {
+      setMovements([]);
+    }
   }, [value]);
 
   useEffect(() => {
