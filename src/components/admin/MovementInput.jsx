@@ -1,8 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import './../../styles/MovementInput.css';
 
-const MovementInput = ({ value, onChange }) => {
-  const [rawInput, setRawInput] = useState(value || '');
+const MovementInput = ({ value = [], onChange }) => {
   const [movements, setMovements] = useState([]);
   const [library, setLibrary] = useState([]);
   const [suggestions, setSuggestions] = useState([]);
@@ -10,11 +9,12 @@ const MovementInput = ({ value, onChange }) => {
   const [newMovement, setNewMovement] = useState('');
   const [newLink, setNewLink] = useState('');
   const [activeInput, setActiveInput] = useState('');
+  const [inputText, setInputText] = useState('');
 
   const token = localStorage.getItem('token');
 
   useEffect(() => {
-    setRawInput(value || '');
+    setMovements(value);
   }, [value]);
 
   useEffect(() => {
@@ -32,28 +32,13 @@ const MovementInput = ({ value, onChange }) => {
     fetchLibrary();
   }, [token]);
 
-  useEffect(() => {
-    const parsed = rawInput
-      .split(',')
-      .map(m => m.trim())
-      .filter(m => m !== '');
-    setMovements(parsed);
-  }, [rawInput]);
-
   const fetchSuggestions = async (query) => {
     try {
       const res = await fetch(`${process.env.REACT_APP_API_BASE_URL}/movements/search?q=${query}`);
       if (res.ok) {
         const data = await res.json();
-        const currentList = value
-          .split(',')
-          .map(m => m.trim().toLowerCase())
-          .filter(m => m !== '');
-
-        const filtered = data
-          .map(item => item.name)
-          .filter(name => !currentList.includes(name.toLowerCase()));
-
+        const currentNames = movements.map(m => m.name.toLowerCase());
+        const filtered = data.filter(item => !currentNames.includes(item.name.toLowerCase()));
         setSuggestions(filtered);
       }
     } catch (err) {
@@ -63,33 +48,22 @@ const MovementInput = ({ value, onChange }) => {
 
   const handleInputChange = (e) => {
     const raw = e.target.value;
-    setRawInput(raw);
-    onChange(raw);
+    setInputText(raw);
+    const last = raw.split(',').pop().trim();
+    setActiveInput(last);
 
-    const parts = raw.split(',').map(p => p.trim()).filter(Boolean);
-    const last = parts[parts.length - 1];
-
-    const alreadySelected = parts.slice(0, -1);
-    const isDuplicate = alreadySelected.some(p => p.toLowerCase() === last.toLowerCase());
-
-    if (!isDuplicate && last.length >= 2) {
+    if (last.length >= 2) {
       fetchSuggestions(last);
     } else {
       setSuggestions([]);
     }
-
-    setActiveInput(last);
   };
 
-  const selectSuggestion = (sugg) => {
-    const parts = rawInput.split(',').map(p => p.trim());
-    parts[parts.length - 1] = sugg;
-
-    const deduped = [...new Set(parts.filter(Boolean))];
-    const updated = deduped.join(', ') + ', ';
-
-    setRawInput(updated);
+  const selectSuggestion = (selected) => {
+    const updated = [...movements, selected];
+    setMovements(updated);
     onChange(updated);
+    setInputText('');
     setSuggestions([]);
     setActiveInput('');
   };
@@ -102,11 +76,15 @@ const MovementInput = ({ value, onChange }) => {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify({ name: newMovement, youtubeUrl: newLink }),
+        body: JSON.stringify({ name: newMovement, url: newLink }),
       });
       if (res.ok) {
-        const updatedLibrary = [...library, { name: newMovement, youtubeUrl: newLink }];
+        const data = await res.json();
+        const updatedLibrary = [...library, data.video];
         setLibrary(updatedLibrary);
+        const updated = [...movements, data.video];
+        setMovements(updated);
+        onChange(updated);
         setShowModal(false);
         setNewMovement('');
         setNewLink('');
@@ -121,7 +99,7 @@ const MovementInput = ({ value, onChange }) => {
       <label>Movements:</label>
       <input
         type="text"
-        value={rawInput}
+        value={inputText}
         onChange={handleInputChange}
         placeholder="e.g. Push-Up, Air Squat"
         autoComplete="off"
@@ -130,25 +108,23 @@ const MovementInput = ({ value, onChange }) => {
       {suggestions.length > 0 && (
         <ul className="suggestion-list">
           {suggestions.map((s, idx) => (
-            <li key={idx} onClick={() => selectSuggestion(s)}>{s}</li>
+            <li key={idx} onClick={() => selectSuggestion(s)}>{s.name}</li>
           ))}
         </ul>
       )}
 
       <div className="movement-tags">
-        {movements.map((m, idx) => {
-          const exists = library.some(l => l.name.toLowerCase() === m.toLowerCase());
-          return (
-            <span key={idx} className="tag">
-              {m} {!exists && (
-                <span className="add-icon" onClick={() => {
-                  setNewMovement(m);
-                  setShowModal(true);
-                }}>➕</span>
-              )}
-            </span>
-          );
-        })}
+        {movements.map((m, idx) => (
+          <span key={idx} className="tag">
+            {m.name}
+            {!m.url && (
+              <span className="add-icon" onClick={() => {
+                setNewMovement(m.name);
+                setShowModal(true);
+              }}>➕</span>
+            )}
+          </span>
+        ))}
       </div>
 
       {showModal && (
