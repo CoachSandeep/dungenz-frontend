@@ -45,7 +45,17 @@ const MovementInput = ({ value, onChange }) => {
       const res = await fetch(`${process.env.REACT_APP_API_BASE_URL}/movements/search?q=${query}`);
       if (res.ok) {
         const data = await res.json();
-        setSuggestions(data.map(item => item.name));
+        const currentList = value
+          .split(',')
+          .map(m => m.trim().toLowerCase())
+          .filter(m => m !== '');
+  
+        // ❌ Filter out already selected movements
+        const filtered = data
+          .map(item => item.name)
+          .filter(name => !currentList.includes(name.toLowerCase()));
+  
+        setSuggestions(filtered);
       }
     } catch (err) {
       console.error("Error fetching suggestions:", err);
