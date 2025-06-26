@@ -292,6 +292,14 @@ line-height:18px;
   font-weight: bold;
   margin-bottom: 5px;
 }
+
+.movement-demo-section ul li {
+  font-size: 15px;
+  display: flex;
+  align-items: center;
+}
+
 .youtube-embed-container iframe {
-  border-radius: 10px;
+  border-radius: 8px;
+  width: 100%;
 }

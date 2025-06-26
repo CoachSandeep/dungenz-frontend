@@ -22,6 +22,7 @@ const Workouts = () => {
   const [selectedUserId, setSelectedUserId] = useState('');
   const [users, setUsers] = useState([]);
   const [dailyMeta, setDailyMeta] = useState({}); // New state
+  const [movementVideo, setMovementVideo] = useState(null);
 
   const today = new Date();
   const todayKey = today.toLocaleDateString('en-CA', { timeZone: 'Asia/Kolkata' });
@@ -399,26 +400,22 @@ const Workouts = () => {
 {modalWorkout.movements?.length > 0 && (
   <div className="movement-demo-section">
     <h4>📽 Movement Demos</h4>
-    <div className="movement-video-list">
+    <ul style={{ listStyle: 'none', paddingLeft: 0 }}>
       {modalWorkout.movements.map((m, idx) => (
-        <div key={idx} className="movement-item">
-          <div className="movement-name">{m.name}</div>
+        <li key={idx} style={{ marginBottom: '8px' }}>
+          {m.name}
           {m.url && (
-            <div className="youtube-embed-container">
-              <iframe
-                width="100%"
-                height="215"
-                src={m.url.replace("watch?v=", "embed/")}
-                title={m.name}
-                frameBorder="0"
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                allowFullScreen
-              ></iframe>
-            </div>
+            <span
+              style={{ marginLeft: '10px', cursor: 'pointer' }}
+              onClick={() => setMovementVideo(m)}
+              title="Watch Demo"
+            >
+              🔗
+            </span>
           )}
-        </div>
+        </li>
       ))}
-    </div>
+    </ul>
   </div>
 )}
             </div>
@@ -426,6 +423,28 @@ const Workouts = () => {
           </div>
         </div>
       )}
+
+{movementVideo && (
+  <div className="modal-overlay" onClick={() => setMovementVideo(null)}>
+    <div className="modal-box" onClick={(e) => e.stopPropagation()}>
+      <h3>{movementVideo.name}</h3>
+      <div className="youtube-embed-container" style={{ marginTop: '10px' }}>
+        <iframe
+          width="100%"
+          height="315"
+          src={movementVideo.url.replace("watch?v=", "embed/")}
+          title={movementVideo.name}
+          frameBorder="0"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+          allowFullScreen
+        ></iframe>
+      </div>
+      <button onClick={() => setMovementVideo(null)} style={{ marginTop: '15px' }}>
+        Close
+      </button>
+    </div>
+  </div>
+)}
 
       {isLoading && (
         <div className="loading-overlay">Loading your workouts...</div>
