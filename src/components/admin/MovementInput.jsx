@@ -54,26 +54,38 @@ const MovementInput = ({ value, onChange }) => {
 
   const handleInputChange = (e) => {
     const raw = e.target.value;
-    onChange(raw); // Keep setting full input value for main form
+    onChange(raw);
   
-    const last = raw.split(',').pop().trim(); // only latest movement
-    setActiveInput(last);
+    const parts = raw.split(',').map(p => p.trim()).filter(Boolean);
+    const last = parts[parts.length - 1]; // last part being typed
   
-    if (last.length >= 2) {
-      fetchSuggestions(last); // search only by latest movement
+    // If last is already in list, no need to suggest again
+    const alreadySelected = parts.slice(0, -1); // all except the one being typed
+    const isDuplicate = alreadySelected.some(p => p.toLowerCase() === last.toLowerCase());
+  
+    if (!isDuplicate && last.length >= 2) {
+      fetchSuggestions(last);
     } else {
       setSuggestions([]);
     }
+  
+    setActiveInput(last);
   };
 
   const selectSuggestion = (sugg) => {
-    const parts = value.split(',');
-    parts[parts.length - 1] = sugg;
-    const updated = parts.join(', ').replace(/\s+/g, ' ').trim(); // optional clean-up
-    onChange(updated + ', '); // add comma+space after selection for smooth typing
+    const parts = value.split(',').map(p => p.trim());
+    parts[parts.length - 1] = sugg; // replace last part with selected suggestion
+  
+    const deduped = [...new Set(parts.filter(Boolean))]; // remove accidental duplicates
+    const updated = deduped.join(', ') + ', ';
+    
+    onChange(updated);
     setSuggestions([]);
     setActiveInput('');
   };
+
+
+
   const handleAddMovement = async () => {
     try {
       const res = await fetch(`${process.env.REACT_APP_API_BASE_URL}/movements`, {
