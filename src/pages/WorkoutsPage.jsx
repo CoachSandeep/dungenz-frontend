@@ -396,6 +396,31 @@ const Workouts = () => {
     <div>{modalWorkout.capTime}</div>
   </div>
 )}
+{modalWorkout.movements?.length > 0 && (
+  <div className="movement-demo-section">
+    <h4>📽 Movement Demos</h4>
+    <div className="movement-video-list">
+      {modalWorkout.movements.map((m, idx) => (
+        <div key={idx} className="movement-item">
+          <div className="movement-name">{m.name}</div>
+          {m.url && (
+            <div className="youtube-embed-container">
+              <iframe
+                width="100%"
+                height="215"
+                src={m.url.replace("watch?v=", "embed/")}
+                title={m.name}
+                frameBorder="0"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowFullScreen
+              ></iframe>
+            </div>
+          )}
+        </div>
+      ))}
+    </div>
+  </div>
+)}
             </div>
             <button onClick={() => setModalWorkout(null)}>Close</button>
           </div>
