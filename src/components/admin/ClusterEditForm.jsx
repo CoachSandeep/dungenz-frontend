@@ -23,7 +23,9 @@ const ClusterEditForm = ({ version, workouts, onSave, onCancel }) => {
     const token = localStorage.getItem('token');
   
     const updatedItems = items.map((item, index) => {
-      const movementIds = (item.movements || []).map((m) => m._id); // ✅ extract movement IDs
+      const movementIds = (item.movements || []).map((m) =>
+        typeof m === 'string' ? m : m._id || m
+      );
       return {
         ...item,
         order: index,

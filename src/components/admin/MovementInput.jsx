@@ -16,15 +16,20 @@ const MovementInput = ({ value = [], onChange }) => {
   // Normalize incoming value
   useEffect(() => {
     if (Array.isArray(value)) {
-      const normalized = value.map(item =>
-        typeof item === 'string' ? { name: item, url: '' } : item
-      );
+      const normalized = value.map(item => {
+        if (typeof item === 'string') {
+          // Match from library by _id
+          const matched = library.find(m => m._id === item);
+          return matched ? matched : { name: item, url: '' };
+        }
+        return item;
+      });
       setMovements(normalized);
     } else {
       setMovements([]);
     }
-  }, [value]);
-
+  }, [value, library]);
+  
   useEffect(() => {
     const fetchLibrary = async () => {
       try {
