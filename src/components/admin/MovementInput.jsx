@@ -113,13 +113,23 @@ const MovementInput = ({ value = [], onChange }) => {
         autoComplete="off"
       />
 
-      {suggestions.length > 0 && (
-        <ul className="suggestion-list">
-          {suggestions.map((s, idx) => (
-            <li key={idx} onClick={() => selectSuggestion(s)}>{s.name}</li>
-          ))}
-        </ul>
-      )}
+{(suggestions.length > 0 || (inputText.trim().length >= 2 && !suggestions.find(s => s.name.toLowerCase() === inputText.trim().toLowerCase()))) && (
+  <ul className="suggestion-list">
+    {suggestions.map((s, idx) => (
+      <li key={idx} onClick={() => selectSuggestion(s)}>{s.name}</li>
+    ))}
+
+    {/* ✅ Show Add New Option if no match */}
+    {!suggestions.find(s => s.name.toLowerCase() === inputText.trim().toLowerCase()) && inputText.trim().length >= 2 && (
+      <li className="add-new" onClick={() => {
+        setNewMovement(inputText.trim());
+        setShowModal(true);
+      }}>
+        ➕ Add "{inputText.trim()}"
+      </li>
+    )}
+  </ul>
+)}
 
       <div className="movement-tags">
         {movements.map((m, idx) => (
