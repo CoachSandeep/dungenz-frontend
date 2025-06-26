@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import './../../styles/MovementInput.css';
 
 const MovementInput = ({ value, onChange }) => {
+  const [rawInput, setRawInput] = useState(value || '');
   const [movements, setMovements] = useState([]);
   const [library, setLibrary] = useState([]);
   const [suggestions, setSuggestions] = useState([]);
@@ -11,6 +12,10 @@ const MovementInput = ({ value, onChange }) => {
   const [activeInput, setActiveInput] = useState('');
 
   const token = localStorage.getItem('token');
+
+  useEffect(() => {
+    setRawInput(value || '');
+  }, [value]);
 
   useEffect(() => {
     const fetchLibrary = async () => {
@@ -28,12 +33,12 @@ const MovementInput = ({ value, onChange }) => {
   }, [token]);
 
   useEffect(() => {
-    const parsed = value
+    const parsed = rawInput
       .split(',')
       .map(m => m.trim())
       .filter(m => m !== '');
     setMovements(parsed);
-  }, [value]);
+  }, [rawInput]);
 
   const fetchSuggestions = async (query) => {
     try {
@@ -48,10 +53,11 @@ const MovementInput = ({ value, onChange }) => {
   };
 
   const handleInputChange = (e) => {
-    const raw = e.target.value;
-    onChange(raw);
+    const input = e.target.value;
+    setRawInput(input);
+    onChange(input);
 
-    const last = raw.split(',').pop().trim();
+    const last = input.split(',').pop().trim();
     setActiveInput(last);
 
     if (last.length >= 2) {
@@ -62,9 +68,10 @@ const MovementInput = ({ value, onChange }) => {
   };
 
   const selectSuggestion = (sugg) => {
-    const parts = value.split(',');
-    parts[parts.length - 1] = sugg;
-    const updated = parts.join(', ');
+    const parts = rawInput.split(',');
+    parts[parts.length - 1] = ` ${sugg}`; // Add space for better readability
+    const updated = parts.join(',').replace(/^,/, '').trimStart();
+    setRawInput(updated);
     onChange(updated);
     setSuggestions([]);
   };
@@ -96,7 +103,7 @@ const MovementInput = ({ value, onChange }) => {
       <label>Movements:</label>
       <input
         type="text"
-        value={value}
+        value={rawInput}
         onChange={handleInputChange}
         placeholder="e.g. Push-Up, Air Squat"
         autoComplete="off"
