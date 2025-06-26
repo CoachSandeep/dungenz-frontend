@@ -106,3 +106,25 @@
   .suggestion-list li:hover {
     background-color: #ece5e5;
   }
+
+  .tag {
+    display: inline-flex;
+    align-items: center;
+    background-color: #f3f3f3;
+    padding: 4px 8px;
+    border-radius: 8px;
+    margin: 4px;
+    font-size: 14px;
+  }
+  
+  .add-icon,
+  .delete-icon {
+    margin-left: 6px;
+    cursor: pointer;
+    font-weight: bold;
+  }
+  
+  .add-icon:hover,
+  .delete-icon:hover {
+    color: red;
+  }

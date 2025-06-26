@@ -136,19 +136,28 @@ const MovementInput = ({ value = [], onChange }) => {
   </ul>
 )}
 
-      <div className="movement-tags">
-        {movements.map((m, idx) => (
-          <span key={idx} className="tag">
-            {m.name}
-            {!m.url && (
-              <span className="add-icon" onClick={() => {
-                setNewMovement(m.name);
-                setShowModal(true);
-              }}>➕</span>
-            )}
-          </span>
-        ))}
-      </div>
+<div className="movement-tags">
+  {movements.map((m, idx) => (
+    <span key={idx} className="tag">
+      {m.name}
+      
+      {/* ➕ Show add icon if url missing */}
+      {!m.url && (
+        <span className="add-icon" title="Add YouTube link" onClick={() => {
+          setNewMovement(m.name);
+          setShowModal(true);
+        }}>➕</span>
+      )}
+
+      {/* ❌ Always show delete icon to remove from workout */}
+      <span className="delete-icon" title="Remove from workout" onClick={() => {
+        const updated = movements.filter((_, i) => i !== idx);
+        setMovements(updated);
+        onChange(updated);
+      }}>❌</span>
+    </span>
+  ))}
+</div>
 
       {showModal && (
         <div className="modal-backdrop">
