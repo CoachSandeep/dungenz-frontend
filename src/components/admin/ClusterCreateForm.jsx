@@ -204,7 +204,10 @@ const ClusterCreateForm = ({ defaultDate, onSaved }) => {
     onChange={(e) => handleChange(index, 'adminNote', e.target.value)}
   />
 
-<MovementInput value={w.movements?.join(', ')} onChange={(val) => handleChange(index, 'movements', val.split(',').map(m => m.trim()))} />
+<MovementInput
+  value={w.movements || []}
+  onChange={(val) => handleChange(index, 'movements', val)}
+/>
 
                       {index > 0 && (
                         <button className="remove-btn" onClick={() => handleRemove(index)}>🗑️ Remove</button>
