@@ -53,29 +53,27 @@ const MovementInput = ({ value, onChange }) => {
   };
 
   const handleInputChange = (e) => {
-    const input = e.target.value;
-    setRawInput(input);
-    onChange(input);
-
-    const last = input.split(',').pop().trim();
+    const raw = e.target.value;
+    onChange(raw); // Keep setting full input value for main form
+  
+    const last = raw.split(',').pop().trim(); // only latest movement
     setActiveInput(last);
-
+  
     if (last.length >= 2) {
-      fetchSuggestions(last);
+      fetchSuggestions(last); // search only by latest movement
     } else {
       setSuggestions([]);
     }
   };
 
   const selectSuggestion = (sugg) => {
-    const parts = rawInput.split(',');
-    parts[parts.length - 1] = ` ${sugg}`; // Add space for better readability
-    const updated = parts.join(',').replace(/^,/, '').trimStart();
-    setRawInput(updated);
-    onChange(updated);
+    const parts = value.split(',');
+    parts[parts.length - 1] = sugg;
+    const updated = parts.join(', ').replace(/\s+/g, ' ').trim(); // optional clean-up
+    onChange(updated + ', '); // add comma+space after selection for smooth typing
     setSuggestions([]);
+    setActiveInput('');
   };
-
   const handleAddMovement = async () => {
     try {
       const res = await fetch(`${process.env.REACT_APP_API_BASE_URL}/movements`, {
