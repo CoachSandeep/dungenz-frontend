@@ -288,6 +288,13 @@ line-height:18px;
   flex-direction: column;
   gap: 10px;
 }
+
+.movement-demo-section h4 {
+  margin-bottom:0;
+}
+.movement-demo-section ul {
+  margin-top:8px;
+}
 .movement-name {
   font-weight: bold;
   margin-bottom: 5px;
