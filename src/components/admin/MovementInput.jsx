@@ -1,13 +1,14 @@
-// MovementInput.js
 import React, { useEffect, useState } from 'react';
 import './../../styles/MovementInput.css';
 
 const MovementInput = ({ value, onChange }) => {
   const [movements, setMovements] = useState([]);
   const [library, setLibrary] = useState([]);
+  const [suggestions, setSuggestions] = useState([]);
   const [showModal, setShowModal] = useState(false);
   const [newMovement, setNewMovement] = useState('');
   const [newLink, setNewLink] = useState('');
+  const [activeInput, setActiveInput] = useState('');
 
   const token = localStorage.getItem('token');
 
@@ -33,6 +34,40 @@ const MovementInput = ({ value, onChange }) => {
       .filter(m => m !== '');
     setMovements(parsed);
   }, [value]);
+
+  const fetchSuggestions = async (query) => {
+    try {
+      const res = await fetch(`${process.env.REACT_APP_API_BASE_URL}/movements/search?q=${query}`);
+      if (res.ok) {
+        const data = await res.json();
+        setSuggestions(data.map(item => item.name));
+      }
+    } catch (err) {
+      console.error("Error fetching suggestions:", err);
+    }
+  };
+
+  const handleInputChange = (e) => {
+    const raw = e.target.value;
+    onChange(raw);
+
+    const last = raw.split(',').pop().trim();
+    setActiveInput(last);
+
+    if (last.length >= 2) {
+      fetchSuggestions(last);
+    } else {
+      setSuggestions([]);
+    }
+  };
+
+  const selectSuggestion = (sugg) => {
+    const parts = value.split(',');
+    parts[parts.length - 1] = sugg;
+    const updated = parts.join(', ');
+    onChange(updated);
+    setSuggestions([]);
+  };
 
   const handleAddMovement = async () => {
     try {
@@ -62,18 +97,30 @@ const MovementInput = ({ value, onChange }) => {
       <input
         type="text"
         value={value}
-        onChange={(e) => onChange(e.target.value)}
+        onChange={handleInputChange}
         placeholder="e.g. Push-Up, Air Squat"
+        autoComplete="off"
       />
+
+      {suggestions.length > 0 && (
+        <ul className="suggestion-list">
+          {suggestions.map((s, idx) => (
+            <li key={idx} onClick={() => selectSuggestion(s)}>{s}</li>
+          ))}
+        </ul>
+      )}
+
       <div className="movement-tags">
         {movements.map((m, idx) => {
           const exists = library.some(l => l.name.toLowerCase() === m.toLowerCase());
           return (
             <span key={idx} className="tag">
-              {m} { !exists && <span className="add-icon" onClick={() => {
-                setNewMovement(m);
-                setShowModal(true);
-              }}>➕</span> }
+              {m} {!exists && (
+                <span className="add-icon" onClick={() => {
+                  setNewMovement(m);
+                  setShowModal(true);
+                }}>➕</span>
+              )}
             </span>
           );
         })}
