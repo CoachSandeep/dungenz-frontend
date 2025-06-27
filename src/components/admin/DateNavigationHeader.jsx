@@ -19,8 +19,8 @@ const DateNavigationHeader = ({
     <div className="date-nav-header">
       <div className="left">
         <button className="nav-arrow" onClick={onPrevMonth}>⬅</button>
-        <h2 className="month-label">{currentMonth}</h2>
         <button className="nav-arrow" onClick={onNextMonth}>➡</button>
+        <h2 className="month-label">{currentMonth}</h2>
       </div>
 
       <div className="right">
