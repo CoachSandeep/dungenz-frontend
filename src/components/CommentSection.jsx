@@ -55,7 +55,10 @@ const CommentSection = ({ date, user }) => {
     try {
       const res = await fetch(`${process.env.REACT_APP_API_BASE_URL}/comments/${date}`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      },
         body: JSON.stringify({ text: newComment, user: fallbackUser })
       });
 
@@ -74,7 +77,10 @@ const CommentSection = ({ date, user }) => {
   const handleLike = async (commentId) => {
     await fetch(`${process.env.REACT_APP_API_BASE_URL}/comments/${date}/${commentId}/like`, {
       method: 'PATCH',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      },
       body: JSON.stringify({
         userId: user.id,
         name: user.name,
@@ -111,7 +117,10 @@ const CommentSection = ({ date, user }) => {
 
     await fetch(`${process.env.REACT_APP_API_BASE_URL}/comments/${date}/${commentId}/reply`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      },
       body: JSON.stringify({ text, user: fallbackUser })
     });
     fetchComments();
