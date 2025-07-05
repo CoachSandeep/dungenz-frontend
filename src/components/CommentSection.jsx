@@ -7,7 +7,8 @@ const CommentSection = ({ date, user }) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [likeModalOpen, setLikeModalOpen] = useState(false);
   const [likeList, setLikeList] = useState([]);
-
+  const token = localStorage.getItem('token'); 
+  
   if (!date) return null;
 
   const fetchComments = async () => {
