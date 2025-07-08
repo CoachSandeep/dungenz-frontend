@@ -355,9 +355,21 @@ const Workouts = () => {
                                     {expandedVersions[version] && (
                                       <div className="inline-details">
                                         <div dangerouslySetInnerHTML={{ __html: w.description.replace(/\n/g, '<br/>') }} />
-                                        <div className="wod-instructions">
-    TIME CAP:<div>{w.capTime}</div></div>
-                                        <div>{w.instructions}</div>
+                                      
+   
+{w.capTime && ( <div className="wod-instructions">
+    TIME CAP:
+    <div>{w.capTime}</div>
+  </div>)}
+
+  {w.instructions && (
+
+<div className="wod-instructions">
+    INSTRUCTIONS:
+    <div dangerouslySetInnerHTML={{ __html: w.instructions.replace(/\n/g, '<br/>') }} />
+  </div>
+  )}
+    
                                       </div>
                                     )}
                                   </div>

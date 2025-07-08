@@ -376,6 +376,7 @@ const AdminTimeline = () => {
               defaultDate={selectedDate}
               onSaved={() => {
                 fetchMonthWorkouts(selectedMonth);
+                setSelectedDate(selectedDate); // ✅ Re-select previously selected date
                 setShowAdd(false);
               }}
             />
@@ -421,6 +422,7 @@ const AdminTimeline = () => {
         onSave={() => {
           setEditingWorkoutId(null);
           fetchMonthWorkouts(selectedMonth);
+          setSelectedDate(selectedDate); // ✅ Preserve selected date
         }}
         onCancel={() => setEditingWorkoutId(null)}
       />
