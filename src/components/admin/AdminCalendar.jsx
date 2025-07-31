@@ -1,4 +1,4 @@
-// ✅ Modified AdminTimeline to support user filtering and display user name
+// ✅ Modified AdminTimeline to support user filtering and display user name with workouts
 
 import React, { useEffect, useState, useRef } from 'react';
 import {
@@ -178,7 +178,7 @@ const AdminTimeline = () => {
                   <div key={w._id} className="admin-workout-item">
                     <div className="workout-title-row">
                       <h4>{w.title}</h4>
-                      <p style={{ fontSize: '12px', color: '#ccc' }}>By: {w.user?.name || 'Unknown'}</p>
+                      <p style={{ fontSize: '12px', color: '#ccc' }}>By: {w.user?.name || w.user?.email || 'Unknown'}</p>
                     </div>
                   </div>
                 ))}
