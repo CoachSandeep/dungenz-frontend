@@ -40,7 +40,7 @@ const AdminTimeline = () => {
 
   const fetchUserList = async () => {
     try {
-      const res = await fetch(`${process.env.REACT_APP_API_BASE_URL}/admin/users/distinct`, {
+      const res = await fetch(`${process.env.REACT_APP_API_BASE_URL}/users`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       const data = await res.json();
