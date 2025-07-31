@@ -112,6 +112,53 @@ const AdminTimeline = () => {
     setSelectedDate(grouped[todayKey] ? todayKey : Object.keys(grouped)[0]);
   };
 
+  const handleSaveCalories = async () => {
+    if (!selectedDate || !calorieValue) return;
+    try {
+      const res = await fetch(`${process.env.REACT_APP_API_BASE_URL}/admin/workouts/daily-meta`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          date: selectedDate,
+          calories: calorieValue
+        })
+      });
+      if (res.ok) {
+        toast.success('Calories saved!');
+        fetchMonthWorkouts(selectedMonth);
+      } else {
+        toast.error('Failed to save calories');
+      }
+    } catch (err) {
+      console.error('Error saving calories', err);
+      toast.error('Error saving calories');
+    }
+  };
+  
+  const handleDeleteCalories = async () => {
+    if (!selectedDate) return;
+    try {
+      const res = await fetch(`${process.env.REACT_APP_API_BASE_URL}/admin/workouts/daily-meta?date=${selectedDate}`, {
+        method: 'DELETE',
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      });
+      if (res.ok) {
+        toast.success('Calories deleted!');
+        fetchMonthWorkouts(selectedMonth);
+      } else {
+        toast.error('Failed to delete calories');
+      }
+    } catch (err) {
+      console.error('Error deleting calories', err);
+      toast.error('Error deleting calories');
+    }
+  };
+
   const getFilteredGrouped = () => {
     const filtered = {};
     Object.keys(groupedWorkouts).forEach((date) => {
