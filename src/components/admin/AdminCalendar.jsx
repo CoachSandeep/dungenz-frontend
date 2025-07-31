@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState, useRef } from 'react';
 import {
   FaEdit, FaTrash, FaCopy, FaStar, FaRegStar, FaBookOpen, FaPlus
@@ -33,8 +32,11 @@ const AdminTimeline = () => {
   const scrollRefs = useRef({});
 
   useEffect(() => {
-    fetchMonthWorkouts(selectedMonth);
     fetchUserList();
+  }, []);
+
+  useEffect(() => {
+    fetchMonthWorkouts(selectedMonth);
   }, [selectedMonth]);
 
   useEffect(() => {
@@ -44,22 +46,6 @@ const AdminTimeline = () => {
       setSelectedDate(filteredDates[0] || null);
     }
   }, [filterUser, onlyStarred, groupedWorkouts]);
-
-  useEffect(() => {
-    if (selectedDate && scrollRefs.current[selectedDate]) {
-      scrollRefs.current[selectedDate].scrollIntoView({
-        behavior: 'smooth',
-        inline: 'center',
-        block: 'nearest',
-      });
-    }
-  }, [selectedDate]);
-
-  useEffect(() => {
-    if (selectedDate && groupedWorkouts[selectedDate]) {
-      setCalorieValue(groupedWorkouts[selectedDate].calories || '');
-    }
-  }, [selectedDate, groupedWorkouts]);
 
   const fetchUserList = async () => {
     try {
@@ -122,7 +108,6 @@ const AdminTimeline = () => {
     });
 
     setGroupedWorkouts(grouped);
-
     const todayKey = new Date().toISOString().split('T')[0];
     setSelectedDate(grouped[todayKey] ? todayKey : Object.keys(grouped)[0]);
   };
@@ -135,7 +120,7 @@ const AdminTimeline = () => {
         let workouts = groupedWorkouts[date].versions[v];
         if (!workouts) return;
         if (filterUser) {
-          workouts = workouts.filter(w => w.user === filterUser || w.user?._id === filterUser);
+          workouts = workouts.filter(w => w.user?._id === filterUser || w.user === filterUser);
         }
         if (onlyStarred) {
           workouts = workouts.filter(w => w.isStarred);
@@ -148,6 +133,7 @@ const AdminTimeline = () => {
     });
     return filtered;
   };
+
 
   return (
     <div className="admin-timeline-container">
