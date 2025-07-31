@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState, useRef } from 'react';
 import {
   FaEdit, FaTrash, FaCopy, FaStar, FaRegStar, FaBookOpen, FaPlus
@@ -11,7 +12,6 @@ import './../../styles/adminCalendar.css';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import { subMonths, addMonths, format } from 'date-fns';
-
 
 const versionOrder = ['Ultra Train', 'Super Train', 'Minimal Equipment', 'Beginner'];
 
@@ -29,7 +29,6 @@ const AdminTimeline = () => {
   const [calorieValue, setCalorieValue] = useState('');
   const [userList, setUserList] = useState([]);
 
-
   const token = localStorage.getItem('token');
   const scrollRefs = useRef({});
 
@@ -38,6 +37,13 @@ const AdminTimeline = () => {
     fetchUserList();
   }, [selectedMonth]);
 
+  useEffect(() => {
+    const filtered = getFilteredGrouped();
+    const filteredDates = Object.keys(filtered).sort((a, b) => new Date(a) - new Date(b));
+    if (!filtered[selectedDate]) {
+      setSelectedDate(filteredDates[0] || null);
+    }
+  }, [filterUser, onlyStarred, groupedWorkouts]);
 
   useEffect(() => {
     if (selectedDate && scrollRefs.current[selectedDate]) {
@@ -48,14 +54,6 @@ const AdminTimeline = () => {
       });
     }
   }, [selectedDate]);
-
-  useEffect(() => {
-    const starredDates = Object.keys(getFilteredGrouped()).sort((a, b) => new Date(a) - new Date(b));
-    if (onlyStarred && !starredDates.includes(selectedDate)) {
-      setSelectedDate(starredDates[0] || null);
-    }
-  }, [onlyStarred, groupedWorkouts]);
-
 
   useEffect(() => {
     if (selectedDate && groupedWorkouts[selectedDate]) {
@@ -74,7 +72,6 @@ const AdminTimeline = () => {
       console.error('Failed to fetch users');
     }
   };
-
 
   const fetchMonthWorkouts = async (date) => {
     const year = date.getFullYear();
@@ -130,79 +127,6 @@ const AdminTimeline = () => {
     setSelectedDate(grouped[todayKey] ? todayKey : Object.keys(grouped)[0]);
   };
 
-  const handleSaveCalories = async () => {
-    if (!selectedDate) return toast.error("Select a date first");
-    try {
-      const res = await fetch(`${process.env.REACT_APP_API_BASE_URL}/admin/workouts/daily-meta`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`
-        },
-        body: JSON.stringify({ date: selectedDate, calories: calorieValue })
-      });
-      const data = await res.json();
-      if (res.ok) {
-        toast.success("Calories saved ✅");
-        fetchMonthWorkouts(selectedMonth);
-      } else {
-        toast.error(data.message || "Failed to save calories");
-      }
-    } catch (err) {
-      toast.error("Something went wrong");
-    }
-  };
-
-  const handleDeleteCalories = async () => {
-    if (!selectedDate) return toast.error("Select a date first");
-    try {
-      const res = await fetch(`${process.env.REACT_APP_API_BASE_URL}/admin/workouts/daily-meta?date=${selectedDate}`, {
-        method: 'DELETE',
-        headers: { Authorization: `Bearer ${token}` }
-        
-      });
-      if (res.ok) {
-        toast.success("Calories deleted ❌");
-        setCalorieValue('');
-        fetchMonthWorkouts(selectedMonth);
-      } else {
-        toast.error("Failed to delete calories");
-      }
-    } catch (err) {
-      toast.error("Something went wrong");
-    }
-  };
-
-  const handleClusterCopy = async ({ date, version, user }) => {
-    try {
-      const res = await fetch(`${process.env.REACT_APP_API_BASE_URL}/admin/workouts/copy-day`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({
-          fromDate: selectedDate,
-          fromVersion: version,
-          toDate: date,
-          toVersion: version,
-          user: user || "all"
-        })
-      });
-  
-      if (res.ok) {
-        toast.success('✅ Workouts copied successfully!');
-        fetchMonthWorkouts(selectedMonth);
-      } else {
-        const err = await res.json();
-        toast.error(`❌ Copy failed: ${err.message}`);
-      }
-    } catch (err) {
-      toast.error('❌ Something went wrong while copying workouts');
-    }
-  };
-  
-
   const getFilteredGrouped = () => {
     const filtered = {};
     Object.keys(groupedWorkouts).forEach((date) => {
@@ -225,92 +149,6 @@ const AdminTimeline = () => {
     return filtered;
   };
 
-  const toggleWorkoutSelection = (workout, date, version) => {
-    const key = `${date}-${version}`;
-    const versionWorkouts = groupedWorkouts[date]?.versions[version] || [];
-    const allSelected = versionWorkouts.every(w => selectedWorkouts.includes(w._id));
-    const newSelection = [...selectedWorkouts];
-    versionWorkouts.forEach(w => {
-      const idx = newSelection.indexOf(w._id);
-      if (!allSelected && idx === -1) newSelection.push(w._id);
-      else if (allSelected && idx !== -1) newSelection.splice(idx, 1);
-    });
-    setSelectedWorkouts(newSelection);
-  };
-
-  const filteredGrouped = getFilteredGrouped();
-  const filteredDates = Object.keys(filteredGrouped).sort((a, b) => new Date(a) - new Date(b));
-
-  const handleDelete = async (id, date, version) => {
-    if (window.confirm('Delete workout?')) {
-      try {
-        const res = await fetch(`${process.env.REACT_APP_API_BASE_URL}/admin/workouts/${id}/delete`, {
-          method: 'DELETE',
-          headers: { Authorization: `Bearer ${token}` },
-        });
-
-        if (res.ok) {
-          toast.success('🗑️ Workout deleted');
-          setGroupedWorkouts(prev => {
-            const updated = { ...prev };
-            if (!updated[date]) return prev;
-
-            const versionList = updated[date].versions[version];
-            if (!versionList) return prev;
-
-            updated[date].versions[version] = versionList.filter(w => w._id !== id);
-            return updated;
-          });
-        } else {
-          toast.error('❌ Failed to delete workout');
-        }
-      } catch (err) {
-        toast.error('❌ Error deleting workout');
-      }
-    }
-  };
-
-  const toggleStar = async (id) => {
-    try {
-      const res = await fetch(`${process.env.REACT_APP_API_BASE_URL}/admin/workouts/${id}/star`, {
-        method: 'PATCH',
-        headers: { Authorization: `Bearer ${token}` },
-      });
-
-      if (res.ok) {
-        toast.success('⭐ Workout starred/unstarred');
-        fetchMonthWorkouts(selectedMonth);
-      } else {
-        toast.error('❌ Failed to update star');
-      }
-    } catch (err) {
-      toast.error('❌ Error toggling star');
-    }
-  };
-
-  const toggleLibrary = async (id) => {
-    try {
-      const res = await fetch(`${process.env.REACT_APP_API_BASE_URL}/admin/workouts/${id}/library`, {
-        method: 'PATCH',
-        headers: { Authorization: `Bearer ${token}` },
-      });
-
-      if (res.ok) {
-        toast.success('📚 Workout added/removed from Library');
-        fetchMonthWorkouts(selectedMonth);
-      } else {
-        toast.error('❌ Failed to update library status');
-      }
-    } catch (err) {
-      toast.error('❌ Error toggling library');
-    }
-  };
-  
-
-  const isChecked = (date, version) => {
-    const versionWorkouts = groupedWorkouts[date]?.versions[version] || [];
-    return versionWorkouts.every(w => selectedWorkouts.includes(w._id));
-  };
   return (
     <div className="admin-timeline-container">
       <ToastContainer position="top-right" autoClose={3000} />
