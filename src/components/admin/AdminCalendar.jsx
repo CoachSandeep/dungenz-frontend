@@ -19,6 +19,7 @@ const AdminTimeline = () => {
   const [groupedWorkouts, setGroupedWorkouts] = useState({});
   const [selectedDate, setSelectedDate] = useState(null);
   const [filterVersion, setFilterVersion] = useState('');
+  const [filterUser, setFilterUser] = useState('');
   const [onlyStarred, setOnlyStarred] = useState(false);
   const [editingWorkoutId, setEditingWorkoutId] = useState(null);
   const [showAdd, setShowAdd] = useState(false);
@@ -26,6 +27,8 @@ const AdminTimeline = () => {
   const [selectedWorkouts, setSelectedWorkouts] = useState([]);
   const [showCopyModal, setShowCopyModal] = useState(false);
   const [calorieValue, setCalorieValue] = useState('');
+  const [userList, setUserList] = useState([]);
+
 
   const token = localStorage.getItem('token');
   const scrollRefs = useRef({});
