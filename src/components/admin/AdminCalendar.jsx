@@ -131,7 +131,7 @@ const AdminTimeline = () => {
       <div className="timeline-header">
         <h2>DUNGENZ Admin Timeline</h2>
       </div>
-
+  
       <div className="calendar-filter">
         <DatePicker
           selected={selectedMonth}
@@ -140,7 +140,7 @@ const AdminTimeline = () => {
           showMonthYearPicker
         />
       </div>
-
+  
       <div className="filter-bar">
         <select value={filterVersion} className="selectfilter" onChange={(e) => setFilterVersion(e.target.value)}>
           <option value="">All Versions</option>
@@ -148,7 +148,7 @@ const AdminTimeline = () => {
             <option key={v} value={v}>{v}</option>
           ))}
         </select>
-
+  
         <select value={filterUser} className="selectfilter" onChange={(e) => setFilterUser(e.target.value)}>
           <option value="">All Users</option>
           {userList.map((user) => (
@@ -156,37 +156,44 @@ const AdminTimeline = () => {
           ))}
         </select>
       </div>
-
-      {selectedDate && filteredGrouped[selectedDate] && (
-        <div className="timeline-details-box">
-          <div className="admin-date-heading">
-            <h3>Workouts for {filteredGrouped[selectedDate].displayDate}</h3>
-          </div>
-
-          {versionOrder.map((version) => {
-            if (filterVersion && version !== filterVersion) return null;
-            const workouts = filteredGrouped[selectedDate].versions[version];
-            if (!workouts || !workouts.length) return null;
-
-            return (
-              <div key={version} className="version-group">
-                <div className="badge-title-line">
-                  <span className={`badge badge-${version.replace(/\s+/g, '').toLowerCase()}`}>{version}</span>
-                </div>
-
-                {workouts.map((w) => (
-                  <div key={w._id} className="admin-workout-item">
-                    <div className="workout-title-row">
-                      <h4>{w.title}</h4>
-                      <p style={{ fontSize: '12px', color: '#ccc' }}>By: {w.user?.name || w.user?.email || 'Unknown'}</p>
-                    </div>
-                  </div>
-                ))}
+  
+      <div className="timeline-scroll">
+        {filteredDates.map((dateKey) => {
+          const dayData = filteredGrouped[dateKey];
+          return (
+            <div key={dateKey} className="timeline-details-box" ref={(el) => (scrollRefs.current[dateKey] = el)}>
+              <div className="admin-date-heading">
+                <h3>{dayData.displayDate} ({dayData.day})</h3>
               </div>
-            );
-          })}
-        </div>
-      )}
+  
+              {versionOrder.map((version) => {
+                if (filterVersion && version !== filterVersion) return null;
+                const workouts = dayData.versions[version];
+                if (!workouts || !workouts.length) return null;
+  
+                return (
+                  <div key={version} className="version-group">
+                    <div className="badge-title-line">
+                      <span className={`badge badge-${version.replace(/\s+/g, '').toLowerCase()}`}>{version}</span>
+                    </div>
+  
+                    {workouts.map((w) => (
+                      <div key={w._id} className="admin-workout-item">
+                        <div className="workout-title-row">
+                          <h4>{w.title}</h4>
+                          <p style={{ fontSize: '12px', color: '#ccc' }}>
+                            By: {w.user?.name || w.user?.email || 'Unknown'}
+                          </p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                );
+              })}
+            </div>
+          );
+        })}
+      </div>
     </div>
   );
 };
