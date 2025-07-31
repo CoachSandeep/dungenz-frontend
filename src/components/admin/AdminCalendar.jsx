@@ -204,13 +204,19 @@ const AdminTimeline = () => {
   
 
   const getFilteredGrouped = () => {
-    if (!onlyStarred) return groupedWorkouts;
     const filtered = {};
     Object.keys(groupedWorkouts).forEach((date) => {
       const versions = {};
       versionOrder.forEach((v) => {
-        const workouts = groupedWorkouts[date].versions[v]?.filter(w => w.isStarred);
-        if (workouts?.length) versions[v] = workouts;
+        let workouts = groupedWorkouts[date].versions[v];
+        if (!workouts) return;
+        if (filterUser) {
+          workouts = workouts.filter(w => w.user === filterUser || w.user?._id === filterUser);
+        }
+        if (onlyStarred) {
+          workouts = workouts.filter(w => w.isStarred);
+        }
+        if (workouts.length) versions[v] = workouts;
       });
       if (Object.keys(versions).length) {
         filtered[date] = { ...groupedWorkouts[date], versions };
