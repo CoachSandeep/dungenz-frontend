@@ -137,7 +137,7 @@ const AdminTimeline = () => {
       toast.error('Error saving calories');
     }
   };
-  
+
   const handleDeleteCalories = async () => {
     if (!selectedDate) return;
     try {
@@ -180,6 +180,7 @@ const AdminTimeline = () => {
     });
     return filtered;
   };
+
 
 
   return (
