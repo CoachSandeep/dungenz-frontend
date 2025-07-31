@@ -12,13 +12,13 @@ import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import { subMonths, addMonths, format } from 'date-fns';
 
+
 const versionOrder = ['Ultra Train', 'Super Train', 'Minimal Equipment', 'Beginner'];
 
 const AdminTimeline = () => {
   const [groupedWorkouts, setGroupedWorkouts] = useState({});
   const [selectedDate, setSelectedDate] = useState(null);
   const [filterVersion, setFilterVersion] = useState('');
-  const [filterUser, setFilterUser] = useState('');
   const [onlyStarred, setOnlyStarred] = useState(false);
   const [editingWorkoutId, setEditingWorkoutId] = useState(null);
   const [showAdd, setShowAdd] = useState(false);
@@ -26,39 +26,38 @@ const AdminTimeline = () => {
   const [selectedWorkouts, setSelectedWorkouts] = useState([]);
   const [showCopyModal, setShowCopyModal] = useState(false);
   const [calorieValue, setCalorieValue] = useState('');
-  const [userList, setUserList] = useState([]);
 
   const token = localStorage.getItem('token');
   const scrollRefs = useRef({});
 
   useEffect(() => {
-    fetchUserList();
-  }, []);
-
-  useEffect(() => {
     fetchMonthWorkouts(selectedMonth);
   }, [selectedMonth]);
 
+
   useEffect(() => {
-    const filtered = getFilteredGrouped();
-    const filteredDates = Object.keys(filtered).sort((a, b) => new Date(a) - new Date(b));
-    if (!filtered[selectedDate]) {
-      setSelectedDate(filteredDates[0] || null);
-    }
-  }, [filterUser, onlyStarred, groupedWorkouts]);
-
-  const fetchUserList = async () => {
-    try {
-      const res = await fetch(`${process.env.REACT_APP_API_BASE_URL}/users`, {
-        headers: { Authorization: `Bearer ${token}` },
+    if (selectedDate && scrollRefs.current[selectedDate]) {
+      scrollRefs.current[selectedDate].scrollIntoView({
+        behavior: 'smooth',
+        inline: 'center',
+        block: 'nearest',
       });
-      const data = await res.json();
-      if (res.ok) setUserList(data);
-    } catch (err) {
-      console.error('Failed to fetch users');
     }
-  };
+  }, [selectedDate]);
 
+  useEffect(() => {
+    const starredDates = Object.keys(getFilteredGrouped()).sort((a, b) => new Date(a) - new Date(b));
+    if (onlyStarred && !starredDates.includes(selectedDate)) {
+      setSelectedDate(starredDates[0] || null);
+    }
+  }, [onlyStarred, groupedWorkouts]);
+
+
+  useEffect(() => {
+    if (selectedDate && groupedWorkouts[selectedDate]) {
+      setCalorieValue(groupedWorkouts[selectedDate].calories || '');
+    }
+  }, [selectedDate, groupedWorkouts]);
   const fetchMonthWorkouts = async (date) => {
     const year = date.getFullYear();
     const month = date.getMonth() + 1;
@@ -108,12 +107,13 @@ const AdminTimeline = () => {
     });
 
     setGroupedWorkouts(grouped);
+
     const todayKey = new Date().toISOString().split('T')[0];
     setSelectedDate(grouped[todayKey] ? todayKey : Object.keys(grouped)[0]);
   };
 
   const handleSaveCalories = async () => {
-    if (!selectedDate || !calorieValue) return;
+    if (!selectedDate) return toast.error("Select a date first");
     try {
       const res = await fetch(`${process.env.REACT_APP_API_BASE_URL}/admin/workouts/daily-meta`, {
         method: 'POST',
@@ -121,58 +121,78 @@ const AdminTimeline = () => {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${token}`
         },
-        body: JSON.stringify({
-          date: selectedDate,
-          calories: calorieValue
-        })
+        body: JSON.stringify({ date: selectedDate, calories: calorieValue })
       });
+      const data = await res.json();
       if (res.ok) {
-        toast.success('Calories saved!');
+        toast.success("Calories saved ✅");
         fetchMonthWorkouts(selectedMonth);
       } else {
-        toast.error('Failed to save calories');
+        toast.error(data.message || "Failed to save calories");
       }
     } catch (err) {
-      console.error('Error saving calories', err);
-      toast.error('Error saving calories');
+      toast.error("Something went wrong");
     }
   };
 
   const handleDeleteCalories = async () => {
-    if (!selectedDate) return;
+    if (!selectedDate) return toast.error("Select a date first");
     try {
       const res = await fetch(`${process.env.REACT_APP_API_BASE_URL}/admin/workouts/daily-meta?date=${selectedDate}`, {
         method: 'DELETE',
-        headers: {
-          Authorization: `Bearer ${token}`
-        }
+        headers: { Authorization: `Bearer ${token}` }
+        
       });
       if (res.ok) {
-        toast.success('Calories deleted!');
+        toast.success("Calories deleted ❌");
+        setCalorieValue('');
         fetchMonthWorkouts(selectedMonth);
       } else {
-        toast.error('Failed to delete calories');
+        toast.error("Failed to delete calories");
       }
     } catch (err) {
-      console.error('Error deleting calories', err);
-      toast.error('Error deleting calories');
+      toast.error("Something went wrong");
     }
   };
 
+  const handleClusterCopy = async ({ date, version, user }) => {
+    try {
+      const res = await fetch(`${process.env.REACT_APP_API_BASE_URL}/admin/workouts/copy-day`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          fromDate: selectedDate,
+          fromVersion: version,
+          toDate: date,
+          toVersion: version,
+          user: user || "all"
+        })
+      });
+  
+      if (res.ok) {
+        toast.success('✅ Workouts copied successfully!');
+        fetchMonthWorkouts(selectedMonth);
+      } else {
+        const err = await res.json();
+        toast.error(`❌ Copy failed: ${err.message}`);
+      }
+    } catch (err) {
+      toast.error('❌ Something went wrong while copying workouts');
+    }
+  };
+  
+
   const getFilteredGrouped = () => {
+    if (!onlyStarred) return groupedWorkouts;
     const filtered = {};
     Object.keys(groupedWorkouts).forEach((date) => {
       const versions = {};
       versionOrder.forEach((v) => {
-        let workouts = groupedWorkouts[date].versions[v];
-        if (!workouts) return;
-        if (filterUser) {
-          workouts = workouts.filter(w => w.user?._id === filterUser || w.user === filterUser);
-        }
-        if (onlyStarred) {
-          workouts = workouts.filter(w => w.isStarred);
-        }
-        if (workouts.length) versions[v] = workouts;
+        const workouts = groupedWorkouts[date].versions[v]?.filter(w => w.isStarred);
+        if (workouts?.length) versions[v] = workouts;
       });
       if (Object.keys(versions).length) {
         filtered[date] = { ...groupedWorkouts[date], versions };
@@ -181,8 +201,92 @@ const AdminTimeline = () => {
     return filtered;
   };
 
+  const toggleWorkoutSelection = (workout, date, version) => {
+    const key = `${date}-${version}`;
+    const versionWorkouts = groupedWorkouts[date]?.versions[version] || [];
+    const allSelected = versionWorkouts.every(w => selectedWorkouts.includes(w._id));
+    const newSelection = [...selectedWorkouts];
+    versionWorkouts.forEach(w => {
+      const idx = newSelection.indexOf(w._id);
+      if (!allSelected && idx === -1) newSelection.push(w._id);
+      else if (allSelected && idx !== -1) newSelection.splice(idx, 1);
+    });
+    setSelectedWorkouts(newSelection);
+  };
 
+  const filteredGrouped = getFilteredGrouped();
+  const filteredDates = Object.keys(filteredGrouped).sort((a, b) => new Date(a) - new Date(b));
 
+  const handleDelete = async (id, date, version) => {
+    if (window.confirm('Delete workout?')) {
+      try {
+        const res = await fetch(`${process.env.REACT_APP_API_BASE_URL}/admin/workouts/${id}/delete`, {
+          method: 'DELETE',
+          headers: { Authorization: `Bearer ${token}` },
+        });
+
+        if (res.ok) {
+          toast.success('🗑️ Workout deleted');
+          setGroupedWorkouts(prev => {
+            const updated = { ...prev };
+            if (!updated[date]) return prev;
+
+            const versionList = updated[date].versions[version];
+            if (!versionList) return prev;
+
+            updated[date].versions[version] = versionList.filter(w => w._id !== id);
+            return updated;
+          });
+        } else {
+          toast.error('❌ Failed to delete workout');
+        }
+      } catch (err) {
+        toast.error('❌ Error deleting workout');
+      }
+    }
+  };
+
+  const toggleStar = async (id) => {
+    try {
+      const res = await fetch(`${process.env.REACT_APP_API_BASE_URL}/admin/workouts/${id}/star`, {
+        method: 'PATCH',
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      if (res.ok) {
+        toast.success('⭐ Workout starred/unstarred');
+        fetchMonthWorkouts(selectedMonth);
+      } else {
+        toast.error('❌ Failed to update star');
+      }
+    } catch (err) {
+      toast.error('❌ Error toggling star');
+    }
+  };
+
+  const toggleLibrary = async (id) => {
+    try {
+      const res = await fetch(`${process.env.REACT_APP_API_BASE_URL}/admin/workouts/${id}/library`, {
+        method: 'PATCH',
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      if (res.ok) {
+        toast.success('📚 Workout added/removed from Library');
+        fetchMonthWorkouts(selectedMonth);
+      } else {
+        toast.error('❌ Failed to update library status');
+      }
+    } catch (err) {
+      toast.error('❌ Error toggling library');
+    }
+  };
+  
+
+  const isChecked = (date, version) => {
+    const versionWorkouts = groupedWorkouts[date]?.versions[version] || [];
+    return versionWorkouts.every(w => selectedWorkouts.includes(w._id));
+  };
   return (
     <div className="admin-timeline-container">
       <ToastContainer position="top-right" autoClose={3000} />
@@ -204,14 +308,6 @@ const AdminTimeline = () => {
           <option value="">All Versions</option>
           {versionOrder.map((v) => (
             <option key={v} value={v}>{v}</option>
-          ))}
-        </select>
-
-
-        <select value={filterUser} className="selectfilter" onChange={(e) => setFilterUser(e.target.value)}>
-          <option value="">All Users</option>
-          {userList.map((user) => (
-            <option key={user._id} value={user._id}>{user.name || user.email}</option>
           ))}
         </select>
       </div>
