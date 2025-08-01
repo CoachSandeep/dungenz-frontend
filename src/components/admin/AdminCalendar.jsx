@@ -167,7 +167,7 @@ const AdminTimeline = () => {
         let workouts = groupedWorkouts[date].versions[v];
         if (!workouts) return;
         if (filterUser) {
-          workouts = workouts.filter(w => w.user?._id === filterUser || w.user === filterUser);
+          w.targetUser?._id === filterUser || w.targetUser === filterUser
         }
         if (onlyStarred) {
           workouts = workouts.filter(w => w.isStarred);
@@ -182,7 +182,7 @@ const AdminTimeline = () => {
   };
   const filteredGrouped = getFilteredGrouped();
   const filteredDates = Object.keys(filteredGrouped).sort((a, b) => new Date(a) - new Date(b));
-  
+
   const isChecked = (date, version) => {
     const workouts = filteredGrouped[date]?.versions?.[version] || [];
     return workouts.every((w) => selectedWorkouts.includes(w._id));
