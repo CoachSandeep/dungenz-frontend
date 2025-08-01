@@ -170,17 +170,26 @@ const AdminTimeline = () => {
         if (!allWorkouts) return;
   
         const filteredWorkouts = allWorkouts.filter((w) => {
-          const matchUser = !filterUser || w.targetUser?._id === filterUser || w.targetUser === filterUser;
-          const matchStar = !onlyStarred || w.isStarred;
-          return matchUser && matchStar;
+          // ✅ If no user selected, show only workouts without targetUser
+          if (!filterUser) {
+            if (w.targetUser) return false;
+          } else {
+            // ✅ If user selected, show only their workouts
+            if (!(w.targetUser === filterUser || w.targetUser?._id === filterUser)) return false;
+          }
+  
+          // ✅ Handle starred filter
+          if (onlyStarred && !w.isStarred) return false;
+  
+          return true;
         });
   
-        if (filteredWorkouts.length) {
+        if (filteredWorkouts.length > 0) {
           versions[v] = filteredWorkouts;
         }
       });
   
-      if (Object.keys(versions).length) {
+      if (Object.keys(versions).length > 0) {
         filtered[date] = { ...groupedWorkouts[date], versions };
       }
     });
