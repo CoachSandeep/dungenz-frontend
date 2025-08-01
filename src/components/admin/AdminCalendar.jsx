@@ -161,24 +161,30 @@ const AdminTimeline = () => {
 
   const getFilteredGrouped = () => {
     const filtered = {};
+  
     Object.keys(groupedWorkouts).forEach((date) => {
       const versions = {};
+  
       versionOrder.forEach((v) => {
-        let workouts = groupedWorkouts[date].versions[v];
-        if (!workouts) return;
-        if (filterUser) {
-          workouts = workouts.filter(w => w.targetUser?._id === filterUser || w.targetUser === filterUser);
-         
+        const allWorkouts = groupedWorkouts[date].versions[v];
+        if (!allWorkouts) return;
+  
+        const filteredWorkouts = allWorkouts.filter((w) => {
+          const matchUser = !filterUser || w.targetUser?._id === filterUser || w.targetUser === filterUser;
+          const matchStar = !onlyStarred || w.isStarred;
+          return matchUser && matchStar;
+        });
+  
+        if (filteredWorkouts.length) {
+          versions[v] = filteredWorkouts;
         }
-        if (onlyStarred) {
-          workouts = workouts.filter(w => w.isStarred);
-        }
-        if (workouts.length) versions[v] = workouts;
       });
+  
       if (Object.keys(versions).length) {
         filtered[date] = { ...groupedWorkouts[date], versions };
       }
     });
+  
     return filtered;
   };
   const filteredGrouped = getFilteredGrouped();
