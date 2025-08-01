@@ -59,7 +59,7 @@ const AdminTimeline = () => {
     }
   };
 
-  const fetchMonthWorkouts = async (date) => {
+  const fetchMonthWorkouts = async (date, preserveSelectedDate = null) => {
     const year = date.getFullYear();
     const month = date.getMonth() + 1;
 
@@ -108,102 +108,52 @@ const AdminTimeline = () => {
     });
 
     setGroupedWorkouts(grouped);
-    const todayKey = new Date().toISOString().split('T')[0];
-    setSelectedDate(grouped[todayKey] ? todayKey : Object.keys(grouped)[0]);
-  };
 
-  const handleSaveCalories = async () => {
-    if (!selectedDate || !calorieValue) return;
-    try {
-      const res = await fetch(`${process.env.REACT_APP_API_BASE_URL}/admin/workouts/daily-meta`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`
-        },
-        body: JSON.stringify({
-          date: selectedDate,
-          calories: calorieValue
-        })
-      });
-      if (res.ok) {
-        toast.success('Calories saved!');
-        fetchMonthWorkouts(selectedMonth);
-      } else {
-        toast.error('Failed to save calories');
-      }
-    } catch (err) {
-      console.error('Error saving calories', err);
-      toast.error('Error saving calories');
-    }
-  };
-
-  const handleDeleteCalories = async () => {
-    if (!selectedDate) return;
-    try {
-      const res = await fetch(`${process.env.REACT_APP_API_BASE_URL}/admin/workouts/daily-meta?date=${selectedDate}`, {
-        method: 'DELETE',
-        headers: {
-          Authorization: `Bearer ${token}`
-        }
-      });
-      if (res.ok) {
-        toast.success('Calories deleted!');
-        fetchMonthWorkouts(selectedMonth);
-      } else {
-        toast.error('Failed to delete calories');
-      }
-    } catch (err) {
-      console.error('Error deleting calories', err);
-      toast.error('Error deleting calories');
+    if (preserveSelectedDate && grouped[preserveSelectedDate]) {
+      setSelectedDate(preserveSelectedDate);
+    } else {
+      const todayKey = new Date().toISOString().split('T')[0];
+      setSelectedDate(grouped[todayKey] ? todayKey : Object.keys(grouped)[0]);
     }
   };
 
   const getFilteredGrouped = () => {
     const filtered = {};
-  
     Object.keys(groupedWorkouts).forEach((date) => {
       const versions = {};
-  
       versionOrder.forEach((v) => {
         const allWorkouts = groupedWorkouts[date].versions[v];
         if (!allWorkouts) return;
-  
+
         const filteredWorkouts = allWorkouts.filter((w) => {
-          // ✅ If no user selected, show only workouts without targetUser
           if (!filterUser) {
             if (w.targetUser) return false;
           } else {
-            // ✅ If user selected, show only their workouts
             if (!(w.targetUser === filterUser || w.targetUser?._id === filterUser)) return false;
           }
-  
-          // ✅ Handle starred filter
           if (onlyStarred && !w.isStarred) return false;
-  
           return true;
         });
-  
+
         if (filteredWorkouts.length > 0) {
           versions[v] = filteredWorkouts;
         }
       });
-  
+
       if (Object.keys(versions).length > 0) {
         filtered[date] = { ...groupedWorkouts[date], versions };
       }
     });
-  
     return filtered;
   };
+
   const filteredGrouped = getFilteredGrouped();
   const filteredDates = Object.keys(filteredGrouped).sort((a, b) => new Date(a) - new Date(b));
-  
+
   const isChecked = (date, version) => {
     const workouts = filteredGrouped[date]?.versions?.[version] || [];
     return workouts.every((w) => selectedWorkouts.includes(w._id));
   };
-
   return (
     <div className="admin-timeline-container">
       <ToastContainer position="top-right" autoClose={3000} />
