@@ -182,7 +182,11 @@ const AdminTimeline = () => {
   };
   const filteredGrouped = getFilteredGrouped();
   const filteredDates = Object.keys(filteredGrouped).sort((a, b) => new Date(a) - new Date(b));
-
+  
+  const isChecked = (date, version) => {
+    const workouts = filteredGrouped[date]?.versions?.[version] || [];
+    return workouts.every((w) => selectedWorkouts.includes(w._id));
+  };
 
   return (
     <div className="admin-timeline-container">
