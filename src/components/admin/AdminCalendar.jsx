@@ -27,6 +27,8 @@ const AdminTimeline = () => {
   const [showCopyModal, setShowCopyModal] = useState(false);
   const [calorieValue, setCalorieValue] = useState('');
   const [userList, setUserList] = useState([]);
+  const [modalWorkout, setModalWorkout] = useState(null);
+
 
   const token = localStorage.getItem('token');
   const scrollRefs = useRef({});
@@ -46,6 +48,31 @@ const AdminTimeline = () => {
       setSelectedDate(filteredDates[0] || null);
     }
   }, [filterUser, onlyStarred, groupedWorkouts]);
+
+  const WorkoutDetailModal = ({ workout, onClose }) => {
+    if (!workout) return null;
+    return (
+      <div className="modal-overlay" onClick={onClose}>
+        <div className="modal-content workout-modal" onClick={(e) => e.stopPropagation()}>
+          <h2>{workout.customName || workout.title}</h2>
+          <p><strong>Version:</strong> {workout.version}</p>
+          {workout.icon && <p><strong>Icon:</strong> {workout.icon}</p>}
+          {workout.timeCap && <p><strong>Time Cap:</strong> {workout.timeCap} minutes</p>}
+          <p><strong>Description:</strong></p>
+          <p dangerouslySetInnerHTML={{ __html: workout.description?.replace(/\n/g, '<br />') }} />
+          {workout.instructions && (
+            <>
+              <p><strong>Instructions:</strong></p>
+              <p dangerouslySetInnerHTML={{ __html: workout.instructions.replace(/\n/g, '<br />') }} />
+            </>
+          )}
+          <button onClick={onClose} className="close-btn">Close</button>
+        </div>
+      </div>
+    );
+  };
+
+
 
   const fetchUserList = async () => {
     try {
@@ -290,6 +317,13 @@ const AdminTimeline = () => {
   return (
     <div className="admin-timeline-container">
       <ToastContainer position="top-right" autoClose={3000} />
+
+      {modalWorkout && (
+        <WorkoutDetailModal
+          workout={modalWorkout}
+          onClose={() => setModalWorkout(null)}
+        />
+      )}
       <div className="timeline-header">
         <h2>DUNGENZ Admin Timeline</h2>
       </div>
@@ -422,7 +456,7 @@ const AdminTimeline = () => {
                 </div>
 
                 {workouts.map((w) => (
-  <div key={w._id} className="admin-workout-item">
+  <div key={w._id} className="admin-workout-item" onClick={() => setModalWorkout(w)}>
     {editingWorkoutId === w._id ? (
       <ClusterEditForm
         version={version}
