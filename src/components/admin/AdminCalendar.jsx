@@ -469,7 +469,7 @@ const AdminTimeline = () => {
         onCancel={() => setEditingWorkoutId(null)}
       />
     ) : (
-      <div className="workout-title-row" onClick={() => setPreviewWorkout(w)}>
+      <div className="workout-title-row" >
        <div>
         {w.customName && (
     <div style={{ fontSize: '0.9rem', color: '#bbb', fontWeight: '500' }}>
