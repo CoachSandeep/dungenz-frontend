@@ -414,6 +414,7 @@ const Workouts = () => {
         </div>
       )}
     </div>
+    </div>
             <div className="modal-inside-content">
               <div className="wod-desp" dangerouslySetInnerHTML={{ __html: modalWorkout.description.replace(/\n/g, '<br/>') }} />
               {modalWorkout.instructions && (
