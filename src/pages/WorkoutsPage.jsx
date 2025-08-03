@@ -393,8 +393,27 @@ const Workouts = () => {
       {modalWorkout && (
         <div className="modal-overlay" onClick={() => setModalWorkout(null)}>
           <div className="modal-box" onClick={(e) => e.stopPropagation()}>
-            <h2>{modalWorkout.customName || modalWorkout.title}</h2>
-            <h3>{modalWorkout.title}</h3>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+    <div>
+      <h2 style={{ marginBottom: 0 }}>{modalWorkout.customName || modalWorkout.title}</h2>
+      {modalWorkout.customName && <h3 style={{ marginTop: 4, fontWeight: 'normal' }}>{modalWorkout.title}</h3>}
+    </div>
+
+    <div style={{ textAlign: 'right' }}>
+      {modalWorkout.version && (
+        <span
+          className={`badge badge-${modalWorkout.version.replace(/\s+/g, '').toLowerCase()}`}
+          style={{ fontSize: '0.75rem', padding: '3px 8px', borderRadius: '8px', marginBottom: '4px', display: 'inline-block' }}
+        >
+          {modalWorkout.version}
+        </span>
+      )}
+      {modalWorkout.date && (
+        <div style={{ fontSize: '0.75rem', color: '#aaa' }}>
+          {new Date(modalWorkout.date).toLocaleDateString('en-GB')}
+        </div>
+      )}
+    </div>
             <div className="modal-inside-content">
               <div className="wod-desp" dangerouslySetInnerHTML={{ __html: modalWorkout.description.replace(/\n/g, '<br/>') }} />
               {modalWorkout.instructions && (
