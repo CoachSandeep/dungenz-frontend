@@ -399,7 +399,7 @@ const Workouts = () => {
       {modalWorkout.customName && <h3 style={{ marginTop: 4, fontWeight: 'normal' }}>{modalWorkout.title}</h3>}
     </div>
 
-    <div style={{ textAlign: 'right' }}>
+    <div style={{ textAlign: 'right', minWidth: '15%' }}>
       {modalWorkout.version && (
         <span
           className={`badge badge-${modalWorkout.version.replace(/\s+/g, '').toLowerCase()}`}
