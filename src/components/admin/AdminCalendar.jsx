@@ -469,14 +469,21 @@ const AdminTimeline = () => {
         onCancel={() => setEditingWorkoutId(null)}
       />
     ) : (
-      <div className="workout-title-row">
+      <div className="workout-title-row" onClick={() => setPreviewWorkout(w)}>
+       <div>
+        {w.customName && (
+    <div style={{ fontSize: '0.9rem', color: '#bbb', fontWeight: '500' }}>
+      {w.customName}
+    </div>
+  )}
         <h4>{w.title}</h4>
-        <div className="icon-actions">
-          <FaEdit onClick={() => setEditingWorkoutId(w._id)} />
-          <FaTrash  onClick={() => handleDelete(w._id, w.date.split('T')[0], w.version)} />
-          <FaStar onClick={() => toggleStar(w._id)} />
-          <FaBookOpen onClick={() => toggleLibrary(w._id)} />
         </div>
+        <div className="icon-actions">
+    <FaEdit onClick={(e) => { e.stopPropagation(); setEditingWorkoutId(w._id); }} />
+    <FaTrash onClick={(e) => { e.stopPropagation(); handleDelete(w._id, w.date.split('T')[0], w.version); }} />
+    <FaStar onClick={(e) => { e.stopPropagation(); toggleStar(w._id); }} />
+    <FaBookOpen onClick={(e) => { e.stopPropagation(); toggleLibrary(w._id); }} />
+  </div>
       </div>
     )}
   </div>
