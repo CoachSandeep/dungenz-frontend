@@ -186,7 +186,34 @@ const AdminTimeline = () => {
     }
   };
 
+  const handleClusterCopy = async ({ date, version, user }) => {
+    try {
+      const res = await fetch(`${process.env.REACT_APP_API_BASE_URL}/admin/workouts/copy-day`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          fromDate: selectedDate,
+          fromVersion: version,
+          toDate: date,
+          toVersion: version,
+          user: user || "all"
+        })
+      });
   
+      if (res.ok) {
+        toast.success('✅ Workouts copied successfully!');
+        fetchMonthWorkouts(selectedMonth);
+      } else {
+        const err = await res.json();
+        toast.error(`❌ Copy failed: ${err.message}`);
+      }
+    } catch (err) {
+      toast.error('❌ Something went wrong while copying workouts');
+    }
+  };
  
 
   const getFilteredGrouped = () => {
@@ -456,7 +483,7 @@ const AdminTimeline = () => {
                 </div>
 
                 {workouts.map((w) => (
-  <div key={w._id} className="admin-workout-item" onClick={() => setModalWorkout(w)}>
+  <div key={w._id} className="admin-workout-item" >
     {editingWorkoutId === w._id ? (
       <ClusterEditForm
         version={version}
