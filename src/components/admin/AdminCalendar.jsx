@@ -86,6 +86,12 @@ const AdminTimeline = () => {
     }
   };
 
+  useEffect(() => {
+    if (selectedDate && groupedWorkouts[selectedDate]) {
+      setCalorieValue(groupedWorkouts[selectedDate].calories || '');
+    }
+  }, [selectedDate, groupedWorkouts]);
+
   const fetchMonthWorkouts = async (date) => {
     const year = date.getFullYear();
     const month = date.getMonth() + 1;
@@ -390,7 +396,19 @@ const AdminTimeline = () => {
           ⭐ Show only Starred
         </label>
       </div>
+<div>
 
+<button
+  className="back-to-today-btn"
+  onClick={() => {
+    const todayKey = new Date().toISOString().split('T')[0];
+    setSelectedDate(todayKey);
+    scrollRefs.current[todayKey]?.scrollIntoView({ behavior: 'smooth', inline: 'center' });
+  }}
+>
+  🎯 Back to Today
+</button>
+</div>
       <div style={{ margin: '10px 0', display: 'flex', gap: '10px', alignItems: 'center' }}>
         <label style={{ color: 'white' }}>🔥 Set Cals</label>
         <input
