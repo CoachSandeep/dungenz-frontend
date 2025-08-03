@@ -483,7 +483,15 @@ const AdminTimeline = () => {
                 </div>
 
                 {workouts.map((w) => (
-  <div key={w._id} className="admin-workout-item" >
+  <div
+  key={w._id}
+  className="admin-workout-item"
+  onClick={() => {
+    if (editingWorkoutId !== w._id) {
+      setModalWorkout(w);
+    }
+  }}
+>
     {editingWorkoutId === w._id ? (
       <ClusterEditForm
         version={version}
