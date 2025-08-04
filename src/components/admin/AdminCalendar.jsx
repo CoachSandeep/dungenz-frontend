@@ -401,9 +401,19 @@ const AdminTimeline = () => {
 <button
   className="back-to-today-btn"
   onClick={() => {
-    const todayKey = new Date().toISOString().split('T')[0];
-    setSelectedDate(todayKey);
-    scrollRefs.current[todayKey]?.scrollIntoView({ behavior: 'smooth', inline: 'center' });
+    const today = new Date();
+    const todayKey = today.toISOString().split('T')[0];
+    const monthStart = new Date(today.getFullYear(), today.getMonth(), 1);
+
+    setSelectedMonth(monthStart); // 👈 Load current month
+
+    setTimeout(() => {
+      setSelectedDate(todayKey); // 👈 Set selected date after month updates
+
+      setTimeout(() => {
+        scrollRefs.current[todayKey]?.scrollIntoView({ behavior: 'smooth', inline: 'center' });
+      }, 100); // 👈 Delay to let DOM render refs
+    }, 300); // 👈 Delay to allow month change and re-fetch
   }}
 >
   🎯 Back to Today
@@ -436,13 +446,18 @@ const AdminTimeline = () => {
 
       <div className="timeline-horizontal" style={{ display: 'flex', overflowX: 'auto', scrollSnapType: 'x mandatory' }}>
         {filteredDates.map((dateKey) => (
-          <div
-            key={dateKey}
-            ref={(el) => (scrollRefs.current[dateKey] = el)}
-            className={`timeline-date-circle ${selectedDate === dateKey ? 'active' : ''}`}
-            onClick={() => setSelectedDate(dateKey)}
-            style={{ flex: '0 0 auto', scrollSnapAlign: 'center' }}
-          >
+        <div
+        key={dateKey}
+        ref={(el) => (scrollRefs.current[dateKey] = el)}
+        className={`timeline-date-circle ${selectedDate === dateKey ? 'active' : ''}`}
+        onClick={() => {
+          setSelectedDate(dateKey);
+          setTimeout(() => {
+            scrollRefs.current[dateKey]?.scrollIntoView({ behavior: 'smooth', inline: 'center' });
+          }, 100); // allow DOM update
+        }}
+        style={{ flex: '0 0 auto', scrollSnapAlign: 'center' }}
+      >
             <div className="circle-date">{filteredGrouped[dateKey].displayDate.split('/')[0]}</div>
             <div className="circle-day">{filteredGrouped[dateKey].day}</div>
           </div>
