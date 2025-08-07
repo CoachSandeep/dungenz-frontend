@@ -4,6 +4,7 @@ import './../styles/workout.css';
 import SandboxedCommentSection from '../components/SandboxedCommentSection';
 import CalorieShadeBar from '../components/CalorieShadeBar';
 import { FiRefreshCw } from 'react-icons/fi';
+import DailyNoteSection from '../components/DailyNoteSection';
 
 const versionOrder = ["Ultra Train", "Super Train", "Minimal Equipment", "Beginner"];
 

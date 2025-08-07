@@ -44,6 +44,22 @@ const AdminUsers = () => {
     }
   };
 
+  const toggleIndividualProgram = async (id, value) => {
+    try {
+      await fetch(`${process.env.REACT_APP_API_BASE_URL}/users/${id}/individual-program`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ value }),
+      });
+      fetchUsers();
+    } catch (err) {
+      console.error("❌ Error updating individual programming:", err);
+    }
+  };
+
   const toggleActive = async (id) => {
     try {
       await fetch(`${process.env.REACT_APP_API_BASE_URL}/users/${id}/toggle-active`, {
@@ -97,6 +113,16 @@ const AdminUsers = () => {
                   <option value="superadmin">Superadmin</option>
                 </select>
               </div>
+              <div className="user-individual-checkbox">
+  <label>
+    <input
+      type="checkbox"
+      checked={user.isIndividualProgram || false}
+      onChange={(e) => toggleIndividualProgram(user._id, e.target.checked)}
+    />
+    Individual Programming
+  </label>
+</div>
               <div
                 className={`user-status ${user.isActive ? 'active' : 'inactive'}`}
                 onClick={() => toggleActive(user._id)}
