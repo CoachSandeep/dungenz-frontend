@@ -58,6 +58,11 @@ const Workouts = () => {
     setDailyMeta(prev => ({ ...prev, ...metaMap }));
   };
 
+  const viewingUser = selectedUserId
+  ? users.find(u => u._id === selectedUserId)
+  : user;
+
+const isIndividual = viewingUser?.isIndividualProgram;
 
   const getDisplayDate = (selectedDate) => {
     const targetDate = new Date(selectedDate);
@@ -324,7 +329,11 @@ const Workouts = () => {
                 ) : (
                   <>
                     <div className="section-card-indvidual">
-                      <SandboxedCommentSection date={selectedDate} user={user} />
+                      {isIndividual ? (
+  <DailyNoteSection date={selectedDate} user={viewingUser} />
+) : (
+  <SandboxedCommentSection date={selectedDate} user={viewingUser} />
+)}
                     </div>
 
                     {versionOrder.map((version) =>
