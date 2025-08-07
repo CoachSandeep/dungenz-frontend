@@ -101,6 +101,16 @@ const AdminUsers = () => {
               <h3>{user.name}</h3>
               <p>{user.email}</p>
             </div>
+            <div className="user-individual-checkbox">
+  <label>
+    <input
+      type="checkbox"
+      checked={user.isIndividualProgram || false}
+      onChange={(e) => toggleIndividualProgram(user._id, e.target.checked)}
+    />
+    Individual Programming
+  </label>
+</div>
             <div className="user-controls">
               <div className="user-role">
                 <label>Role</label>
@@ -113,16 +123,7 @@ const AdminUsers = () => {
                   <option value="superadmin">Superadmin</option>
                 </select>
               </div>
-              <div className="user-individual-checkbox">
-  <label>
-    <input
-      type="checkbox"
-      checked={user.isIndividualProgram || false}
-      onChange={(e) => toggleIndividualProgram(user._id, e.target.checked)}
-    />
-    Individual Programming
-  </label>
-</div>
+          
               <div
                 className={`user-status ${user.isActive ? 'active' : 'inactive'}`}
                 onClick={() => toggleActive(user._id)}
