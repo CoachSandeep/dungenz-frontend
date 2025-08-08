@@ -6,8 +6,9 @@ const DailyNoteSection = ({ date, selectedUserId, loggedInUser }) => {
   const [loading, setLoading] = useState(false);
 
   const token = localStorage.getItem('token');
+  const user = JSON.parse(localStorage.getItem('user'));
 
-  const isCoach = ['coach', 'superadmin'].includes(loggedInUser.role);
+  const isCoach = ['coach', 'superadmin'].includes(user?.role);
   const isSameUser = loggedInUser._id === selectedUserId;
 
   const fetchNote = async () => {
