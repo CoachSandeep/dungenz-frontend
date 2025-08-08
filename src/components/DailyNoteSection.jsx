@@ -6,10 +6,12 @@ const DailyNoteSection = ({ date, selectedUserId, loggedInUser }) => {
   const [loading, setLoading] = useState(false);
 
   const token = localStorage.getItem('token');
-  const user = JSON.parse(localStorage.getItem('user'));
+  const localUser = JSON.parse(localStorage.getItem('user') || '{}');
+  const loggedInUser = { ...localUser, _id: localUser.id };
+  
 
-  const isCoach = ['coach', 'superadmin'].includes(user?.role);
-  const isSameUser = loggedInUser._id === selectedUserId;
+  const isCoach = ['coach', 'superadmin'].includes(loggedInUser?.role);
+  const isSameUser = loggedInUser._id === user?._id;
 
   const fetchNote = async () => {
     try {
@@ -80,10 +82,10 @@ const DailyNoteSection = ({ date, selectedUserId, loggedInUser }) => {
   };
 
   useEffect(() => {
-    if (date && selectedUserId) {
+    if (date && user?._id) {
       fetchNote();
     }
-  }, [date, selectedUserId]);
+  }, [date, user?._id]);
 
   return (
     <div className="section-card-indvidual" style={{ marginBottom: '10px' }}>
