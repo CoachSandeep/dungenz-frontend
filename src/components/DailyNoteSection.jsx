@@ -43,9 +43,16 @@ const DailyNoteSection = ({ date, selectedUserId, selectedUser }) => {
   // Save a note (user or coach)
   const saveNote = async (type) => {
     setLoading(true);
+    const saveuser = selectedUserId;
+if(type == 'user')
+{
+  saveuser = loggedInUser?.id
+
+}
+
     try {
       const payload = {
-        user: selectedUserId,
+        user: saveuser,
         date,
         ...(type === 'user' && { userNote }),
         ...(type === 'coach' && { coachNote }),
