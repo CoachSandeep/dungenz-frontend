@@ -91,7 +91,7 @@ const DailyNoteSection = ({ date, selectedUserId, selectedUser }) => {
 
   // Fetch note whenever date or selectedUserId changes
   useEffect(() => {
-    if (date && selectedUserId) {
+    if (showNotes) {
       fetchNote();
     }
   }, [date, selectedUserId]);
