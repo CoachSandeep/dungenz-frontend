@@ -5,20 +5,20 @@ const DailyNoteSection = ({ date, selectedUserId, selectedUser }) => {
   const [coachNote, setCoachNote] = useState('');
   const [loading, setLoading] = useState(false);
 
-  // current logged‐in user
+  // Current logged-in user (from localStorage)
   const token = localStorage.getItem('token');
   const localUser = JSON.parse(localStorage.getItem('user') || '{}');
   const loggedInUser = { ...localUser, _id: localUser.id };
 
-  // roles and ownership
+  // Role checks and ownership
   const isCoach = ['coach', 'superadmin'].includes(loggedInUser?.role);
-  const isSameUser = loggedInUser._id === selectedUserId;
+  const isSameUser = loggedInUser._id === selectedUserId; // ✅ fix: compare with selectedUserId
   const isIndividual = selectedUser?.isIndividualProgram;
 
-  // show notes when user is on individual programming or viewer is coach
+  // Show notes if user is on an individual programme or viewer is coach
   const showNotes = isIndividual || isCoach;
 
-  // fetch notes from API
+  // Fetch the note data
   const fetchNote = async () => {
     try {
       const res = await fetch(
@@ -40,7 +40,7 @@ const DailyNoteSection = ({ date, selectedUserId, selectedUser }) => {
     }
   };
 
-  // save note for user or coach
+  // Save a note (user or coach)
   const saveNote = async (type) => {
     setLoading(true);
     try {
@@ -71,7 +71,7 @@ const DailyNoteSection = ({ date, selectedUserId, selectedUser }) => {
     }
   };
 
-  // delete note for user or coach
+  // Delete a note (user or coach)
   const deleteNote = async (type) => {
     try {
       await fetch(
@@ -89,6 +89,7 @@ const DailyNoteSection = ({ date, selectedUserId, selectedUser }) => {
     }
   };
 
+  // Fetch note whenever date or selectedUserId changes
   useEffect(() => {
     if (date && selectedUserId) {
       fetchNote();
@@ -99,7 +100,7 @@ const DailyNoteSection = ({ date, selectedUserId, selectedUser }) => {
     <div className="section-card-indvidual" style={{ marginBottom: '10px' }}>
       {showNotes && <h3 style={{ color: 'white' }}>📝 Daily Notes</h3>}
 
-      {/* User's own note */}
+      {/* User's note section (editable only for the same user) */}
       {isSameUser && showNotes && (
         <div style={{ marginBottom: '20px' }}>
           <label style={{ color: '#bbb' }}>Your Note</label>
@@ -124,12 +125,11 @@ const DailyNoteSection = ({ date, selectedUserId, selectedUser }) => {
         </div>
       )}
 
-      {/* Coach note: always visible when showNotes is true */}
+      {/* Coach note section: editable for coach/superadmin, read-only for users */}
       {showNotes && (
         <div>
           <label style={{ color: '#bbb' }}>Coach Note</label>
           {isCoach ? (
-            // Editable for coach/superadmin
             <textarea
               value={coachNote}
               onChange={(e) => setCoachNote(e.target.value)}
@@ -138,7 +138,6 @@ const DailyNoteSection = ({ date, selectedUserId, selectedUser }) => {
               style={{ width: '100%', padding: '10px', marginTop: '5px' }}
             />
           ) : (
-            // Read‐only for normal user
             <div
               style={{
                 width: '100%',
