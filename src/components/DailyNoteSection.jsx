@@ -22,7 +22,7 @@ const DailyNoteSection = ({ date, selectedUserId, selectedUser }) => {
   const fetchNote = async () => {
     try {
       const res = await fetch(
-        `${process.env.REACT_APP_API_BASE_URL}/daily-notes?user=${localUser.id}&date=${date}`,
+        `${process.env.REACT_APP_API_BASE_URL}/daily-notes?user=${loggedInUser?.id}&date=${date}`,
         {
           headers: { Authorization: `Bearer ${token}` },
         }
