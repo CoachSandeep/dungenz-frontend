@@ -330,7 +330,11 @@ const isIndividual = viewingUser?.isIndividualProgram;
                   <>
                     <div className="section-card-indvidual">
                       {isIndividual ? (
-                        <DailyNoteSection date={selectedDate} selectedUserId={viewingUser._id} />
+                        <DailyNoteSection
+                        date={selectedDate}
+                        selectedUserId={viewingUser._id}
+                        selectedUser={viewingUser}
+                      />
 ) : (
   <SandboxedCommentSection date={selectedDate} user={viewingUser} />
 )}
