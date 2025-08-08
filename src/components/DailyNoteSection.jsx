@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 
-const DailyNoteSection = ({ date, selectedUserId, loggedInUser }) => {
+const DailyNoteSection = ({ date, selectedUserId }) => {
   const [userNote, setUserNote] = useState('');
   const [coachNote, setCoachNote] = useState('');
   const [loading, setLoading] = useState(false);
