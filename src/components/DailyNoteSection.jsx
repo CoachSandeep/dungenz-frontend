@@ -101,7 +101,7 @@ const DailyNoteSection = ({ date, selectedUserId, selectedUser }) => {
       {showNotes && <h3 style={{ color: 'white' }}>📝 Daily Notes</h3>}
 
       {/* User's note section (editable only for the same user) */}
-      {isSameUser && showNotes && (
+      {showNotes && (
         <div style={{ marginBottom: '20px' }}>
           <label style={{ color: '#bbb' }}>Your Note</label>
           <textarea
