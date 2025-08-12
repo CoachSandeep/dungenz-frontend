@@ -12,17 +12,17 @@ const DailyNoteSection = ({ date, selectedUserId, selectedUser }) => {
 
   // Role checks and ownership
   const isCoach = ['coach', 'superadmin'].includes(loggedInUser?.role);
-  const isSameUser = loggedInUser._id === selectedUserId; // ✅ fix: compare with selectedUserId
+  const isSameUser = loggedInUser._id === selectedUserId;
   const isIndividual = selectedUser?.isIndividualProgram;
 
   // Show notes if user is on an individual programme or viewer is coach
   const showNotes = isIndividual || isCoach;
 
-  // Fetch the note data
+  // Fetch the note data (always use selectedUserId in the query)
   const fetchNote = async () => {
     try {
       const res = await fetch(
-        `${process.env.REACT_APP_API_BASE_URL}/daily-notes?user=${loggedInUser?.id}&date=${date}`,
+        `${process.env.REACT_APP_API_BASE_URL}/daily-notes?user=${selectedUserId}&date=${date}`,
         {
           headers: { Authorization: `Bearer ${token}` },
         }
@@ -40,19 +40,14 @@ const DailyNoteSection = ({ date, selectedUserId, selectedUser }) => {
     }
   };
 
-  // Save a note (user or coach)
+  // Save a note (use current user for user note, selected user for coach note)
   const saveNote = async (type) => {
     setLoading(true);
-    const saveuser = selectedUserId;
-if(type == 'user')
-{
-  saveuser = loggedInUser?.id
-
-}
+    const noteUserId = type === 'user' ? loggedInUser._id : selectedUserId;
 
     try {
       const payload = {
-        user: saveuser,
+        user: noteUserId,
         date,
         ...(type === 'user' && { userNote }),
         ...(type === 'coach' && { coachNote }),
@@ -78,11 +73,13 @@ if(type == 'user')
     }
   };
 
-  // Delete a note (user or coach)
+  // Delete a note (use current user for user note, selected user for coach note)
   const deleteNote = async (type) => {
     try {
+      const userToDelete = type === 'user' ? loggedInUser._id : selectedUserId;
+
       await fetch(
-        `${process.env.REACT_APP_API_BASE_URL}/daily-notes?user=${selectedUserId}&date=${date}&type=${type}`,
+        `${process.env.REACT_APP_API_BASE_URL}/daily-notes?user=${userToDelete}&date=${date}&type=${type}`,
         {
           method: 'DELETE',
           headers: { Authorization: `Bearer ${token}` },
@@ -96,19 +93,19 @@ if(type == 'user')
     }
   };
 
-  // Fetch note whenever date or selectedUserId changes
+  // Fetch note whenever date or selectedUserId changes and notes should be shown
   useEffect(() => {
-    if (showNotes) {
+    if (showNotes && date && selectedUserId) {
       fetchNote();
     }
-  }, [date, selectedUserId]);
+  }, [date, selectedUserId, showNotes]);
 
   return (
     <div className="section-card-indvidual" style={{ marginBottom: '10px' }}>
       {showNotes && <h3 style={{ color: 'white' }}>📝 Daily Notes</h3>}
 
-      {/* User's note section (editable only for the same user) */}
-      {showNotes && (
+      {/* User note: only visible and editable for the same user */}
+      {isSameUser && showNotes && (
         <div style={{ marginBottom: '20px' }}>
           <label style={{ color: '#bbb' }}>Your Note</label>
           <textarea
@@ -132,7 +129,7 @@ if(type == 'user')
         </div>
       )}
 
-      {/* Coach note section: editable for coach/superadmin, read-only for users */}
+      {/* Coach note: visible to the logged-in user if showNotes; editable for coach/superadmin */}
       {showNotes && (
         <div>
           <label style={{ color: '#bbb' }}>Coach Note</label>
