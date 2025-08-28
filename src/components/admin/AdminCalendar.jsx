@@ -260,17 +260,28 @@ const AdminTimeline = () => {
     return filtered;
   };
   const toggleWorkoutSelection = (workout, date, version) => {
-    const key = `${date}-${version}`;
-    const versionWorkouts = groupedWorkouts[date]?.versions[version] || [];
-    const allSelected = versionWorkouts.every(w => selectedWorkouts.includes(w._id));
+    // use filteredGrouped instead of groupedWorkouts
+    const versionWorkouts =
+      filteredGrouped[date]?.versions?.[version] || [];
+  
+    // if all visible workouts are already selected, then unselect them
+    const allSelected = versionWorkouts.every((w) =>
+      selectedWorkouts.includes(w._id),
+    );
     const newSelection = [...selectedWorkouts];
-    versionWorkouts.forEach(w => {
+  
+    versionWorkouts.forEach((w) => {
       const idx = newSelection.indexOf(w._id);
-      if (!allSelected && idx === -1) newSelection.push(w._id);
-      else if (allSelected && idx !== -1) newSelection.splice(idx, 1);
+      if (!allSelected && idx === -1) {
+        newSelection.push(w._id);
+      } else if (allSelected && idx !== -1) {
+        newSelection.splice(idx, 1);
+      }
     });
+  
     setSelectedWorkouts(newSelection);
   };
+  
 
   const filteredGrouped = getFilteredGrouped();
   const filteredDates = Object.keys(filteredGrouped).sort((a, b) => new Date(a) - new Date(b));
