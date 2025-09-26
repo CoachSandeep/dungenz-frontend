@@ -24,7 +24,6 @@ const Workouts = () => {
   const [users, setUsers] = useState([]);
   const [dailyMeta, setDailyMeta] = useState({}); // New state
   const [movementVideo, setMovementVideo] = useState(null);
-  const [showCalendar, setShowCalendar] = useState(false);
 
   const today = new Date();
   const todayKey = today.toLocaleDateString('en-CA', { timeZone: 'Asia/Kolkata' });
@@ -295,7 +294,6 @@ const isIndividual = viewingUser?.isIndividualProgram;
         </div>
       )}
 
-
            <div style={{ minHeight: '100%' }}>
             {selectedDate && (
               <>
@@ -305,12 +303,6 @@ const isIndividual = viewingUser?.isIndividualProgram;
                     <h1>Hi {user.name}</h1>
                     </div>
                     <div>
-                    <FiCalendar
-            size={24}
-            style={{ cursor: 'pointer', color: '#ff2c2c', marginRight: '10px' }}
-            title="Open Calendar"
-            onClick={() => setShowCalendar(true)}
-          />
                     <FiRefreshCw
       size={24}
       style={{ cursor: 'pointer', color: '#ff2c2c' }}
