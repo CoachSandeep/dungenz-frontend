@@ -5,6 +5,8 @@ import SandboxedCommentSection from '../components/SandboxedCommentSection';
 import CalorieShadeBar from '../components/CalorieShadeBar';
 import { FiRefreshCw } from 'react-icons/fi';
 import DailyNoteSection from '../components/DailyNoteSection';
+import Calendar from 'react-calendar';
+import 'react-calendar/dist/Calendar.css';
 
 const versionOrder = ["Ultra Train", "Super Train", "Minimal Equipment", "Beginner"];
 
@@ -22,7 +24,7 @@ const Workouts = () => {
   const [isAtTop, setIsAtTop] = useState(true);
   const [selectedUserId, setSelectedUserId] = useState('');
   const [users, setUsers] = useState([]);
-  const [dailyMeta, setDailyMeta] = useState({}); // New state
+  const [dailyMeta, setDailyMeta] = useState({});
   const [movementVideo, setMovementVideo] = useState(null);
 
   const today = new Date();
@@ -31,7 +33,6 @@ const Workouts = () => {
   const tomorrow = new Date();
   tomorrow.setDate(tomorrow.getDate() + 1);
   const tomorrowKey = tomorrow.toLocaleDateString('en-CA', { timeZone: 'Asia/Kolkata' });
-
 
   const fetchMonthWorkouts = async (date) => {
     const token = localStorage.getItem('token');
@@ -59,10 +60,10 @@ const Workouts = () => {
   };
 
   const viewingUser = selectedUserId
-  ? users.find(u => u._id === selectedUserId)
-  : user;
+    ? users.find(u => u._id === selectedUserId)
+    : user;
 
-const isIndividual = viewingUser?.isIndividualProgram;
+  const isIndividual = viewingUser?.isIndividualProgram;
 
   const getDisplayDate = (selectedDate) => {
     const targetDate = new Date(selectedDate);
@@ -207,6 +208,8 @@ const isIndividual = viewingUser?.isIndividualProgram;
     if (groupedWorkouts[dateKey]) {
       setSelectedDate(dateKey);
       scrollToCenter(dateKey);
+    } else {
+      setSelectedDate(dateKey);
     }
   };
 
@@ -235,89 +238,91 @@ const isIndividual = viewingUser?.isIndividualProgram;
     ));
 
   return (
-    <div className="horizontal-container" style={{ flex: 1, height: '100vh', display: 'flex', flexDirection: 'column' }}>
-    <div className="timeline-horizontal" ref={scrollContainerRef}>
-      {dates.map((dateKey) => {
-        if (dateKey === "__load_more__") {
-          return (
-            <div key="__load_more__" className="timeline-date-wrapper">
-              <div className="timeline-date-circle load-more-circle" onClick={handleLoadMore}>
-                <div className="circle-date">⇤</div>
-                <div className="circle-day">More</div>
+    <div style={{ display: 'flex', height: '100vh' }}>
+      {/* Sidebar Calendar */}
+      <div style={{ width: '280px', borderRight: '1px solid #444', background: '#111', padding: '10px', overflowY: 'auto' }}>
+        <Calendar
+          value={selectedDate ? new Date(selectedDate) : new Date()}
+          onChange={(date) => {
+            const key = date.toLocaleDateString('en-CA', { timeZone: 'Asia/Kolkata' });
+            handleDateSelect(key);
+          }}
+          tileClassName={({ date }) => {
+            const key = date.toLocaleDateString('en-CA', { timeZone: 'Asia/Kolkata' });
+            return groupedWorkouts[key] ? 'has-workout' : '';
+          }}
+        />
+      </div>
+
+      {/* Main Section */}
+      <div className="horizontal-container" style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
+        
+        {/* Timeline */}
+        <div className="timeline-horizontal" ref={scrollContainerRef}>
+          {dates.map((dateKey) => {
+            if (dateKey === "__load_more__") {
+              return (
+                <div key="__load_more__" className="timeline-date-wrapper">
+                  <div className="timeline-date-circle load-more-circle" onClick={handleLoadMore}>
+                    <div className="circle-date">⇤</div>
+                    <div className="circle-day">More</div>
+                  </div>
+                </div>
+              );
+            }
+
+            const dateObj = new Date(dateKey);
+            const isActive = selectedDate === dateKey;
+            const isFutureBeyondTomorrow = dateObj > new Date(tomorrowKey);
+
+            return (
+              <div key={dateKey} className="timeline-date-wrapper">
+                <div
+                  className={`timeline-date-circle ${isActive ? 'active' : ''} ${isFutureBeyondTomorrow ? 'disabled' : ''}`}
+                  onClick={() => handleDateSelect(dateKey)}
+                  ref={(el) => (scrollRef.current[dateKey] = el)}
+                >
+                  <div className="circle-date">
+                    {groupedWorkouts[dateKey]?.displayDate?.split('/')[0] || dateKey.split('-')[2]}
+                  </div>
+                  <div className="circle-day">
+                    {groupedWorkouts[dateKey]?.day || dateObj.toLocaleDateString("en-US", { weekday: 'short' })}
+                  </div>
+                </div>
               </div>
-            </div>
-          );
-        }
-
-        const dateObj = new Date(dateKey);
-        const isActive = selectedDate === dateKey;
-        const isFutureBeyondTomorrow = dateObj > new Date(tomorrowKey);
-
-        return (
-          <div key={dateKey} className="timeline-date-wrapper">
-            <div
-              className={`timeline-date-circle ${isActive ? 'active' : ''} ${isFutureBeyondTomorrow ? 'disabled' : ''}`}
-              onClick={() => handleDateSelect(dateKey)}
-              ref={(el) => (scrollRef.current[dateKey] = el)}
-            >
-              <div className="circle-date">
-                {groupedWorkouts[dateKey]?.displayDate?.split('/')[0] || dateKey.split('-')[2]}
-              </div>
-              <div className="circle-day">
-                {groupedWorkouts[dateKey]?.day || dateObj.toLocaleDateString("en-US", { weekday: 'short' })}
-              </div>
-            </div>
-          </div>
-        );
-      })}
-    </div>
-
-      
-   
-       
-
-      <div ref={scrollWrapperRef} style={{ overflowY: 'auto', flex: 1 }}>
-     
-      {user?.role === 'superadmin' && (
-      <div className="section-card-indvidual">
-          <label style={{ fontWeight: 'bold', color: 'white' }}>Target User:</label>
-          <select
-            value={selectedUserId}
-            onChange={(e) => setSelectedUserId(e.target.value)}
-            style={{ padding: '5px 10px', marginTop: '5px' }}
-          >
-            <option value="">All (Daily Programming)</option>
-            {users.map((u) => (
-              <option key={u._id} value={u._id}>{u.name}</option>
-            ))}
-          </select>
+            );
+          })}
         </div>
-      )}
 
-           <div style={{ minHeight: '100%' }}>
+        {/* Workouts List */}
+        <div ref={scrollWrapperRef} style={{ overflowY: 'auto', flex: 1 }}>
+          <div style={{ minHeight: '100%' }}>
             {selectedDate && (
               <>
                 <div className="section-card-indvidual">
                   <div className="section-header-row">
                     <div>
-                    <h1>Hi {user.name}</h1>
+                      <h1>Hi {user.name}</h1>
                     </div>
                     <div>
-                    <FiRefreshCw
-      size={24}
-      style={{ cursor: 'pointer', color: '#ff2c2c' }}
-      title="Reload Workouts"
-      onClick={handleRefresh}
-    />
-    </div> <div>
-                    <button className="back-to-today-btns" onClick={() => handleDateSelect(todayKey)}>Back to Today</button>
+                      <FiRefreshCw
+                        size={24}
+                        style={{ cursor: 'pointer', color: '#ff2c2c' }}
+                        title="Reload Workouts"
+                        onClick={handleRefresh}
+                      />
+                    </div>
+                    <div>
+                      <button className="back-to-today-btns" onClick={() => handleDateSelect(todayKey)}>Back to Today</button>
                     </div>
                   </div>
                   <h3 style={{ color: "#ff2c2c", marginBottom: '10px' }}>Workout for {getDisplayDate(selectedDate)}</h3>
                 </div>
+
                 {dailyMeta[selectedDate] && (
-                <CalorieShadeBar calorie={dailyMeta[selectedDate]} />
-              )}
+                  <CalorieShadeBar calorie={dailyMeta[selectedDate]} />
+                )}
+
                 {isRestDay ? (
                   <div className="section-card-indvidual">
                     <div style={{ textAlign: 'center', fontStyle: 'italic', padding: '10px', color: '#ff2c2c' }}>
@@ -331,13 +336,13 @@ const isIndividual = viewingUser?.isIndividualProgram;
                     <div className="section-card-indvidual">
                       {isIndividual ? (
                         <DailyNoteSection
-                        date={selectedDate}
-                        selectedUserId={viewingUser._id}
-                        selectedUser={viewingUser}
-                      />
-) : (
-  <SandboxedCommentSection date={selectedDate} user={viewingUser} />
-)}
+                          date={selectedDate}
+                          selectedUserId={viewingUser._id}
+                          selectedUser={viewingUser}
+                        />
+                      ) : (
+                        <SandboxedCommentSection date={selectedDate} user={viewingUser} />
+                      )}
                     </div>
 
                     {versionOrder.map((version) =>
@@ -369,21 +374,18 @@ const isIndividual = viewingUser?.isIndividualProgram;
                                     {expandedVersions[version] && (
                                       <div className="inline-details">
                                         <div dangerouslySetInnerHTML={{ __html: w.description.replace(/\n/g, '<br/>') }} />
-                                      
-   
-{w.capTime && ( <div className="wod-instructions">
-    TIME CAP:
-    <div>{w.capTime}</div>
-  </div>)}
-
-  {w.instructions && (
-
-<div className="wod-instructions">
-    INSTRUCTIONS:
-    <div dangerouslySetInnerHTML={{ __html: w.instructions.replace(/\n/g, '<br/>') }} />
-  </div>
-  )}
-    
+                                        {w.capTime && (
+                                          <div className="wod-instructions">
+                                            TIME CAP:
+                                            <div>{w.capTime}</div>
+                                          </div>
+                                        )}
+                                        {w.instructions && (
+                                          <div className="wod-instructions">
+                                            INSTRUCTIONS:
+                                            <div dangerouslySetInnerHTML={{ __html: w.instructions.replace(/\n/g, '<br/>') }} />
+                                          </div>
+                                        )}
                                       </div>
                                     )}
                                   </div>
@@ -401,100 +403,76 @@ const isIndividual = viewingUser?.isIndividualProgram;
               </>
             )}
           </div>
-       
+        </div>
       </div>
 
+      {/* Modals */}
       {modalWorkout && (
         <div className="modal-overlay" onClick={() => setModalWorkout(null)}>
           <div className="modal-box" onClick={(e) => e.stopPropagation()}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-    <div>
-      <h2 style={{ marginBottom: 0 }}>{modalWorkout.customName || modalWorkout.title}</h2>
-      {modalWorkout.customName && <h3 style={{ marginTop: 4, fontWeight: 'normal' }}>{modalWorkout.title}</h3>}
-    </div>
-
-    <div style={{ textAlign: 'right' }}>
-      {modalWorkout.version && (
-        <span
-          className={`badge badge-${modalWorkout.version.replace(/\s+/g, '').toLowerCase()}`}
-          style={{ fontSize: '0.75rem', padding: '3px 8px', borderRadius: '8px', marginBottom: '4px', display: 'inline-block' }}
-        >
-          {modalWorkout.version}
-        </span>
-      )}
-      {modalWorkout.date && (
-        <div style={{ fontSize: '0.75rem', color: '#aaa' }}>
-          {new Date(modalWorkout.date).toLocaleDateString('en-GB')}
-        </div>
-      )}
-    </div>
-    </div>
-            <div className="modal-inside-content">
-              <div className="wod-desp" dangerouslySetInnerHTML={{ __html: modalWorkout.description.replace(/\n/g, '<br/>') }} />
-              {modalWorkout.instructions && (
-  <div className="wod-instructions">
-    INSTRUCTIONS:
-    <div dangerouslySetInnerHTML={{ __html: modalWorkout.instructions.replace(/\n/g, '<br/>') }} />
-  </div>
-)}
-
-{modalWorkout.capTime && (
-  <div className="wod-instructions">
-    TIME CAP:
-    <div>{modalWorkout.capTime}</div>
-  </div>
-)}
-{modalWorkout.movements?.length > 0 && (
-  <div className="movement-demo-section">
-    <h4>📽 Movement Demos</h4>
-    <ul style={{ listStyle: 'none', paddingLeft: 0 }}>
-      {modalWorkout.movements.map((m, idx) => (
-        <li key={idx} style={{ marginBottom: '8px' }}>
-          {m.name}
-          {m.url && (
-            <span
-              style={{ marginLeft: '10px', cursor: 'pointer' }}
-              onClick={() => setMovementVideo(m)}
-              title="Watch Demo"
-            >
-              🔗
-            </span>
-          )}
-        </li>
-      ))}
-    </ul>
-  </div>
-)}
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+              <div>
+                <h2 style={{ marginBottom: 0 }}>{modalWorkout.customName || modalWorkout.title}</h2>
+                {modalWorkout.customName && <h3 style={{ marginTop: 4, fontWeight: 'normal' }}>{modalWorkout.title}</h3>}
+              </div>
+              <div style={{ textAlign: 'right' }}>
+                {modalWorkout.version && (
+                  <span
+                    className={`badge badge-${modalWorkout.version.replace(/\s+/g, '').toLowerCase()}`}
+                    style={{ fontSize: '0.75rem', padding: '3px 8px', borderRadius: '8px', marginBottom: '4px', display: 'inline-block' }}
+                  >
+                    {modalWorkout.version}
+                  </span>
+                )}
+                {modalWorkout.date && (
+                  <div style={{ fontSize: '0.75rem', color: '#aaa' }}>
+                    {new Date(modalWorkout.date).toLocaleDateString('en-GB')}
+                  </div>
+                )}
+              </div>
             </div>
-            <button onClick={() => setModalWorkout(null)}>Close</button>
+            <div style={{ marginTop: '10px' }} dangerouslySetInnerHTML={{ __html: modalWorkout.description.replace(/\n/g, '<br/>') }} />
+            {modalWorkout.capTime && (
+              <div className="wod-instructions">
+                TIME CAP:
+                <div>{modalWorkout.capTime}</div>
+              </div>
+            )}
+            {modalWorkout.instructions && (
+              <div className="wod-instructions">
+                INSTRUCTIONS:
+                <div dangerouslySetInnerHTML={{ __html: modalWorkout.instructions.replace(/\n/g, '<br/>') }} />
+              </div>
+            )}
+            {modalWorkout.videoUrl && (
+              <div className="video-wrapper">
+                <iframe
+                  width="100%"
+                  height="315"
+                  src={modalWorkout.videoUrl}
+                  title="Workout Video"
+                  frameBorder="0"
+                  allowFullScreen
+                ></iframe>
+              </div>
+            )}
           </div>
         </div>
       )}
 
-{movementVideo && (
-  <div className="modal-overlay" onClick={() => setMovementVideo(null)}>
-    <div className="modal-box" onClick={(e) => e.stopPropagation()}>
-      <h3>{movementVideo.name}</h3>
-      <div className="youtube-embed-container" style={{ marginTop: '10px' }}>
-        <iframe
-          width="100%"
-          height="315"
-          src={movementVideo.url.replace("watch?v=", "embed/")}
-          title={movementVideo.name}
-          frameBorder="0"
-          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-          allowFullScreen
-        ></iframe>
-      </div>
-      <button onClick={() => setMovementVideo(null)} style={{ marginTop: '15px' }}>
-        Close
-      </button>
-    </div>
-  </div>
-)}
-
-      {isLoading && (
-        <div className="loading-overlay">Loading your workouts...</div>
+      {movementVideo && (
+        <div className="modal-overlay" onClick={() => setMovementVideo(null)}>
+          <div className="modal-box" onClick={(e) => e.stopPropagation()}>
+            <iframe
+              width="100%"
+              height="315"
+              src={movementVideo}
+              title="Movement Video"
+              frameBorder="0"
+              allowFullScreen
+            ></iframe>
+          </div>
+        </div>
       )}
     </div>
   );

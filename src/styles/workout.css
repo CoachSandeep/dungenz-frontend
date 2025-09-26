@@ -310,3 +310,9 @@ line-height:18px;
   border-radius: 8px;
   width: 100%;
 }
+
+.has-workout {
+  background: #ff2c2c !important;
+  color: white !important;
+  border-radius: 50%;
+}
